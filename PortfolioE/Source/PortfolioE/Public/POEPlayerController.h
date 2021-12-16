@@ -20,9 +20,14 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
-	void GoToDestination();
+	//virtual void PlayerTick(float DeltaTime) override;
+
+	void DetectNPCOnCursor();
 
 // ��� ����
 private:
+	UPROPERTY()
+	TWeakObjectPtr<class UPrimitiveComponent> currentTarget;
 
+	FTimerHandle detectTimer;
 };

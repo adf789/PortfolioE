@@ -84,7 +84,6 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		});
 	PlayerInputComponent->AddActionBinding(Pressed);
 	PlayerInputComponent->AddActionBinding(Released);
-	//PlayerInputComponent->BindAction(TEXT("SetDestination"), EInputEvent::IE_Repeat, this, [this]() {CheckMouseDrag = true; });
 }
 
 void APOECharacter::PossessedBy(AController * NewController)
