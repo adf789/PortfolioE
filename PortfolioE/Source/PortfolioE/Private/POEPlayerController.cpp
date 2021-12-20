@@ -26,8 +26,11 @@ void APOEPlayerController::DetectNPCOnCursor()
 	FHitResult hitResult;
 	bool bResult = GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, hitResult);
 	if (bResult) {
-		if (currentTarget != hitResult.Component) {
-			if (currentTarget != nullptr) currentTarget->SetRenderCustomDepth(false);
+		if (currentTarget == hitResult.Component) {
+			return;
+		}
+		else{
+			if(currentTarget != nullptr) currentTarget->SetRenderCustomDepth(false);
 		}
 
 		AActor* actor = hitResult.GetActor();
