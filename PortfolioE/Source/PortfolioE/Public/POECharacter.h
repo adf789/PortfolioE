@@ -37,6 +37,7 @@ public:
 
 private:
 	void SetDestination();
+	void ClickTarget();
 
 
 public:
@@ -52,4 +53,5 @@ private:
 	class APOEPlayerController* poePlayerController;
 
 	bool CheckMouseDrag;
+	bool CheckNPC;
 };

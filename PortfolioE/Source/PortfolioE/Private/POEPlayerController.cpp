@@ -2,6 +2,7 @@
 
 #include "POEPlayerController.h"
 #include "POECharacter.h"
+#include "POENpcCharacter.h"
 
 void APOEPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
@@ -26,22 +27,33 @@ void APOEPlayerController::DetectNPCOnCursor()
 	FHitResult hitResult;
 	bool bResult = GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, hitResult);
 	if (bResult) {
-		if (currentTarget == hitResult.Component) {
+		AActor* actor = hitResult.GetActor();
+		if (actor == nullptr || !actor->Tags.Contains(TEXT("NPC"))) {
+			if (outlineTarget != nullptr) {
+				outlineTarget->SetRenderCustomDepth(false);
+				outlineTarget = nullptr;
+			}
 			return;
 		}
-		else{
-			if(currentTarget != nullptr) currentTarget->SetRenderCustomDepth(false);
-		}
 
-		AActor* actor = hitResult.GetActor();
-		if (actor != nullptr) {
-			if (actor->Tags.Contains(TEXT("NPC"))) {
-				currentTarget = hitResult.Component;
-				hitResult.Component->SetRenderCustomDepth(true);
+		ACharacter* character = Cast<ACharacter>(actor);
+		if (outlineTarget != nullptr) {
+			if (outlineTarget != character->GetMesh()) {
+				outlineTarget->SetRenderCustomDepth(false);
 			}
 		}
+		outlineTarget = character->GetMesh();
+		outlineTarget->SetRenderCustomDepth(true);
 	}
 	else {
-		if (currentTarget != nullptr) currentTarget->SetRenderCustomDepth(false);
+		if (outlineTarget != nullptr) {
+			outlineTarget->SetRenderCustomDepth(false);
+			outlineTarget = nullptr;
+		}
 	}
+}
+
+bool APOEPlayerController::IsDetectedNPC()
+{
+	return outlineTarget != nullptr;
 }

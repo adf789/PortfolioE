@@ -20,6 +20,13 @@ APOENpcCharacter::APOENpcCharacter()
 	MenuBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	MenuBarWidget->SetupAttachment(GetMesh());
 
+	static ConstructorHelpers::FClassFinder<UUserWidget>
+		MENUBAR_WC(TEXT("/Game/POE/UIWidget/MenuWidget.MenuWidget_c"));
+	if (MENUBAR_WC.Succeeded()) {
+		MenuBarWidget->SetWidgetClass(MENUBAR_WC.Class);
+		MenuBarWidget->SetDrawSize(FVector2D(100.0f, 150.0f));
+	}
+
 	OnShowMenuBar(false);
 
 	MenuWidgetPath = FSoftObjectPath(TEXT("/Game/POE/UIWidget/MenuWidget.MenuWidget_C"));
@@ -30,25 +37,19 @@ void APOENpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	auto POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
+	/*auto POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
 	CHECKRETURN(POEGameInstance == nullptr);
-	AssetStreamingHandles = POEGameInstance->StreamableManager.RequestAsyncLoad(MenuWidgetPath, FStreamableDelegate::CreateUObject(this, &APOENpcCharacter::OnLoadAssetComplete));
+	AssetStreamingHandles = POEGameInstance->StreamableManager.RequestAsyncLoad(MenuWidgetPath, FStreamableDelegate::CreateUObject(this, &APOENpcCharacter::OnLoadAssetComplete));*/
 }
 
 void APOENpcCharacter::OnLoadAssetComplete()
 {
 	UUserWidget* widgetLoaded = Cast<UUserWidget>(AssetStreamingHandles->GetLoadedAsset());
-	AssetStreamingHandles->Reset();
+	AssetStreamingHandles.Reset();
 	CHECKRETURN(widgetLoaded == nullptr);
 
 	MenuBarWidget->SetWidget(widgetLoaded);
 	MenuBarWidget->SetDrawSize(FVector2D(100.0f, 150.0f));
-	/*static ConstructorHelpers::FClassFinder<UUserWidget>
-		MENUBAR_WC(TEXT("/Game/POE/UIWidget/MenuWidget.MenuWidget_c"));
-	if (MENUBAR_WC.Succeeded()) {
-		MenuBarWidget->SetWidgetClass(MENUBAR_WC.Class);
-		MenuBarWidget->SetDrawSize(FVector2D(100.0f, 150.0f));
-	}*/
 }
 
 // Called every frame
@@ -69,18 +70,6 @@ void APOENpcCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	/*MenuBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("MENUBARWIDGET"));
-	MenuBarWidget->SetRelativeLocation(FVector(.0f, .0f, 300.0f));
-	MenuBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	MenuBarWidget->SetupAttachment(GetMesh());
-
-	static ConstructorHelpers::FClassFinder<UUserWidget>
-		MENUBAR_WC(TEXT("/Game/POE/UIWidget/MenuWidget.MenuWidget_c"));
-	if (MENUBAR_WC.Succeeded()) {
-		MenuBarWidget->SetWidgetClass(MENUBAR_WC.Class);
-		MenuBarWidget->SetDrawSize(FVector2D(100.0f, 150.0f));
-	}
-	OnShowMenuBar(false);*/
 }
 
 void APOENpcCharacter::OnShowMenuBar(bool isActive)

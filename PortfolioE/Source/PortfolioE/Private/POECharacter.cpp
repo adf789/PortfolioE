@@ -3,6 +3,7 @@
 #include "POECharacter.h"
 #include "Components/InputComponent.h"
 #include "POEPlayerController.h"
+#include "POENpcCharacter.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -76,11 +77,17 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	FInputActionBinding Pressed(TEXT("SetDestination"), EInputEvent::IE_Pressed);
 	Pressed.ActionDelegate.GetDelegateForManualSet().BindLambda([this]() {
+		if (poePlayerController != nullptr && poePlayerController->IsDetectedNPC()) {
+			CheckNPC = true;
+			return;
+		}
 		CheckMouseDrag = true;
 		});
 	FInputActionBinding Released(TEXT("SetDestination"), EInputEvent::IE_Released);
 	Released.ActionDelegate.GetDelegateForManualSet().BindLambda([this]() {
+		if (CheckNPC) ClickTarget();
 		CheckMouseDrag = false;
+		CheckNPC = false;
 		});
 	PlayerInputComponent->AddActionBinding(Pressed);
 	PlayerInputComponent->AddActionBinding(Released);
@@ -125,6 +132,27 @@ void APOECharacter::SetDestination()
 
 		SetActorRotation(Rot);
 		UNavigationSystem::SimpleMoveToLocation(GetController(), hitResult.Location);
+	}
+
+	if (CheckNPC && !poePlayerController->IsDetectedNPC()) CheckNPC = false;
+}
+
+void APOECharacter::ClickTarget()
+{
+	CHECKRETURN(poePlayerController == nullptr);
+
+	FHitResult hitResult;
+	bool bResult = poePlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, hitResult);
+	if (bResult) {
+		AActor* actor = hitResult.GetActor();
+		if (actor == nullptr || !actor->Tags.Contains(TEXT("NPC"))) {
+			return;
+		}
+
+		APOENpcCharacter* character = Cast<APOENpcCharacter>(actor);
+		if (character != nullptr) {
+			character->OnShowMenuBar(true);
+		}
 	}
 }
 

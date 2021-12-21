@@ -43,6 +43,7 @@ void UPOENpcMenuWidget::OnTalkButtonClick()
 
 void UPOENpcMenuWidget::BeginDestroy()
 {
+	Super::BeginDestroy();
 	OnTalk.Clear();
 	OnTrade.Clear();
 }

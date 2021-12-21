@@ -23,11 +23,12 @@ public:
 	//virtual void PlayerTick(float DeltaTime) override;
 
 	void DetectNPCOnCursor();
+	bool IsDetectedNPC();
 
 // ��� ����
 private:
 	UPROPERTY()
-	TWeakObjectPtr<class UPrimitiveComponent> currentTarget;
+	TWeakObjectPtr<class UPrimitiveComponent> outlineTarget;
 
 	FTimerHandle detectTimer;
 };
