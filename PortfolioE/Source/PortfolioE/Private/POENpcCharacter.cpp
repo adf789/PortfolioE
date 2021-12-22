@@ -15,7 +15,7 @@ APOENpcCharacter::APOENpcCharacter()
 	// Compare NPC
 	Tags.Add(TEXT("NPC"));
 
-	MenuBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("MENUBARWIDGET"));
+	/*MenuBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("MENUBARWIDGET"));
 	MenuBarWidget->SetRelativeLocation(FVector(.0f, .0f, 300.0f));
 	MenuBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	MenuBarWidget->SetupAttachment(GetMesh());
@@ -27,29 +27,13 @@ APOENpcCharacter::APOENpcCharacter()
 		MenuBarWidget->SetDrawSize(FVector2D(100.0f, 150.0f));
 	}
 
-	OnShowMenuBar(false);
-
-	MenuWidgetPath = FSoftObjectPath(TEXT("/Game/POE/UIWidget/MenuWidget.MenuWidget_C"));
+	OnShowMenuBar(false);*/
 }
 
 // Called when the game starts or when spawned
 void APOENpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	/*auto POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
-	CHECKRETURN(POEGameInstance == nullptr);
-	AssetStreamingHandles = POEGameInstance->StreamableManager.RequestAsyncLoad(MenuWidgetPath, FStreamableDelegate::CreateUObject(this, &APOENpcCharacter::OnLoadAssetComplete));*/
-}
-
-void APOENpcCharacter::OnLoadAssetComplete()
-{
-	UUserWidget* widgetLoaded = Cast<UUserWidget>(AssetStreamingHandles->GetLoadedAsset());
-	AssetStreamingHandles.Reset();
-	CHECKRETURN(widgetLoaded == nullptr);
-
-	MenuBarWidget->SetWidget(widgetLoaded);
-	MenuBarWidget->SetDrawSize(FVector2D(100.0f, 150.0f));
 }
 
 // Called every frame
@@ -72,8 +56,11 @@ void APOENpcCharacter::PostInitializeComponents()
 
 }
 
-void APOENpcCharacter::OnShowMenuBar(bool isActive)
+void APOENpcCharacter::OnTalk()
 {
-	MenuBarWidget->SetHiddenInGame(!isActive);
+}
+
+void APOENpcCharacter::OnTrade()
+{
 }
 

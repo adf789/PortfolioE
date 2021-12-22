@@ -2,7 +2,7 @@
 
 #include "POENpcMenuWidget.h"
 #include "Components/Button.h"
-#include "POENpcCharacter.h"
+#include "POEPlayerController.h"
 
 void UPOENpcMenuWidget::NativeConstruct() {
 	Super::NativeConstruct();
@@ -25,10 +25,10 @@ void UPOENpcMenuWidget::NativeConstruct() {
 
 void UPOENpcMenuWidget::OnCancelButtonClick()
 {
-	auto POENpcCharacter = Cast<APOENpcCharacter>(GetOwningPlayerPawn());
-	CHECKRETURN(POENpcCharacter == nullptr);
+	auto POEPlayerController = Cast<APOEPlayerController>(this->GetOwningPlayer());
+	CHECKRETURN(POEPlayerController == nullptr);
 
-	POENpcCharacter->OnShowMenuBar(false);
+	POEPlayerController->HideNpcMenuWidget();
 }
 
 void UPOENpcMenuWidget::OnTradeButtonClick()

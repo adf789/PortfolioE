@@ -3,6 +3,16 @@
 #include "POEPlayerController.h"
 #include "POECharacter.h"
 #include "POENpcCharacter.h"
+#include "POENpcMenuWidget.h"
+
+APOEPlayerController::APOEPlayerController()
+{
+	static ConstructorHelpers::FClassFinder<UPOENpcMenuWidget>
+		UI_MENU_C(TEXT("/Game/POE/UIWidget/UI_MenuWidget.UI_MenuWidget_c"));
+	if (UI_MENU_C.Succeeded()) {
+		MenuWidgetClass = UI_MENU_C.Class;
+	}
+}
 
 void APOEPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
@@ -56,4 +66,35 @@ void APOEPlayerController::DetectNPCOnCursor()
 bool APOEPlayerController::IsDetectedNPC()
 {
 	return outlineTarget != nullptr;
+}
+
+void APOEPlayerController::ShowNpcMenuWidget(APOENpcCharacter * npc)
+{
+	FVector2D screenPos;
+	bool bResult = ProjectWorldLocationToScreen(npc->GetActorLocation(), screenPos);
+	if (bResult) {
+		if (npcMenuWidget == nullptr) {
+			screenPos.Y -= 110.0f;
+
+			npcMenuWidget = CreateWidget<UPOENpcMenuWidget>(this, MenuWidgetClass);
+			npcMenuWidget->AddToViewport(EViewportLevel::MENU);
+			npcMenuWidget->SetPositionInViewport(screenPos);
+
+			BindNpcMenuAction(npc);
+		}
+	}
+}
+
+void APOEPlayerController::HideNpcMenuWidget()
+{
+	if (npcMenuWidget == nullptr) return;
+	npcMenuWidget->RemoveFromParent();
+	npcMenuWidget = nullptr;
+}
+
+void APOEPlayerController::BindNpcMenuAction(APOENpcCharacter * npc)
+{
+	if (npcMenuWidget == nullptr || npc == nullptr) return;
+	npcMenuWidget->OnTalk.AddUObject(npc, &APOENpcCharacter::OnTalk);
+	npcMenuWidget->OnTrade.AddUObject(npc, &APOENpcCharacter::OnTrade);
 }

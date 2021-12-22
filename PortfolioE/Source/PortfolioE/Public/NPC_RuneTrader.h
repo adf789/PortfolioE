@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PortfolioE.h"
 #include "POENpcCharacter.h"
 #include "NPC_RuneTrader.generated.h"
 
@@ -19,10 +19,13 @@ public:
 	
 	virtual void PostInitializeComponents() override;
 
-	UFUNCTION()
-	void OnTalkButtonClicked();
-
-	UFUNCTION()
-	void OnTradeButtonClicked();
+	virtual void OnTalk() override;
+	virtual void OnTrade() override;
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UPOENpcMenuWidget> storeUIClass;
+
+	UPROPERTY()
+	class UPOERuneStoreWidget* runeStoreWidget;
 };

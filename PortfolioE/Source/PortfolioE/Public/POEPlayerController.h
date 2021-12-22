@@ -3,6 +3,7 @@
 #pragma once
 
 #include "PortfolioE.h"
+#include "POENpcCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "POEPlayerController.generated.h"
 
@@ -21,14 +22,35 @@ protected:
 	
 public:
 	//virtual void PlayerTick(float DeltaTime) override;
+	APOEPlayerController();
 
 	void DetectNPCOnCursor();
+
+	UFUNCTION()
 	bool IsDetectedNPC();
 
+	UFUNCTION()
+	void ShowNpcMenuWidget(APOENpcCharacter* npc);
+
+	UFUNCTION()
+	void HideNpcMenuWidget();
+
+	void BindNpcMenuAction(APOENpcCharacter* npc);
+
+	
+
+
 // ��� ����
-private:
+protected:
 	UPROPERTY()
 	TWeakObjectPtr<class UPrimitiveComponent> outlineTarget;
 
+	UPROPERTY()
+	class UPOENpcMenuWidget* npcMenuWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UPOENpcMenuWidget> MenuWidgetClass;
+
+private:
 	FTimerHandle detectTimer;
 };

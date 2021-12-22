@@ -19,8 +19,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void OnLoadAssetComplete();
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -29,19 +27,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
 
-	UFUNCTION()
-	void OnShowMenuBar(bool isActive);
+	virtual void OnTalk();
+	virtual void OnTrade();
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	class UWidgetComponent* MenuBarWidget;
 
 protected:
-	UPROPERTY()
-	FSoftObjectPath MenuWidgetPath;
-
-	UPROPERTY()
-	FSoftObjectPath MeshPath;	
-
-	TSharedPtr<struct FStreamableHandle> AssetStreamingHandles;
 };

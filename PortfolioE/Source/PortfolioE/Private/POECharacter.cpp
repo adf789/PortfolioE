@@ -87,7 +87,6 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Released.ActionDelegate.GetDelegateForManualSet().BindLambda([this]() {
 		if (CheckNPC) ClickTarget();
 		CheckMouseDrag = false;
-		CheckNPC = false;
 		});
 	PlayerInputComponent->AddActionBinding(Pressed);
 	PlayerInputComponent->AddActionBinding(Released);
@@ -134,7 +133,10 @@ void APOECharacter::SetDestination()
 		UNavigationSystem::SimpleMoveToLocation(GetController(), hitResult.Location);
 	}
 
-	if (CheckNPC && !poePlayerController->IsDetectedNPC()) CheckNPC = false;
+	if (CheckNPC && !poePlayerController->IsDetectedNPC()) {
+		poePlayerController->HideNpcMenuWidget();
+		CheckNPC = false;
+	}
 }
 
 void APOECharacter::ClickTarget()
@@ -149,9 +151,10 @@ void APOECharacter::ClickTarget()
 			return;
 		}
 
+		UNavigationSystem::SimpleMoveToLocation(GetController(), GetActorLocation());
 		APOENpcCharacter* character = Cast<APOENpcCharacter>(actor);
 		if (character != nullptr) {
-			character->OnShowMenuBar(true);
+			poePlayerController->ShowNpcMenuWidget(character);
 		}
 	}
 }
