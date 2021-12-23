@@ -74,11 +74,12 @@ void APOEPlayerController::ShowNpcMenuWidget(APOENpcCharacter * npc)
 	bool bResult = ProjectWorldLocationToScreen(npc->GetActorLocation(), screenPos);
 	if (bResult) {
 		if (npcMenuWidget == nullptr) {
-			screenPos.Y -= 110.0f;
+			screenPos.Y -= 140.0f;
 
 			npcMenuWidget = CreateWidget<UPOENpcMenuWidget>(this, MenuWidgetClass);
 			npcMenuWidget->AddToViewport(EViewportLevel::MENU);
 			npcMenuWidget->SetPositionInViewport(screenPos);
+			npcMenuWidget->SetDesiredSizeInViewport(FVector2D(150, 200));
 
 			BindNpcMenuAction(npc);
 		}

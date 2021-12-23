@@ -45,7 +45,7 @@ protected:
 	UPROPERTY()
 	TWeakObjectPtr<class UPrimitiveComponent> outlineTarget;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = UI)
 	class UPOENpcMenuWidget* npcMenuWidget;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)

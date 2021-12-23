@@ -24,7 +24,7 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
-	TSubclassOf<class UPOENpcMenuWidget> storeUIClass;
+	TSubclassOf<class UPOERuneStoreWidget> storeUIClass;
 
 	UPROPERTY()
 	class UPOERuneStoreWidget* runeStoreWidget;
