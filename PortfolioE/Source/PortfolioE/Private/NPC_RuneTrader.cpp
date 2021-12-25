@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NPC_RuneTrader.h"
-#include "POERuneStoreWidget.h"
+#include "POEStageStartWidget.h"
 #include "Components/WidgetComponent.h"
+#include "POEPlayerController.h"
 
 ANPC_RuneTrader::ANPC_RuneTrader() : Super() {
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
@@ -13,9 +14,9 @@ ANPC_RuneTrader::ANPC_RuneTrader() : Super() {
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget>
-		UI_RUNE_STORE_C(TEXT("/Game/POE/UIWidget/UI_RuneStorePanel.UI_RuneStorePanel_c"));
-	if (UI_RUNE_STORE_C.Succeeded()) {
-		this->storeUIClass = UI_RUNE_STORE_C.Class;
+		UI_STAGE_START_C(TEXT("/Game/POE/UIWidget/UI_StageStartPanel.UI_StageStartPanel_c"));
+	if (UI_STAGE_START_C.Succeeded()) {
+		this->stageUIClass = UI_STAGE_START_C.Class;
 	}
 }
 
@@ -27,14 +28,23 @@ void ANPC_RuneTrader::PostInitializeComponents()
 void ANPC_RuneTrader::OnTalk()
 {
 	Super::OnTalk();
-	TEST_LOG("On Talk");
 }
 
-void ANPC_RuneTrader::OnTrade()
+void ANPC_RuneTrader::OnAction()
 {
-	Super::OnTrade();
-	TEST_LOG("On Trade");
+	Super::OnAction();
 
-	runeStoreWidget = CreateWidget<UPOERuneStoreWidget>(GetWorld()->GetFirstPlayerController(), storeUIClass);
-	runeStoreWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
+	stageStartWidget = CreateWidget<UPOEStageStartWidget>(GetWorld()->GetFirstPlayerController(), stageUIClass);
+	stageStartWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
+	GetWorld()->GetFirstPlayerController()->SetPause(true);
+
+	auto POEPlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
+	CHECKRETURN(POEPlayerController == nullptr);
+
+	POEPlayerController->HideNpcMenuWidget();
+}
+
+void ANPC_RuneTrader::OnCancel()
+{
+	Super::OnCancel();
 }

@@ -5,6 +5,7 @@
 #include "Engine/StreamableManager.h"
 #include "Templates/SharedPointer.h"
 #include "POEGameInstance.h"
+#include "POEPlayerController.h"
 
 // Sets default values
 APOENpcCharacter::APOENpcCharacter()
@@ -58,9 +59,21 @@ void APOENpcCharacter::PostInitializeComponents()
 
 void APOENpcCharacter::OnTalk()
 {
+	TEST_LOG("On Talk");
 }
 
-void APOENpcCharacter::OnTrade()
+void APOENpcCharacter::OnAction()
 {
+	TEST_LOG("On Action");
+}
+
+void APOENpcCharacter::OnCancel()
+{
+	TEST_LOG("On Cancel");
+
+	auto POEPlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
+	CHECKRETURN(POEPlayerController == nullptr);
+
+	POEPlayerController->HideNpcMenuWidget();
 }
 

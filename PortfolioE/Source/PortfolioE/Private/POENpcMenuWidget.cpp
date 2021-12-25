@@ -12,9 +12,9 @@ void UPOENpcMenuWidget::NativeConstruct() {
 		TalkButton->OnClicked.AddDynamic(this, &UPOENpcMenuWidget::OnTalkButtonClick);
 	}
 
-	TradeButton = Cast<UButton>(GetWidgetFromName(TEXT("Button_Trade")));
-	if (TradeButton != nullptr) {
-		TradeButton->OnClicked.AddDynamic(this, &UPOENpcMenuWidget::OnTradeButtonClick);
+	ActionButton = Cast<UButton>(GetWidgetFromName(TEXT("Button_Action")));
+	if (ActionButton != nullptr) {
+		ActionButton->OnClicked.AddDynamic(this, &UPOENpcMenuWidget::OnActionButtonClick);
 	}
 
 	CancelButton = Cast<UButton>(GetWidgetFromName(TEXT("Button_Cancel")));
@@ -25,15 +25,16 @@ void UPOENpcMenuWidget::NativeConstruct() {
 
 void UPOENpcMenuWidget::OnCancelButtonClick()
 {
-	auto POEPlayerController = Cast<APOEPlayerController>(this->GetOwningPlayer());
+	/*auto POEPlayerController = Cast<APOEPlayerController>(this->GetOwningPlayer());
 	CHECKRETURN(POEPlayerController == nullptr);
 
-	POEPlayerController->HideNpcMenuWidget();
+	POEPlayerController->HideNpcMenuWidget();*/
+	OnCancel.Broadcast();
 }
 
-void UPOENpcMenuWidget::OnTradeButtonClick()
+void UPOENpcMenuWidget::OnActionButtonClick()
 {
-	OnTrade.Broadcast();
+	OnAction.Broadcast();
 }
 
 void UPOENpcMenuWidget::OnTalkButtonClick()
@@ -45,5 +46,6 @@ void UPOENpcMenuWidget::BeginDestroy()
 {
 	Super::BeginDestroy();
 	OnTalk.Clear();
-	OnTrade.Clear();
+	OnAction.Clear();
+	OnCancel.Clear();
 }

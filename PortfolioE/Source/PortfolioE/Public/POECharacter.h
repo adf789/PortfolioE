@@ -26,6 +26,7 @@ protected:
 	};
 
 	void SetControlMode(EControlType ControlType);
+	void ActiveSkill();
 
 public:	
 	// Called every frame

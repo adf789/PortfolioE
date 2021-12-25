@@ -20,12 +20,13 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	virtual void OnTalk() override;
-	virtual void OnTrade() override;
+	virtual void OnAction() override;
+	virtual void OnCancel() override;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
-	TSubclassOf<class UPOERuneStoreWidget> storeUIClass;
+	TSubclassOf<class UPOEStageStartWidget> stageUIClass;
 
 	UPROPERTY()
-	class UPOERuneStoreWidget* runeStoreWidget;
+	class UPOEStageStartWidget* stageStartWidget;
 };

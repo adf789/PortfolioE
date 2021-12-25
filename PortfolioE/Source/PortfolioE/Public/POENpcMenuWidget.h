@@ -23,14 +23,15 @@ protected:
 	void OnCancelButtonClick();
 
 	UFUNCTION()
-	void OnTradeButtonClick();
+	void OnActionButtonClick();
 
 	UFUNCTION()
 	void OnTalkButtonClick();
 
 public:
 	FOnButtonClicked OnTalk;
-	FOnButtonClicked OnTrade;
+	FOnButtonClicked OnAction;
+	FOnButtonClicked OnCancel;
 
 	virtual void BeginDestroy() override;
 	
@@ -39,7 +40,7 @@ protected:
 	class UButton* TalkButton;
 
 	UPROPERTY()
-	class UButton* TradeButton;
+	class UButton* ActionButton;
 
 	UPROPERTY()
 	class UButton* CancelButton;

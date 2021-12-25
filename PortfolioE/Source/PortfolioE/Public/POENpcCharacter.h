@@ -28,7 +28,8 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	virtual void OnTalk();
-	virtual void OnTrade();
+	virtual void OnAction();
+	virtual void OnCancel();
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = UI)

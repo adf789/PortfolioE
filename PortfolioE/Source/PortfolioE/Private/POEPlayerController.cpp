@@ -10,7 +10,7 @@ APOEPlayerController::APOEPlayerController()
 	static ConstructorHelpers::FClassFinder<UPOENpcMenuWidget>
 		UI_MENU_C(TEXT("/Game/POE/UIWidget/UI_MenuWidget.UI_MenuWidget_c"));
 	if (UI_MENU_C.Succeeded()) {
-		MenuWidgetClass = UI_MENU_C.Class;
+		menuWidgetClass = UI_MENU_C.Class;
 	}
 }
 
@@ -76,7 +76,7 @@ void APOEPlayerController::ShowNpcMenuWidget(APOENpcCharacter * npc)
 		if (npcMenuWidget == nullptr) {
 			screenPos.Y -= 140.0f;
 
-			npcMenuWidget = CreateWidget<UPOENpcMenuWidget>(this, MenuWidgetClass);
+			npcMenuWidget = CreateWidget<UPOENpcMenuWidget>(this, menuWidgetClass);
 			npcMenuWidget->AddToViewport(EViewportLevel::MENU);
 			npcMenuWidget->SetPositionInViewport(screenPos);
 			npcMenuWidget->SetDesiredSizeInViewport(FVector2D(150, 200));
@@ -97,5 +97,6 @@ void APOEPlayerController::BindNpcMenuAction(APOENpcCharacter * npc)
 {
 	if (npcMenuWidget == nullptr || npc == nullptr) return;
 	npcMenuWidget->OnTalk.AddUObject(npc, &APOENpcCharacter::OnTalk);
-	npcMenuWidget->OnTrade.AddUObject(npc, &APOENpcCharacter::OnTrade);
+	npcMenuWidget->OnAction.AddUObject(npc, &APOENpcCharacter::OnAction);
+	npcMenuWidget->OnCancel.AddUObject(npc, &APOENpcCharacter::OnCancel);
 }

@@ -20,10 +20,16 @@ APOECharacter::APOECharacter()
 	Camera->SetupAttachment(SpringArm);
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
-		SK_SEVALOG(TEXT("/Game/ParagonSevarog/Characters/Heroes/Sevarog/Meshes/Sevarog.Sevarog"));
-	if (SK_SEVALOG.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_SEVALOG.Object);
+		SK_SEVAROG(TEXT("/Game/ParagonSevarog/Characters/Heroes/Sevarog/Meshes/Sevarog.Sevarog"));
+	if (SK_SEVAROG.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_SEVAROG.Object);
 		GetMesh()->SetWorldRotation(FRotationMatrix::MakeFromZ(GetActorUpVector()).Rotator());
+	}
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance>
+		SAVAROG_ANIM(TEXT("/Game/POE/Animations/SevarogAnim.SevarogAnim_C"));
+	if (SAVAROG_ANIM.Succeeded()) {
+		GetMesh()->SetAnimInstanceClass(SAVAROG_ANIM.Class);
 	}
 }
 
@@ -62,6 +68,25 @@ void APOECharacter::SetControlMode(EControlType ControlType)
 	}
 }
 
+void APOECharacter::ActiveSkill()
+{
+	CHECKRETURN(poePlayerController == nullptr);
+
+	FHitResult hitResult;
+	bool bResult = poePlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
+
+	if (!bResult) return;
+
+	FVector Direction = hitResult.Location - GetActorLocation();
+	Direction.Z = .0f;
+	FRotator Rot = FRotationMatrix::MakeFromX(Direction).Rotator();
+
+	SetActorRotation(Rot);
+	UNavigationSystem::SimpleMoveToLocation(GetController(), GetActorLocation());
+
+	TEST_LOG("Do Skill");
+}
+
 // Called every frame
 void APOECharacter::Tick(float DeltaTime)
 {
@@ -88,8 +113,10 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		if (CheckNPC) ClickTarget();
 		CheckMouseDrag = false;
 		});
+
 	PlayerInputComponent->AddActionBinding(Pressed);
 	PlayerInputComponent->AddActionBinding(Released);
+	PlayerInputComponent->BindAction(TEXT("ActiveSkill"), EInputEvent::IE_Pressed, this, &APOECharacter::ActiveSkill);
 }
 
 void APOECharacter::PossessedBy(AController * NewController)

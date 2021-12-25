@@ -37,7 +37,9 @@ public:
 
 	void BindNpcMenuAction(APOENpcCharacter* npc);
 
-	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI)
+	bool isShowWidget;
 
 
 // ��� ����
@@ -49,7 +51,7 @@ protected:
 	class UPOENpcMenuWidget* npcMenuWidget;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
-	TSubclassOf<class UPOENpcMenuWidget> MenuWidgetClass;
+	TSubclassOf<class UPOENpcMenuWidget> menuWidgetClass;
 
 private:
 	FTimerHandle detectTimer;
