@@ -4,6 +4,7 @@
 #include "Components/InputComponent.h"
 #include "POEPlayerController.h"
 #include "POENpcCharacter.h"
+#include "POECharacterAnimInstance.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -23,7 +24,7 @@ APOECharacter::APOECharacter()
 		SK_SEVAROG(TEXT("/Game/ParagonSevarog/Characters/Heroes/Sevarog/Meshes/Sevarog.Sevarog"));
 	if (SK_SEVAROG.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SEVAROG.Object);
-		GetMesh()->SetWorldRotation(FRotationMatrix::MakeFromZ(GetActorUpVector()).Rotator());
+		GetMesh()->SetWorldRotation(FRotator(.0f, -120.0f, .0f));
 	}
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>
@@ -33,16 +34,54 @@ APOECharacter::APOECharacter()
 	}
 }
 
+void APOECharacter::MeleeAttack(FVector Direction)
+{
+	if (!IsAttacking) {
+		IsAttacking = true;
+		CharacterAnim->PlayMeleeAttack();
+		//GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 300.0f * GetMesh()->GetMass(), true);
+	}
+	else if(IsComboInput){
+		IsComboInput = false;
+		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, MaxCombo);
+		CharacterAnim->JumpToAttackMeleeCombo(CurrentCombo);
+		//GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 300.0f);
+	}
+}
+
+void APOECharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
+	IsAttacking = false;
+	IsComboInput = false;
+	CurrentCombo = 1;
+}
+
+void APOECharacter::SetAttackType()
+{
+	MaxCombo = 3;
+	AttackRange = 50.0f;
+	IsRangeAttack = false;
+}
+
+void APOECharacter::CheckAttackRange()
+{
+}
+
+void APOECharacter::CheckAttackCombo()
+{
+	IsComboInput = true;
+}
+
 // Called when the game starts or when spawned
 void APOECharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SetAttackType();
 }
 
-void APOECharacter::SetControlMode(EControlType ControlType)
+void APOECharacter::SetControlMode(EControlType controlType)
 {
-	switch (ControlType) {
+	switch (controlType) {
 	case EControlType::Player: {
 		SpringArm->TargetArmLength = 1500.0f;
 		SpringArm->SetRelativeRotation(FRotator(-45.0f, .0f, .0f));
@@ -54,12 +93,9 @@ void APOECharacter::SetControlMode(EControlType ControlType)
 		bUseControllerRotationYaw = false;
 		bUseControllerRotationPitch = true;
 		bUseControllerRotationRoll = true;
-		GetCharacterMovement()->bOrientRotationToMovement = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 		GetCharacterMovement()->bUseControllerDesiredRotation = false;
 		GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
-		break;
-	}
-	case EControlType::NPC: {
 		break;
 	}
 	case EControlType::Monster: {
@@ -70,10 +106,10 @@ void APOECharacter::SetControlMode(EControlType ControlType)
 
 void APOECharacter::ActiveSkill()
 {
-	CHECKRETURN(poePlayerController == nullptr);
+	CHECKRETURN(POEPlayerController == nullptr);
 
 	FHitResult hitResult;
-	bool bResult = poePlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
+	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
 
 	if (!bResult) return;
 
@@ -81,10 +117,12 @@ void APOECharacter::ActiveSkill()
 	Direction.Z = .0f;
 	FRotator Rot = FRotationMatrix::MakeFromX(Direction).Rotator();
 
-	SetActorRotation(Rot);
-	UNavigationSystem::SimpleMoveToLocation(GetController(), GetActorLocation());
+	if (!IsAttacking) {
+		SetActorRotation(Rot);
+		UNavigationSystem::SimpleMoveToLocation(GetController(), GetActorLocation());
+	}
 
-	TEST_LOG("Do Skill");
+	MeleeAttack(Direction);
 }
 
 // Called every frame
@@ -92,7 +130,7 @@ void APOECharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CheckMouseDrag) SetDestination();
+	if (CheckMouseDrag && !IsAttacking) SetDestination();
 }
 
 // Called to bind functionality to input
@@ -102,7 +140,7 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	FInputActionBinding Pressed(TEXT("SetDestination"), EInputEvent::IE_Pressed);
 	Pressed.ActionDelegate.GetDelegateForManualSet().BindLambda([this]() {
-		if (poePlayerController != nullptr && poePlayerController->IsDetectedNPC()) {
+		if (POEPlayerController != nullptr && POEPlayerController->IsDetectedNPC()) {
 			CheckNPC = true;
 			return;
 		}
@@ -123,8 +161,8 @@ void APOECharacter::PossessedBy(AController * NewController)
 {
 	Super::PossessedBy(NewController);
 
-	poePlayerController = Cast<APOEPlayerController>(NewController);
-	CHECKRETURN(poePlayerController == nullptr);
+	POEPlayerController = Cast<APOEPlayerController>(NewController);
+	CHECKRETURN(POEPlayerController == nullptr);
 	if (IsPlayerControlled()) {
 		SetControlMode(EControlType::Player);
 	}
@@ -133,12 +171,23 @@ void APOECharacter::PossessedBy(AController * NewController)
 	}
 }
 
+void APOECharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	CharacterAnim = Cast<UPOECharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	CHECKRETURN(CharacterAnim == nullptr);
+
+	CharacterAnim->OnMontageEnded.AddDynamic(this, &APOECharacter::OnAttackMontageEnded);
+	CharacterAnim->OnAttackCollision.AddUObject(this, &APOECharacter::CheckAttackRange);
+	CharacterAnim->OnNextComboCheck.AddUObject(this, &APOECharacter::CheckAttackCombo);
+}
+
 void APOECharacter::SetDestination()
 {
-	CHECKRETURN(poePlayerController == nullptr);
+	CHECKRETURN(POEPlayerController == nullptr);
 
 	FHitResult hitResult;
-	bool bResult = poePlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
+	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
 
 #if ENABLE_DRAW_DEBUG
 	DrawDebugSphere(GetWorld(),
@@ -160,18 +209,18 @@ void APOECharacter::SetDestination()
 		UNavigationSystem::SimpleMoveToLocation(GetController(), hitResult.Location);
 	}
 
-	if (CheckNPC && !poePlayerController->IsDetectedNPC()) {
-		poePlayerController->HideNpcMenuWidget();
+	if (CheckNPC && !POEPlayerController->IsDetectedNPC()) {
+		POEPlayerController->HideNpcMenuWidget();
 		CheckNPC = false;
 	}
 }
 
 void APOECharacter::ClickTarget()
 {
-	CHECKRETURN(poePlayerController == nullptr);
+	CHECKRETURN(POEPlayerController == nullptr);
 
 	FHitResult hitResult;
-	bool bResult = poePlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, hitResult);
+	bool bResult = POEPlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, hitResult);
 	if (bResult) {
 		AActor* actor = hitResult.GetActor();
 		if (actor == nullptr || !actor->Tags.Contains(TEXT("NPC"))) {
@@ -181,7 +230,7 @@ void APOECharacter::ClickTarget()
 		UNavigationSystem::SimpleMoveToLocation(GetController(), GetActorLocation());
 		APOENpcCharacter* character = Cast<APOENpcCharacter>(actor);
 		if (character != nullptr) {
-			poePlayerController->ShowNpcMenuWidget(character);
+			POEPlayerController->ShowNpcMenuWidget(character);
 		}
 	}
 }

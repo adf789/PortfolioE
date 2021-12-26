@@ -15,26 +15,35 @@ public:
 	// Sets default values for this character's properties
 	APOECharacter();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	enum class EControlType {
-		Player,
-		NPC,
-		Monster
-	};
-
-	void SetControlMode(EControlType ControlType);
-	void ActiveSkill();
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void PostInitializeComponents() override;
+
+	void MeleeAttack(FVector Direction);
+
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UFUNCTION(BlueprintCallable)
+	void SetAttackType();
+	void CheckAttackRange();
+	void CheckAttackCombo();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	enum class EControlType {
+		Player,
+		Monster
+	};
+
+	void SetControlMode(EControlType ControlType);
+	void ActiveSkill();
 
 private:
 	void SetDestination();
@@ -48,11 +57,32 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
 
-	
+
 private:
 	UPROPERTY()
-	class APOEPlayerController* poePlayerController;
+	class APOEPlayerController* POEPlayerController;
 
 	bool CheckMouseDrag;
 	bool CheckNPC;
+
+	UPROPERTY()
+	class UPOECharacterAnimInstance* CharacterAnim;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	bool IsAttacking;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	bool IsComboInput;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	int32 CurrentCombo;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	int32 MaxCombo;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	float AttackRange;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	bool IsRangeAttack;
 };
