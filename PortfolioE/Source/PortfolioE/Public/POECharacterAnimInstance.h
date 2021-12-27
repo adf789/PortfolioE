@@ -20,10 +20,12 @@ class PORTFOLIOE_API UPOECharacterAnimInstance : public UAnimInstance
 public:
 	UPOECharacterAnimInstance();
 
-	virtual void NativeUpdateAnimation(float deltaSeconds) override;
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayMeleeAttack();
-	void JumpToAttackMeleeCombo(int32 newSection);
+	void JumpToAttackMeleeCombo(int32 NewSection);
+	void PlayDash();
+	void PlayCastMagic();
 
 	FOnAttackCheckDelegate OnNextComboCheck;
 	FOnAttackCheckDelegate OnAttackCollision;
@@ -39,19 +41,25 @@ private:
 	UFUNCTION()
 	void AnimNotify_SwayMeleeAttack();
 
-	FName GetMeleeAttackSectionName(int32 section);
+	FName GetMeleeAttackSectionName(int32 Section);
 #pragma endregion
 
 #pragma region 변수
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
-		float pawnSpeed;
+	float PawnSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
-		bool isDead;
+	bool IsDead;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-		UAnimMontage* meleeAttackMontage;
+	UAnimMontage* MeleeAttackMontage;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	UAnimMontage* DashMontage;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	UAnimMontage* CastMontage;
 #pragma endregion
 
 };

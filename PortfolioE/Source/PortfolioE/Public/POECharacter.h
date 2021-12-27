@@ -11,6 +11,7 @@ class PORTFOLIOE_API APOECharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+#pragma region Function
 public:
 	// Sets default values for this character's properties
 	APOECharacter();
@@ -23,15 +24,16 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void PostInitializeComponents() override;
 
-	void MeleeAttack(FVector Direction);
+	void MeleeAttack();
 
 	UFUNCTION()
-	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+		void OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	UFUNCTION(BlueprintCallable)
-	void SetAttackType();
+		void SetAttackType();
 	void CheckAttackRange();
 	void CheckAttackCombo();
+	bool IsPlayingMontionAnything();
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,46 +45,73 @@ protected:
 	};
 
 	void SetControlMode(EControlType ControlType);
-	void ActiveSkill();
-
-private:
+	void ActiveAction();
+	void Dash();
+	bool GetCurDestination(FHitResult& HitResult);
 	void SetDestination();
 	void ClickTarget();
+	void CastingSpell(FVector Location);
+	void ChangeActive(int index);
 
+private:
+	UFUNCTION()
+	void CalculateCoolTime();
+#pragma endregion
 
+#pragma region Variables
 public:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	USpringArmComponent* SpringArm;
+		USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	UCameraComponent* Camera;
-
+		UCameraComponent* Camera;
 
 private:
 	UPROPERTY()
-	class APOEPlayerController* POEPlayerController;
+		class APOEPlayerController* POEPlayerController;
 
 	bool CheckMouseDrag;
 	bool CheckNPC;
 
 	UPROPERTY()
-	class UPOECharacterAnimInstance* CharacterAnim;
+		class UPOECharacterAnimInstance* CharacterAnim;
+
+	UPROPERTY()
+		class UParticleSystem* LavaEffect;
+
+	UPROPERTY()
+		class UParticleSystem* LightningEffect;
+
+	UPROPERTY()
+		class UParticleSystem* SelectedEffect;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
+		bool IsRangeAttack;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
+		bool IsAttacking;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
+		bool IsSprinting;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
+		bool IsCasting;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-	bool IsAttacking;
+		bool IsComboInput;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-	bool IsComboInput;
+		int32 CurrentCombo;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-	int32 CurrentCombo;
+		int32 MaxCombo;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-	int32 MaxCombo;
+		float AttackRange;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-	float AttackRange;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = CoolTime, Meta = (AllowPrivateAccess = true))
+		float DashCoolTime;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-	bool IsRangeAttack;
+	FTimerHandle CoolTimeHandle;
+#pragma endregion
 };

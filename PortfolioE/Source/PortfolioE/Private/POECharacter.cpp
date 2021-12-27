@@ -6,6 +6,9 @@
 #include "POENpcCharacter.h"
 #include "POECharacterAnimInstance.h"
 #include "DrawDebugHelpers.h"
+#include "EffectDamageActor.h"
+#include "ActorObjectPool.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -32,26 +35,38 @@ APOECharacter::APOECharacter()
 	if (SAVAROG_ANIM.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(SAVAROG_ANIM.Class);
 	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>
+		PS_LAVA(TEXT("/Game/InfinityBladeEffects/Effects/FX_Ambient/Fire/P_Lava_Splashes.P_Lava_Splashes"));
+	if (PS_LAVA.Succeeded()) {
+		LavaEffect = PS_LAVA.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>
+		PS_LIGHTNING(TEXT("/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Genno/P_Genno_Overhead_Imp_01.P_Genno_Overhead_Imp_01"));
+	if (PS_LIGHTNING.Succeeded()) {
+		LightningEffect = PS_LIGHTNING.Object;
+	}
 }
 
-void APOECharacter::MeleeAttack(FVector Direction)
+void APOECharacter::MeleeAttack()
 {
 	if (!IsAttacking) {
 		IsAttacking = true;
 		CharacterAnim->PlayMeleeAttack();
-		//GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 300.0f * GetMesh()->GetMass(), true);
 	}
 	else if(IsComboInput){
 		IsComboInput = false;
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, MaxCombo);
 		CharacterAnim->JumpToAttackMeleeCombo(CurrentCombo);
-		//GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 300.0f);
 	}
 }
 
-void APOECharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
+void APOECharacter::OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
 	IsAttacking = false;
 	IsComboInput = false;
+	IsSprinting = false;
+	IsCasting = false;
 	CurrentCombo = 1;
 }
 
@@ -71,12 +86,19 @@ void APOECharacter::CheckAttackCombo()
 	IsComboInput = true;
 }
 
+bool APOECharacter::IsPlayingMontionAnything()
+{
+	return IsAttacking || IsCasting || IsSprinting;
+}
+
 // Called when the game starts or when spawned
 void APOECharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	SetAttackType();
+
+	GetWorld()->GetTimerManager().SetTimer(CoolTimeHandle, this, &APOECharacter::CalculateCoolTime, 1.0f, true);
 }
 
 void APOECharacter::SetControlMode(EControlType controlType)
@@ -104,9 +126,10 @@ void APOECharacter::SetControlMode(EControlType controlType)
 	}
 }
 
-void APOECharacter::ActiveSkill()
+void APOECharacter::ActiveAction()
 {
-	CHECKRETURN(POEPlayerController == nullptr);
+	if (IsPlayingMontionAnything() && !IsComboInput) return;
+	GetCharacterMovement()->StopActiveMovement();
 
 	FHitResult hitResult;
 	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
@@ -117,12 +140,48 @@ void APOECharacter::ActiveSkill()
 	Direction.Z = .0f;
 	FRotator Rot = FRotationMatrix::MakeFromX(Direction).Rotator();
 
-	if (!IsAttacking) {
+	if (!IsPlayingMontionAnything()) {
 		SetActorRotation(Rot);
-		UNavigationSystem::SimpleMoveToLocation(GetController(), GetActorLocation());
 	}
+	
+	if(!IsRangeAttack) MeleeAttack();
+	else CastingSpell(hitResult.Location);
+}
 
-	MeleeAttack(Direction);
+void APOECharacter::Dash()
+{
+	if (DashCoolTime > .0f) {
+		TEST_LOG("Cooltime now");
+		return;
+	}
+	else if (IsPlayingMontionAnything() && !IsComboInput) return;
+
+	FHitResult hitResult;
+	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
+
+	if (bResult) {
+		DashCoolTime = 5.0f;
+		IsSprinting = true;
+
+		GetCharacterMovement()->StopActiveMovement();
+		FVector Direction = hitResult.Location - GetActorLocation();
+		Direction.Z = .0f;
+		FRotator Rot = FRotationMatrix::MakeFromX(Direction).Rotator();
+
+		SetActorRotation(Rot);
+
+		CharacterAnim->PlayDash();
+		GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 4000.0f * GetMesh()->GetMass(), true);
+	}
+}
+
+bool APOECharacter::GetCurDestination(FHitResult & HitResult)
+{
+	if (IsPlayingMontionAnything() || POEPlayerController == nullptr) return false;
+	
+	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, HitResult);
+
+	return bResult;
 }
 
 // Called every frame
@@ -130,7 +189,7 @@ void APOECharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CheckMouseDrag && !IsAttacking) SetDestination();
+	if (CheckMouseDrag) SetDestination();
 }
 
 // Called to bind functionality to input
@@ -154,7 +213,13 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->AddActionBinding(Pressed);
 	PlayerInputComponent->AddActionBinding(Released);
-	PlayerInputComponent->BindAction(TEXT("ActiveSkill"), EInputEvent::IE_Pressed, this, &APOECharacter::ActiveSkill);
+	PlayerInputComponent->BindAction(TEXT("ActiveAction"), EInputEvent::IE_Pressed, this, &APOECharacter::ActiveAction);
+	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &APOECharacter::Dash);
+	DECLARE_DELEGATE_OneParam(FCustomDelegate, int);
+	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveQ"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 0);
+	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveW"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 1);
+	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveE"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 2);
+	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveR"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 3);
 }
 
 void APOECharacter::PossessedBy(AController * NewController)
@@ -177,17 +242,15 @@ void APOECharacter::PostInitializeComponents()
 	CharacterAnim = Cast<UPOECharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	CHECKRETURN(CharacterAnim == nullptr);
 
-	CharacterAnim->OnMontageEnded.AddDynamic(this, &APOECharacter::OnAttackMontageEnded);
+	CharacterAnim->OnMontageEnded.AddDynamic(this, &APOECharacter::OnAnimMontageEnded);
 	CharacterAnim->OnAttackCollision.AddUObject(this, &APOECharacter::CheckAttackRange);
 	CharacterAnim->OnNextComboCheck.AddUObject(this, &APOECharacter::CheckAttackCombo);
 }
 
 void APOECharacter::SetDestination()
 {
-	CHECKRETURN(POEPlayerController == nullptr);
-
 	FHitResult hitResult;
-	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
+	bool bResult = GetCurDestination(hitResult);
 
 #if ENABLE_DRAW_DEBUG
 	DrawDebugSphere(GetWorld(),
@@ -231,6 +294,65 @@ void APOECharacter::ClickTarget()
 		APOENpcCharacter* character = Cast<APOENpcCharacter>(actor);
 		if (character != nullptr) {
 			POEPlayerController->ShowNpcMenuWidget(character);
+		}
+	}
+}
+
+void APOECharacter::CastingSpell(FVector Location)
+{
+	if (IsCasting) return;
+	IsCasting = true;
+	CharacterAnim->PlayCastMagic();
+
+	AEffectDamageActor* NewEffect = Cast<AEffectDamageActor>(ActorObjectPool::GetInstance().GetUnUseEffect());
+	if(NewEffect == nullptr) NewEffect = GetWorld()->SpawnActor<AEffectDamageActor>(AEffectDamageActor::StaticClass(), Location, FRotator::ZeroRotator);
+	else NewEffect->SetActorLocation(Location);
+
+	NewEffect->SetParticleSystem(SelectedEffect);
+	NewEffect->Active();
+	ActorObjectPool::GetInstance().AddEffect(NewEffect);
+
+	TEST_LOG_WITH_VAR(TEXT("timer: %f, size: %d"), lifeTime, ActorObjectPool::GetInstance().GetEffectCount());
+	FTimerHandle effectSpawnHandle;
+	GetWorld()->GetTimerManager().SetTimer(effectSpawnHandle, [NewEffect]() {
+			if (NewEffect != nullptr && ::IsValid(NewEffect)) {
+				NewEffect->InActive();
+			}
+		}, 3.0f, false);
+}
+
+void APOECharacter::ChangeActive(int index)
+{
+	switch (index)
+	{
+	case 0:
+		TEST_LOG("Change melee!");
+		IsRangeAttack = false;
+		break;
+	case 1:
+		SelectedEffect = LavaEffect;
+		TEST_LOG("Change Fire!");
+		IsRangeAttack = true;
+		break;
+	case 2:
+	case 3:
+		SelectedEffect = LightningEffect;
+		TEST_LOG("Change Lightning!");
+		IsRangeAttack = true;
+		break;
+	default:
+		break;
+	}
+}
+
+void APOECharacter::CalculateCoolTime()
+{
+	if (DashCoolTime > .0f) {
+		DashCoolTime -= 1.0f;
+
+		if (DashCoolTime <= .0f) {
+			TEST_LOG("Can use dash now");
+			DashCoolTime = .0f;
 		}
 	}
 }
