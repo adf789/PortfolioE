@@ -9,6 +9,8 @@
 #include "EffectDamageActor.h"
 #include "ActorObjectPool.h"
 #include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInstanceConstant.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 
 // Sets default values
@@ -28,6 +30,14 @@ APOECharacter::APOECharacter()
 	if (SK_SEVAROG.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SEVAROG.Object);
 		GetMesh()->SetWorldRotation(FRotator(.0f, -120.0f, .0f));
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInstanceConstant>
+		MT_SMEAR(TEXT("/Game/ParagonSevarog/Characters/Heroes/Sevarog/Materials/M_Sevarog_Torso_2_Inst.M_Sevarog_Torso_2_Inst"));
+	if (MT_SMEAR.Succeeded()) {
+		SmearMaterialInstance = GetMesh()->CreateDynamicMaterialInstance(0, MT_SMEAR.Object);
+		
+		//GetMesh()->OverrideMaterials[0].
 	}
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>
@@ -57,7 +67,7 @@ void APOECharacter::MeleeAttack()
 	}
 	else if(IsComboInput){
 		IsComboInput = false;
-		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, MaxCombo);
+		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 2, MaxCombo);
 		CharacterAnim->JumpToAttackMeleeCombo(CurrentCombo);
 	}
 }
@@ -65,6 +75,7 @@ void APOECharacter::MeleeAttack()
 void APOECharacter::OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
 	IsAttacking = false;
 	IsComboInput = false;
+	if(IsSprinting) SmearMaterialInstance->SetScalarParameterValue(TEXT("Amount"), 0);
 	IsSprinting = false;
 	IsCasting = false;
 	CurrentCombo = 1;
@@ -99,31 +110,6 @@ void APOECharacter::BeginPlay()
 	SetAttackType();
 
 	GetWorld()->GetTimerManager().SetTimer(CoolTimeHandle, this, &APOECharacter::CalculateCoolTime, 1.0f, true);
-}
-
-void APOECharacter::SetControlMode(EControlType controlType)
-{
-	switch (controlType) {
-	case EControlType::Player: {
-		SpringArm->TargetArmLength = 1500.0f;
-		SpringArm->SetRelativeRotation(FRotator(-45.0f, .0f, .0f));
-		SpringArm->bUsePawnControlRotation = false;
-		SpringArm->bInheritPitch = false;
-		SpringArm->bInheritRoll = false;
-		SpringArm->bInheritYaw = false;
-		SpringArm->bDoCollisionTest = false; // 카메라가 장애물을 뚫지않게하기위함
-		bUseControllerRotationYaw = false;
-		bUseControllerRotationPitch = true;
-		bUseControllerRotationRoll = true;
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-		GetCharacterMovement()->bUseControllerDesiredRotation = false;
-		GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
-		break;
-	}
-	case EControlType::Monster: {
-		break;
-	}
-	}
 }
 
 void APOECharacter::ActiveAction()
@@ -190,6 +176,12 @@ void APOECharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (CheckMouseDrag) SetDestination();
+
+	if (IsSprinting) {
+		SmearMaterialInstance->SetVectorParameterValue(TEXT("Loc"), GetActorForwardVector() * -1.0f);
+		float CurVelocity = FMath::Clamp(GetVelocity().Size(), 0.0f, 15000.0f);
+		SmearMaterialInstance->SetScalarParameterValue(TEXT("Amount"), CurVelocity * 0.0001f);
+	}
 }
 
 // Called to bind functionality to input
@@ -226,14 +218,24 @@ void APOECharacter::PossessedBy(AController * NewController)
 {
 	Super::PossessedBy(NewController);
 
+	if (IsPlayerControlled()) {
+		SpringArm->TargetArmLength = 1500.0f;
+		SpringArm->SetRelativeRotation(FRotator(-45.0f, .0f, .0f));
+		SpringArm->bUsePawnControlRotation = false;
+		SpringArm->bInheritPitch = false;
+		SpringArm->bInheritRoll = false;
+		SpringArm->bInheritYaw = false;
+		SpringArm->bDoCollisionTest = false;
+		bUseControllerRotationYaw = false;
+		bUseControllerRotationPitch = true;
+		bUseControllerRotationRoll = true;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		GetCharacterMovement()->bUseControllerDesiredRotation = false;
+		GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
+	}
+
 	POEPlayerController = Cast<APOEPlayerController>(NewController);
 	CHECKRETURN(POEPlayerController == nullptr);
-	if (IsPlayerControlled()) {
-		SetControlMode(EControlType::Player);
-	}
-	else {
-
-	}
 }
 
 void APOECharacter::PostInitializeComponents()
@@ -312,7 +314,6 @@ void APOECharacter::CastingSpell(FVector Location)
 	NewEffect->Active();
 	ActorObjectPool::GetInstance().AddEffect(NewEffect);
 
-	TEST_LOG_WITH_VAR(TEXT("timer: %f, size: %d"), lifeTime, ActorObjectPool::GetInstance().GetEffectCount());
 	FTimerHandle effectSpawnHandle;
 	GetWorld()->GetTimerManager().SetTimer(effectSpawnHandle, [NewEffect]() {
 			if (NewEffect != nullptr && ::IsValid(NewEffect)) {

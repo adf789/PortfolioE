@@ -39,12 +39,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	enum class EControlType {
-		Player,
-		Monster
-	};
-
-	void SetControlMode(EControlType ControlType);
 	void ActiveAction();
 	void Dash();
 	bool GetCurDestination(FHitResult& HitResult);
@@ -111,6 +105,9 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = CoolTime, Meta = (AllowPrivateAccess = true))
 		float DashCoolTime;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Material, Meta = (AllowPrivateAccess = true))
+		class UMaterialInstanceDynamic* SmearMaterialInstance;
 
 	FTimerHandle CoolTimeHandle;
 #pragma endregion

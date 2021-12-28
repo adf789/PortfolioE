@@ -9,4 +9,4 @@ DECLARE_LOG_CATEGORY_EXTERN(POE, Log, All);
 
 #define CHECKRETURN(expr, ...) {if(expr) {UE_LOG(POE, Error, TEXT("'"#expr"'")); return __VA_ARGS__;}}
 #define TEST_LOG(expr) UE_LOG(POE, Warning, TEXT(#expr))
-#define TEST_LOG_WITH_VAR(expr, ...) UE_LOG(POE, Warning, TEXT(#expr), #__VA_ARGS__)
+#define TEST_LOG_WITH_VAR(expr, ...) UE_LOG(POE, Warning, TEXT(#expr), ##__VA_ARGS__)
