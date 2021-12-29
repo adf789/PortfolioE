@@ -19,6 +19,9 @@ public:
 	void SetParticleSystem(UParticleSystem* ParticleData);
 	virtual void Active() override;
 	virtual void InActive() override;
+
+protected:
+
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))

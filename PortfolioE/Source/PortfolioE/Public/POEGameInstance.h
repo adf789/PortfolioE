@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PortfolioE.h"
 #include "Engine/GameInstance.h"
 #include "Engine/StreamableManager.h"
 #include "POEGameInstance.generated.h"
@@ -17,6 +17,9 @@ class PORTFOLIOE_API UPOEGameInstance : public UGameInstance
 	
 	
 public:
+	UPOEGameInstance();
+
 	FStreamableManager StreamableManager;
-	
+
+	class ActorObjectPool* EffectPooling;
 };

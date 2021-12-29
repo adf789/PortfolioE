@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "EffectDamageActor.h"
+#include "ActorObjectPool.h"
+#include "POEGameInstance.h"
 
 AEffectDamageActor::AEffectDamageActor() : Super() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -25,4 +27,7 @@ void AEffectDamageActor::Active()
 void AEffectDamageActor::InActive()
 {
 	Super::InActive();
+	UPOEGameInstance* POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
+	CHECKRETURN(POEGameInstance == nullptr);
+	POEGameInstance->EffectPooling->AddObject(this);
 }

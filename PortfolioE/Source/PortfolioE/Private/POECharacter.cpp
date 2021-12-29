@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "POEGameInstance.h"
 
 
 // Sets default values
@@ -57,6 +58,8 @@ APOECharacter::APOECharacter()
 	if (PS_LIGHTNING.Succeeded()) {
 		LightningEffect = PS_LIGHTNING.Object;
 	}
+
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("POECharacter"));
 }
 
 void APOECharacter::MeleeAttack()
@@ -306,13 +309,22 @@ void APOECharacter::CastingSpell(FVector Location)
 	IsCasting = true;
 	CharacterAnim->PlayCastMagic();
 
-	AEffectDamageActor* NewEffect = Cast<AEffectDamageActor>(ActorObjectPool::GetInstance().GetUnUseEffect());
-	if(NewEffect == nullptr) NewEffect = GetWorld()->SpawnActor<AEffectDamageActor>(AEffectDamageActor::StaticClass(), Location, FRotator::ZeroRotator);
+	AEffectDamageActor* NewEffect = nullptr;
+	bool bPooling = true;
+	UPOEGameInstance* PoeInstance = Cast<UPOEGameInstance>(GetGameInstance());
+	if (PoeInstance != nullptr) {
+		NewEffect = Cast<AEffectDamageActor>(PoeInstance->EffectPooling->GetUnUseObject());
+	}
+
+	if (NewEffect == nullptr) {
+		NewEffect = GetWorld()->SpawnActor<AEffectDamageActor>(AEffectDamageActor::StaticClass(), Location, FRotator::ZeroRotator);
+		bPooling = false;
+	}
 	else NewEffect->SetActorLocation(Location);
 
 	NewEffect->SetParticleSystem(SelectedEffect);
 	NewEffect->Active();
-	ActorObjectPool::GetInstance().AddEffect(NewEffect);
+	if(!bPooling && PoeInstance != nullptr) PoeInstance->EffectPooling->AddObject(NewEffect);
 
 	FTimerHandle effectSpawnHandle;
 	GetWorld()->GetTimerManager().SetTimer(effectSpawnHandle, [NewEffect]() {

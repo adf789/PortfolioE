@@ -9,6 +9,11 @@ APOEMonster::APOEMonster()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
+		SM_GRUX(TEXT("/Game/ParagonGrux/Characters/Heroes/Grux/Meshes/Grux.Grux"));
+	if (SM_GRUX.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SM_GRUX.Object);
+	}
 }
 
 // Called when the game starts or when spawned

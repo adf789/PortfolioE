@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PortfolioE.h"
 #include "GameFramework/Character.h"
 #include "POEMonster.generated.h"
 

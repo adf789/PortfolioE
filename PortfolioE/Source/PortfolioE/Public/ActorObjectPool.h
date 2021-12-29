@@ -3,24 +3,20 @@
 #pragma once
 
 #include "PortfolioE.h"
-#include "PoolingActor.h"
 
 /**
  * 
  */
 class PORTFOLIOE_API ActorObjectPool
 {
-private:
+public:
 	ActorObjectPool();
 	~ActorObjectPool();
 
-public:
-	static ActorObjectPool& GetInstance();
-
-	void AddEffect(APoolingActor* poolingObject);
-	APoolingActor* GetUnUseEffect();
-	void ResetAllEffects();
-	int32 GetEffectCount();
+	void AddObject(class APoolingActor* poolingObject);
+	class APoolingActor* GetUnUseObject();
+	void ResetAllObjects();
+	int32 GetObjectCount();
 	   
 protected:
 	TArray<class APoolingActor*> EffectPooling;
