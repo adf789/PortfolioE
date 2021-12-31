@@ -16,6 +16,11 @@ class PORTFOLIOE_API APOEMonsterAIController : public AAIController
 
 public:
 	APOEMonsterAIController();
+
+	virtual void Possess(APawn* InPawn) override;
+
+	void RunAI();
+	void StopAI();
 	
 private:
 	UPROPERTY()
@@ -23,5 +28,8 @@ private:
 
 	UPROPERTY()
 	class UBlackboardData* BBDatas;
+
+public:
+	static const FName BBKEY_Target;
 	
 };

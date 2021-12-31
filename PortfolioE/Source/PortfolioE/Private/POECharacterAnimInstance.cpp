@@ -7,19 +7,19 @@ UPOECharacterAnimInstance::UPOECharacterAnimInstance() {
 	IsDead = false;
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>
-		MELEE_ATTACK_MONTAGE(TEXT("/Game/POE/Animations/SevarogMeleeAttack_Montage.SevarogMeleeAttack_Montage"));
+		MELEE_ATTACK_MONTAGE(TEXT("/Game/POE/Animations/Sevarog/SevarogMeleeAttack_Montage.SevarogMeleeAttack_Montage"));
 	if (MELEE_ATTACK_MONTAGE.Succeeded()) {
 		MeleeAttackMontage = MELEE_ATTACK_MONTAGE.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>
-		DASH_MONTAGE(TEXT("/Game/POE/Animations/SevarogDash_Montage.SevarogDash_Montage"));
+		DASH_MONTAGE(TEXT("/Game/POE/Animations/Sevarog/SevarogDash_Montage.SevarogDash_Montage"));
 	if (DASH_MONTAGE.Succeeded()) {
 		DashMontage = DASH_MONTAGE.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>
-		CAST_MONTAGE(TEXT("/Game/POE/Animations/SevarogMagicAttack_Montage.SevarogMagicAttack_Montage"));
+		CAST_MONTAGE(TEXT("/Game/POE/Animations/Sevarog/SevarogMagicAttack_Montage.SevarogMagicAttack_Montage"));
 	if (CAST_MONTAGE.Succeeded()) {
 		CastMontage = CAST_MONTAGE.Object;
 	}

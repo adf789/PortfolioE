@@ -19,25 +19,16 @@ void ActorObjectPool::AddObject(APoolingActor * poolingObject)
 
 APoolingActor * ActorObjectPool::GetUnUseObject()
 {
-	TEST_LOG_WITH_VAR("ActorObjectPool count : %d", EffectPooling.Num());
-	
 	while (true) {
 		if (EffectPooling.Num() == 0) break;
 
 		APoolingActor* Object = EffectPooling.Pop();
 
-		if (!::IsValid(Object)) {
-			TEST_LOG("This is invalid");
+		if (!::IsValid(Object) || Object == nullptr || Object->IsActive()) {
+			continue;
 		}
 		else if (Object != nullptr && !Object->IsActive()) {
-			UE_LOG(POE, Warning, TEXT("actor : %s"), *Object->GetName());
 			return Object;
-		}
-		else if (Object == nullptr) {
-			UE_LOG(POE, Warning, TEXT("actor is null"), *Object->GetName());
-		}
-		else if (!Object->IsActive()) {
-			UE_LOG(POE, Warning, TEXT("%s is not active"), *Object->GetName());
 		}
 	}
 

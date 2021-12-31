@@ -2,35 +2,39 @@
 
 #pragma once
 
-#include "PortfolioE.h"
-#include "GameFramework/Character.h"
-#include "POEMonster.generated.h"
+#include "CoreMinimal.h"
+#include "POEMonster.h"
+#include "POEGrux_Boss.generated.h"
 
-DECLARE_DELEGATE(FOnAttackEndDelegate);
-
+/**
+ * 
+ */
 UCLASS()
-class PORTFOLIOE_API APOEMonster : public ACharacter
+class PORTFOLIOE_API APOEGrux_Boss : public APOEMonster
 {
 	GENERATED_BODY()
-
+	
 public:
 	// Sets default values for this character's properties
-	APOEMonster();
-
-	FOnAttackEndDelegate OnAttackEndDelegate;
+	APOEGrux_Boss();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual float GetAttackRange();
-	virtual void Attack();
-	virtual void OnMontageEnded();
+	virtual void PostInitializeComponents() override;
+	virtual float GetAttackRange() override;
 
 private:
+	UPROPERTY()
+	class UPOEGruxAnimInstance* GruxAnim;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
-	bool IsAttacking;
+	bool IsSpawned;
+
+	UPROPERTY()
+	class APOEMonsterAIController* AIController;
 };

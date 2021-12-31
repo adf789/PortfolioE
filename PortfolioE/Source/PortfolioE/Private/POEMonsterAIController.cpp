@@ -4,6 +4,8 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 
+const FName APOEMonsterAIController::BBKEY_Target(TEXT("Target"));
+
 APOEMonsterAIController::APOEMonsterAIController() {
 	static ConstructorHelpers::FObjectFinder<UBehaviorTree>
 		BTObject(TEXT("/Game/POE/AI/BT_POEMonster.BT_POEMonster"));
@@ -18,4 +20,24 @@ APOEMonsterAIController::APOEMonsterAIController() {
 	}
 }
 
+void APOEMonsterAIController::Possess(APawn * InPawn)
+{
+	Super::Possess(InPawn);
+}
 
+void APOEMonsterAIController::RunAI()
+{
+	if (UseBlackboard(BBDatas, Blackboard)) {
+		if (!RunBehaviorTree(BTPattern)) {
+			UE_LOG(POE, Error, TEXT("Couldn't run Behavior"));
+		}
+	}
+}
+
+void APOEMonsterAIController::StopAI()
+{
+	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+	if (BehaviorTreeComponent != nullptr) {
+		BehaviorTreeComponent->StopTree(EBTStopMode::Safe);
+	}
+}

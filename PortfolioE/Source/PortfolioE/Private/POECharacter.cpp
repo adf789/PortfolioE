@@ -30,7 +30,7 @@ APOECharacter::APOECharacter()
 		SK_SEVAROG(TEXT("/Game/ParagonSevarog/Characters/Heroes/Sevarog/Meshes/Sevarog.Sevarog"));
 	if (SK_SEVAROG.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SEVAROG.Object);
-		GetMesh()->SetWorldRotation(FRotator(.0f, -120.0f, .0f));
+		GetMesh()->SetWorldLocationAndRotation(FVector(.0f, .0f, -90.0f), FRotator(.0f, -120.0f, .0f));
 	}
 
 	static ConstructorHelpers::FObjectFinder<UMaterialInstanceConstant>
@@ -42,7 +42,7 @@ APOECharacter::APOECharacter()
 	}
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>
-		SAVAROG_ANIM(TEXT("/Game/POE/Animations/SevarogAnim.SevarogAnim_C"));
+		SAVAROG_ANIM(TEXT("/Game/POE/Animations/Sevarog/SevarogAnim.SevarogAnim_c"));
 	if (SAVAROG_ANIM.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(SAVAROG_ANIM.Class);
 	}
@@ -250,6 +250,9 @@ void APOECharacter::PostInitializeComponents()
 	CharacterAnim->OnMontageEnded.AddDynamic(this, &APOECharacter::OnAnimMontageEnded);
 	CharacterAnim->OnAttackCollision.AddUObject(this, &APOECharacter::CheckAttackRange);
 	CharacterAnim->OnNextComboCheck.AddUObject(this, &APOECharacter::CheckAttackCombo);
+
+	GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
+	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }
 
 void APOECharacter::SetDestination()
