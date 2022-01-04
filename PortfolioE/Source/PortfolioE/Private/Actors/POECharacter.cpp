@@ -22,6 +22,7 @@ APOECharacter::APOECharacter()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
+	MeleeCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("MELEECOLLISION"));
 
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
@@ -56,8 +57,6 @@ APOECharacter::APOECharacter()
 	if (PS_LIGHTNING.Succeeded()) {
 		LightningEffect = PS_LIGHTNING.Object;
 	}
-
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("POECharacter"));
 }
 
 void APOECharacter::MeleeAttack()
@@ -87,10 +86,6 @@ void APOECharacter::SetAttackType()
 	MaxCombo = 3;
 	AttackRange = 50.0f;
 	IsRangeAttack = false;
-}
-
-void APOECharacter::CheckAttackRange()
-{
 }
 
 void APOECharacter::CheckAttackCombo()
@@ -245,12 +240,45 @@ void APOECharacter::PostInitializeComponents()
 	CharacterAnim = Cast<UPOECharacterAnimInstance>(AnimInstance);
 	CHECKRETURN(CharacterAnim == nullptr);
 
-	CharacterAnim->OnMontageEnded.AddDynamic(this, &APOECharacter::OnAnimMontageEnded);
-	CharacterAnim->OnAttackCollision.AddUObject(this, &APOECharacter::CheckAttackRange);
 	CharacterAnim->OnNextComboCheck.AddUObject(this, &APOECharacter::CheckAttackCombo);
 
 	GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
 	GetCharacterMovement()->MaxWalkSpeed = 450.0f;
+}
+
+void APOECharacter::CheckMeleeAttackCollision()
+{
+	Super::CheckMeleeAttackCollision();
+	FVector startLocation = GetMesh()->GetSocketLocation(TEXT("Weapon_TriggerStart"));
+	FVector endLocation = GetMesh()->GetSocketLocation(TEXT("Weapon_TriggerEnd"));
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	FCollisionObjectQueryParams Params2(ObjectTypeQuery1);
+	bool bResult = GetWorld()->SweepSingleByObjectType(
+		HitResult,
+		startLocation,
+		endLocation,
+		FQuat::Identity,
+		Params2,
+		FCollisionShape::MakeSphere(30.0f),
+		Params
+		);
+
+#if ENABLE_DRAW_DEBUG
+	DrawDebugCylinder(GetWorld(),
+		startLocation,
+		endLocation,
+		30.0f,
+		10,
+		bResult ? FColor::Green : FColor::Red,
+		false,
+		0.1f);
+#endif
+
+	if (bResult) {
+		TEST_LOG_WITH_VAR("Name : %s", *HitResult.GetActor()->GetName());
+	}
 }
 
 void APOECharacter::SetDestination()

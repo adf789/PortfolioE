@@ -33,6 +33,7 @@ public:
 
 	virtual void Attack();
 	virtual float GetAttackRange();
+	virtual void CheckMeleeAttackCollision();
 
 	UFUNCTION()
 	virtual void OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted);

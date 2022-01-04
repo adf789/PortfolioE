@@ -25,7 +25,6 @@ public:
 	void PlayCastMagic();
 
 	FOnAttackCheckDelegate OnNextComboCheck;
-	FOnAttackCheckDelegate OnAttackCollision;
 	FOnAttackSway OnAttackSway;
 
 protected:
@@ -37,13 +36,13 @@ protected:
 
 private:
 	UFUNCTION()
-	void AnimNotify_AttackHit();
-
-	UFUNCTION()
 	void AnimNotify_ContinueCombo();
 
 	UFUNCTION()
 	void AnimNotify_SwayMeleeAttack();
+
+	UFUNCTION()
+	void AnimNotify_MeleeCollision();
 
 	FName GetMeleeAttackSectionName(int32 Section);
 #pragma endregion

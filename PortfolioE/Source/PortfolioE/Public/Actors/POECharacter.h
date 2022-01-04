@@ -23,6 +23,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void PostInitializeComponents() override;
+	virtual void CheckMeleeAttackCollision() override;
 
 	void MeleeAttack();
 
@@ -31,7 +32,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SetAttackType();
-	void CheckAttackRange();
 	void CheckAttackCombo();
 	bool IsPlayingMontionAnything();
 
@@ -59,6 +59,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 		UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, Category = Collision)
+		UCapsuleComponent* MeleeCollision;
 
 private:
 	UPROPERTY()

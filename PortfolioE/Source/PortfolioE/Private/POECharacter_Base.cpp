@@ -10,6 +10,8 @@ APOECharacter_Base::APOECharacter_Base()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("POECharacter"));
+	GetMesh()->SetCollisionProfileName(TEXT("POECharacter"));
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +52,10 @@ void APOECharacter_Base::Attack()
 float APOECharacter_Base::GetAttackRange()
 {
 	return AttackRange;
+}
+
+void APOECharacter_Base::CheckMeleeAttackCollision()
+{
 }
 
 float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)

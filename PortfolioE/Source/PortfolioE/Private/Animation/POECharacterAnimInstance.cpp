@@ -61,14 +61,9 @@ void UPOECharacterAnimInstance::PlayHitMotion(FVector Direction)
 	Super::PlayHitMotion(Direction);
 }
 
-void UPOECharacterAnimInstance::AnimNotify_AttackHit()
-{
-	OnAttackCollision.Broadcast();
-}
-
 void UPOECharacterAnimInstance::AnimNotify_ContinueCombo()
 {
-	OnNextComboCheck.Broadcast();
+	if(OnNextComboCheck.IsBound()) OnNextComboCheck.Broadcast();
 }
 
 void UPOECharacterAnimInstance::AnimNotify_SwayMeleeAttack()
@@ -79,6 +74,10 @@ void UPOECharacterAnimInstance::AnimNotify_SwayMeleeAttack()
 	if (OwnerCharacter != nullptr) {
 		OwnerCharacter->GetCharacterMovement()->AddImpulse(OwnerCharacter->GetActorForwardVector() * 500.0f * OwnerCharacter->GetMesh()->GetMass(), true);
 	}
+}
+
+void UPOECharacterAnimInstance::AnimNotify_MeleeCollision()
+{
 }
 
 FName UPOECharacterAnimInstance::GetMeleeAttackSectionName(int32 Section)
