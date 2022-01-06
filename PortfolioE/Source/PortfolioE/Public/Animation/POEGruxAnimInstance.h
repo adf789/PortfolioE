@@ -38,8 +38,11 @@ private:
 	void AnimNotify_AttackEnd();
 
 private:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim = Anim, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	class UAnimMontage* GruxMeleeAttackAnim;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
+	class UAnimMontage* GruxHitAnim;
 
 	static const FString MeleeAttackNames[];
 	static const int8 MaxMeleeAttackIndex;

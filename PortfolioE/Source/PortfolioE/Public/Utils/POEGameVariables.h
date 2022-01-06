@@ -15,6 +15,7 @@ class PORTFOLIOE_API POEGameVariables
 
 UENUM()
 enum EViewportLevel { 
-	MENU = 1 UMETA(DisplayName = "ViewportLevel MENU"),
+	DAMAGE_TEXT UMETA(DisplayName = "DAMAGE_TEXT"),
+	MENU UMETA(DisplayName = "ViewportLevel MENU"),
 	NORMAL_PANEL UMETA(DisplayName = "ViewportLevel NORMAL_PANEL"),
 };

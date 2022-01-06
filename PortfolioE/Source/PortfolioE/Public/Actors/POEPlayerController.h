@@ -36,6 +36,7 @@ public:
 	void HideNpcMenuWidget();
 
 	void BindNpcMenuAction(APOENpcCharacter* npc);
+	UUserWidget* ShowWidget(TSubclassOf<UUserWidget> WidgetClass, EViewportLevel Level, FVector Location);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI)

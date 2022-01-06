@@ -2,6 +2,9 @@
 
 #include "POECharacter_Base.h"
 #include "AnimInstance_Base.h"
+#include "POEPlayerController.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/t"
 
 
 // Sets default values
@@ -12,6 +15,12 @@ APOECharacter_Base::APOECharacter_Base()
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("POECharacter"));
 	GetMesh()->SetCollisionProfileName(TEXT("POECharacter"));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget>
+		UI_FLOATING_TEXT(TEXT("/Game/POE/UIWidget/UI_FloatingDamageWidget.UI_FloatingDamageWidget_c"));
+	if (UI_FLOATING_TEXT.Succeeded()) {
+		FloatingDamageClass = UI_FLOATING_TEXT.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -71,7 +80,15 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 
 		if (!ContinousMotion) DontMotion = false;
 	}
+	APOEPlayerController* PlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController != nullptr) {
+		UUserWidget* TempDamageText = PlayerController->ShowWidget(FloatingDamageClass, EViewportLevel::DAMAGE_TEXT, GetActorLocation());
+		if (TempDamageText != nullptr) {
+			UText* TextWidget = Cast<UText>(TempDamageText->GetWidgetFromName(TEXT("DamageText")));
 
+			TempDamageText->PlayAnimation(TempDamageText->GetWidgetFromName(TEXT("DamageText"))
+		}
+	}
 	return totalDamage;
 }
 

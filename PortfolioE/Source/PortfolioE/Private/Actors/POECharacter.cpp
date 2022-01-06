@@ -154,6 +154,7 @@ void APOECharacter::Dash()
 
 		CharacterAnim->PlayDash();
 		GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 4000.0f * GetMesh()->GetMass(), true);
+		LaunchCharacter(GetActorForwardVector() * 10000.0f, false, false);
 	}
 }
 
@@ -254,16 +255,16 @@ void APOECharacter::CheckMeleeAttackCollision()
 
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this);
-	FCollisionObjectQueryParams Params2(ObjectTypeQuery1);
-	bool bResult = GetWorld()->SweepSingleByObjectType(
+	//FCollisionObjectQueryParams Params2(FCollisionObjectQueryParams::);
+	bool bResult = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		startLocation,
 		endLocation,
 		FQuat::Identity,
-		Params2,
+		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(30.0f),
 		Params
-		);
+	);
 
 #if ENABLE_DRAW_DEBUG
 	DrawDebugCylinder(GetWorld(),
@@ -277,7 +278,11 @@ void APOECharacter::CheckMeleeAttackCollision()
 #endif
 
 	if (bResult) {
-		TEST_LOG_WITH_VAR("Name : %s", *HitResult.GetActor()->GetName());
+		APOECharacter_Base* TargetCharacter = Cast<APOECharacter_Base>(HitResult.GetActor());
+		if (TargetCharacter != nullptr) {
+			FDamageEvent DamageEvent;
+			TargetCharacter->TakeDamage(500.0f, DamageEvent, GetController(), this);
+		}
 	}
 }
 

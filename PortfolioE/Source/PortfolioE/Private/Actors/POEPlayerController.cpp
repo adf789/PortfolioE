@@ -100,3 +100,19 @@ void APOEPlayerController::BindNpcMenuAction(APOENpcCharacter * npc)
 	npcMenuWidget->OnAction.AddUObject(npc, &APOENpcCharacter::OnAction);
 	npcMenuWidget->OnCancel.AddUObject(npc, &APOENpcCharacter::OnCancel);
 }
+
+UUserWidget * APOEPlayerController::ShowWidget(TSubclassOf<UUserWidget> WidgetClass, EViewportLevel Level, FVector Location)
+{
+	FVector2D ScreenPos;
+	UUserWidget* TempWidget = CreateWidget<UPOENpcMenuWidget>(this, WidgetClass);
+	bool bResult = ProjectWorldLocationToScreen(Location, ScreenPos);
+	if (bResult) {
+		TempWidget->AddToViewport(EViewportLevel::MENU);
+		TempWidget->SetPositionInViewport(ScreenPos);
+
+		return TempWidget;
+	}
+	else {
+		return nullptr;
+	}
+}

@@ -59,6 +59,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
 	bool DontMotion;
 
+	UPROPERTY(VisibleAnywhere, Category = UI)
+	class TSubclassOf<UUserWidget> FloatingDamageClass;
+
 	bool ContinousMotion;
 	
 };

@@ -72,7 +72,7 @@ void UPOECharacterAnimInstance::AnimNotify_SwayMeleeAttack()
 	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwningActor());
 	CHECKRETURN(!::IsValid(OwnerCharacter));
 	if (OwnerCharacter != nullptr) {
-		OwnerCharacter->GetCharacterMovement()->AddImpulse(OwnerCharacter->GetActorForwardVector() * 500.0f * OwnerCharacter->GetMesh()->GetMass(), true);
+		OwnerCharacter->LaunchCharacter(OwnerCharacter->GetActorForwardVector() * 500.0f, false, false);
 	}
 }
 
