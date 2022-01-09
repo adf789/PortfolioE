@@ -4,7 +4,7 @@
 #include "ActorObjectPool.h"
 #include "POEGameInstance.h"
 
-AEffectDamageActor::AEffectDamageActor() : Super() {
+AEffectDamageActor::AEffectDamageActor() {
 	PrimaryActorTick.bCanEverTick = false;
 	DamageCollision = CreateDefaultSubobject<USphereComponent>(TEXT("DamageArea"));
 	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleEffect"));

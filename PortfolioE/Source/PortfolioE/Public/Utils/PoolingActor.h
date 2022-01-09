@@ -22,8 +22,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void Active();
+
+	UFUNCTION()
 	virtual bool IsActive();
+
+	UFUNCTION()
+	virtual void Active();
+
+	UFUNCTION()
 	virtual void InActive();
 	
 	

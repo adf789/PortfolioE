@@ -4,6 +4,7 @@
 
 #include "PortfolioE.h"
 #include "GameFramework/Character.h"
+#include "POECharacterStat.h"
 #include "POECharacter_Base.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
@@ -40,12 +41,21 @@ public:
 	void DontMotionAtOnce();
 	void SetDontMotion(bool IsDontMontion);
 
+	UFUNCTION(BlueprintCallable)
+	virtual float GetHP();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Attack)
 	float AttackRange;
 
 	UPROPERTY()
 	class UAnimInstance_Base* AnimInstance;
+
+	UPROPERTY()
+	class UWidgetComponent* StatusWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = StatusValue, Meta = (AllowPrivateAccess = true))
+	UPOECharacterStat* CharacterStatus;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
 	bool IsAttacking;
@@ -60,7 +70,7 @@ protected:
 	bool DontMotion;
 
 	UPROPERTY(VisibleAnywhere, Category = UI)
-	class TSubclassOf<UUserWidget> FloatingDamageClass;
+	class TSubclassOf<class AFloatingDamageText> FloatingDamageClass2;
 
 	bool ContinousMotion;
 	

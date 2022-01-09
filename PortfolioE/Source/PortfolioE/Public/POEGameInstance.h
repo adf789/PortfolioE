@@ -22,4 +22,5 @@ public:
 	FStreamableManager StreamableManager;
 
 	class ActorObjectPool* EffectPooling;
+	class ActorObjectPool* DamageTextPooling;
 };

@@ -41,7 +41,7 @@ APOECharacter::APOECharacter()
 	}
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>
-		SAVAROG_ANIM(TEXT("/Game/POE/Animations/Sevarog/SevarogAnim.SevarogAnim_c"));
+		SAVAROG_ANIM(TEXT("/Game/POE/Blueprints/Animations/SevarogAnim.SevarogAnim_c"));
 	if (SAVAROG_ANIM.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(SAVAROG_ANIM.Class);
 	}
@@ -57,16 +57,20 @@ APOECharacter::APOECharacter()
 	if (PS_LIGHTNING.Succeeded()) {
 		LightningEffect = PS_LIGHTNING.Object;
 	}
+
+	CharacterStatus->InitValue(10000.0f, 500.0f, 100.0f);
 }
 
 void APOECharacter::MeleeAttack()
 {
 	if (!IsAttacking) {
 		IsAttacking = true;
+		AlreadyAttackColiision = false;
 		CharacterAnim->PlayAttackCombo(1);
 	}
 	else if(IsComboInput){
 		IsComboInput = false;
+		AlreadyAttackColiision = false;
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 2, MaxCombo);
 		CharacterAnim->PlayAttackCombo(CurrentCombo);
 	}
@@ -125,7 +129,7 @@ void APOECharacter::ActiveAction()
 	if (!IsPlayingMontionAnything()) {
 		SetActorRotation(Rot);
 	}
-	
+
 	if(!IsRangeAttack) MeleeAttack();
 	else CastingSpell(hitResult.Location);
 }
@@ -250,12 +254,14 @@ void APOECharacter::PostInitializeComponents()
 void APOECharacter::CheckMeleeAttackCollision()
 {
 	Super::CheckMeleeAttackCollision();
+
+	if (AlreadyAttackColiision) return;
+
 	FVector startLocation = GetMesh()->GetSocketLocation(TEXT("Weapon_TriggerStart"));
 	FVector endLocation = GetMesh()->GetSocketLocation(TEXT("Weapon_TriggerEnd"));
 
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this);
-	//FCollisionObjectQueryParams Params2(FCollisionObjectQueryParams::);
 	bool bResult = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		startLocation,
@@ -281,7 +287,8 @@ void APOECharacter::CheckMeleeAttackCollision()
 		APOECharacter_Base* TargetCharacter = Cast<APOECharacter_Base>(HitResult.GetActor());
 		if (TargetCharacter != nullptr) {
 			FDamageEvent DamageEvent;
-			TargetCharacter->TakeDamage(500.0f, DamageEvent, GetController(), this);
+			TargetCharacter->TakeDamage(CharacterStatus->AttackValue, DamageEvent, GetController(), this);
+			AlreadyAttackColiision = true;
 		}
 	}
 }

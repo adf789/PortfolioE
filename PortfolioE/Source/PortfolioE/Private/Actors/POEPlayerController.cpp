@@ -104,7 +104,7 @@ void APOEPlayerController::BindNpcMenuAction(APOENpcCharacter * npc)
 UUserWidget * APOEPlayerController::ShowWidget(TSubclassOf<UUserWidget> WidgetClass, EViewportLevel Level, FVector Location)
 {
 	FVector2D ScreenPos;
-	UUserWidget* TempWidget = CreateWidget<UPOENpcMenuWidget>(this, WidgetClass);
+	UUserWidget* TempWidget = CreateWidget<UUserWidget>(this, WidgetClass);
 	bool bResult = ProjectWorldLocationToScreen(Location, ScreenPos);
 	if (bResult) {
 		TempWidget->AddToViewport(EViewportLevel::MENU);

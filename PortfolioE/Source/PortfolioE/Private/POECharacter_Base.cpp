@@ -3,8 +3,13 @@
 #include "POECharacter_Base.h"
 #include "AnimInstance_Base.h"
 #include "POEPlayerController.h"
-#include "Blueprint/UserWidget.h"
-#include "Components/t"
+#include "POEDamageWidget.h"
+#include "Components/TextBlock.h"
+#include "FloatingDamageText.h"
+#include "POEGameInstance.h"
+#include "ActorObjectPool.h"
+#include "POECharacterHPWidget.h"
+#include "Components/WidgetComponent.h"
 
 
 // Sets default values
@@ -13,21 +18,34 @@ APOECharacter_Base::APOECharacter_Base()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	StatusWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("StatusWidget"));
+	CharacterStatus = CreateDefaultSubobject<UPOECharacterStat>(TEXT("CharacterStatus"));
+
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("POECharacter"));
 	GetMesh()->SetCollisionProfileName(TEXT("POECharacter"));
-
-	static ConstructorHelpers::FClassFinder<UUserWidget>
-		UI_FLOATING_TEXT(TEXT("/Game/POE/UIWidget/UI_FloatingDamageWidget.UI_FloatingDamageWidget_c"));
-	if (UI_FLOATING_TEXT.Succeeded()) {
-		FloatingDamageClass = UI_FLOATING_TEXT.Class;
+	StatusWidget->SetupAttachment(GetMesh());
+	
+	static ConstructorHelpers::FClassFinder<AFloatingDamageText>
+		FLOATING_DAMAGE_TEXT_C(TEXT("/Game/POE/Blueprints/UI/BP_FloatingDamageText.BP_FloatingDamageText_c"));
+	if (FLOATING_DAMAGE_TEXT_C.Succeeded()) {
+		FloatingDamageClass2 = FLOATING_DAMAGE_TEXT_C.Class;
 	}
+
+	StatusWidget->SetWorldLocation(FVector(.0f, .0f, 280.0f));
+	StatusWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	static ConstructorHelpers::FClassFinder<UUserWidget>
+		UI_STATUS_VIEW_C(TEXT("/Game/POE/UIWidget/UI_ActorStatusView.UI_ActorStatusView_c"));
+	if (UI_STATUS_VIEW_C.Succeeded()) {
+		StatusWidget->SetWidgetClass(UI_STATUS_VIEW_C.Class);
+		StatusWidget->SetDrawSize(FVector2D(200.0f, 60.0f));
+	}
+	StatusWidget->SetHiddenInGame(true);
 }
 
 // Called when the game starts or when spawned
 void APOECharacter_Base::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -44,6 +62,12 @@ void APOECharacter_Base::PostInitializeComponents()
 	CHECKRETURN(AnimInstance == nullptr);
 
 	AnimInstance->OnMontageEnded.AddDynamic(this, &APOECharacter_Base::OnAnimMontageEnded);
+
+	StatusWidget->InitWidget();
+	UPOECharacterHPWidget* TempWidget = Cast<UPOECharacterHPWidget>(StatusWidget->GetUserWidgetObject());
+	if (TempWidget != nullptr) {
+		TempWidget->BindCharacterStat(CharacterStatus);
+	}
 }
 
 void APOECharacter_Base::Attack()
@@ -81,13 +105,24 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 		if (!ContinousMotion) DontMotion = false;
 	}
 	APOEPlayerController* PlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PlayerController != nullptr) {
-		UUserWidget* TempDamageText = PlayerController->ShowWidget(FloatingDamageClass, EViewportLevel::DAMAGE_TEXT, GetActorLocation());
-		if (TempDamageText != nullptr) {
-			UText* TextWidget = Cast<UText>(TempDamageText->GetWidgetFromName(TEXT("DamageText")));
+	if (FloatingDamageClass2 != nullptr && PlayerController != nullptr) {
+		UPOEGameInstance* POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
 
-			TempDamageText->PlayAnimation(TempDamageText->GetWidgetFromName(TEXT("DamageText"))
+		AFloatingDamageText* TempDamageText = nullptr;
+		if (POEGameInstance != nullptr) {
+			TempDamageText = Cast< AFloatingDamageText>(POEGameInstance->DamageTextPooling->GetUnUseObject());
 		}
+		
+		if (TempDamageText == nullptr) {
+			TempDamageText = GetWorld()->SpawnActor<AFloatingDamageText>(FloatingDamageClass2, GetActorLocation(), FRotator::ZeroRotator);
+		}
+		else {
+			TempDamageText->SetActorLocation(GetActorLocation());
+		}
+
+		TempDamageText->ShowDamage(DamageAmount);
+		CharacterStatus->SetHPValue(CharacterStatus->CurrentHPValue - DamageAmount);
+		StatusWidget->SetHiddenInGame(false);
 	}
 	return totalDamage;
 }
@@ -114,5 +149,10 @@ void APOECharacter_Base::SetDontMotion(bool DontMontion)
 {
 	ContinousMotion = true;
 	this->DontMotion = DontMotion;
+}
+
+float APOECharacter_Base::GetHP()
+{
+	return CharacterStatus->CurrentHPValue;
 }
 

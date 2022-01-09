@@ -13,13 +13,15 @@ APOEGrux_Boss::APOEGrux_Boss() {
 	}
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>
-		ANIM_GRUX_C(TEXT("/Game/POE/Animations/Grux/Grux.Grux_C"));
+		ANIM_GRUX_C(TEXT("/Game/POE/Blueprints/Animations/Grux.Grux_C"));
 	if (ANIM_GRUX_C.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_GRUX_C.Class);
 	}
 
 	AIControllerClass = APOEMonsterAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	CharacterStatus->InitValue(10000.0f, 100.0f, 100.0f);
 
 	IsSpawned = false;
 }
@@ -56,4 +58,13 @@ void APOEGrux_Boss::PostInitializeComponents()
 float APOEGrux_Boss::GetAttackRange()
 {
 	return 230.0f;
+}
+
+float APOEGrux_Boss::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
+{
+	float TempDamage = DamageAmount - CharacterStatus->DefenseValue;
+	if (TempDamage < KINDA_SMALL_NUMBER) TempDamage = .0f;
+
+	Super::TakeDamage(TempDamage, DamageEvent, EventInstigator, DamageCauser);
+	return TempDamage;
 }
