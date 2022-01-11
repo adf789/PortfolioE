@@ -4,6 +4,7 @@
 
 #include "PortfolioE.h"
 #include "BehaviorTree/BTTaskNode.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BTTask_Attack.generated.h"
 
 /**
@@ -21,6 +22,13 @@ public:
 	
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+	void SetAttackState(bool Active);
+
 private:
 	bool IsAttacking;
+	float PassTimer;
+	float BaseTimer;
+
+	UPROPERTY()
+	UBehaviorTreeComponent* BTComponent;
 };

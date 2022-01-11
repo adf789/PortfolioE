@@ -6,6 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 
 const FName APOEMonsterAIController::BBKEY_Target(TEXT("Target"));
+const FName APOEMonsterAIController::BBKEY_IsAttack(TEXT("IsAttack"));
 
 APOEMonsterAIController::APOEMonsterAIController() {
 	static ConstructorHelpers::FObjectFinder<UBehaviorTree>

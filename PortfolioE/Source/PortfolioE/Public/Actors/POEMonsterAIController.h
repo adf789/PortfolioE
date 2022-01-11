@@ -32,5 +32,6 @@ private:
 
 public:
 	static const FName BBKEY_Target;
+	static const FName BBKEY_IsAttack;
 	
 };

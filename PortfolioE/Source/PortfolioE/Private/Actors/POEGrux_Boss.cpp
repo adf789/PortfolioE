@@ -57,7 +57,7 @@ void APOEGrux_Boss::PostInitializeComponents()
 
 float APOEGrux_Boss::GetAttackRange()
 {
-	return 230.0f;
+	return 400.0f;
 }
 
 float APOEGrux_Boss::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
