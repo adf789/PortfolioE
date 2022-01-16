@@ -5,6 +5,16 @@
 UAnimInstance_Base::UAnimInstance_Base() {
 	PawnSpeed = .0f;
 	IsDead = false;
+	BufferedCalculateCount = 0;
+}
+
+void UAnimInstance_Base::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	auto Pawn = TryGetPawnOwner();
+	if (::IsValid(Pawn)) {
+		PrevForwardVector = Pawn->GetActorForwardVector();
+	}
 }
 
 void UAnimInstance_Base::NativeUpdateAnimation(float DeltaSeconds)
@@ -12,8 +22,36 @@ void UAnimInstance_Base::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	auto Pawn = TryGetPawnOwner();
 	if (::IsValid(Pawn)) {
-		if (!IsDead) PawnSpeed = Pawn->GetVelocity().Size();
-		else PawnSpeed = .0f;
+		if (!IsDead) {
+			PawnSpeed = Pawn->GetVelocity().Size();
+
+			FVector DirectVector = Pawn->GetActorForwardVector() - PrevForwardVector;
+			FVector CrossVector = FVector::CrossProduct(Pawn->GetActorForwardVector(), PrevForwardVector);
+
+			// Calculate degree value
+			if (DirectVector.Size() == .0f) {
+				if (BufferedCalculateCount == MaxBufferedCalculateCount) {
+					BufferedCalculateCount = 0;
+
+					if (FMath::Abs(PawnRotateValue) <= 1.0f) PawnRotateValue = .0f;
+					else PawnRotateValue += (PawnRotateValue > .0f ? -1.0f : 1.0f);
+					//PawnRotateValue = TempVector.Size() * 100;
+				}
+				else {
+					BufferedCalculateCount++;
+				}
+			}
+			else {
+				BufferedCalculateCount = 0;
+				PawnRotateValue = DirectVector.Size() * 100 * (CrossVector.Z >= 0 ? -1.0f : 1.0f);
+			}
+			PrevForwardVector = Pawn->GetActorForwardVector();
+
+		}
+		else {
+			PawnSpeed = .0f;
+			PawnRotateValue = .0f;
+		}
 	}
 }
 
@@ -29,10 +67,25 @@ void UAnimInstance_Base::PlayHit(FVector Direction)
 	PlayHitMotion(Direction);
 }
 
+void UAnimInstance_Base::BindCharacter(APOECharacter_Base* Actor)
+{
+	CharacterActor = Actor;
+}
+
 void UAnimInstance_Base::PlayAttackMotion()
 {
 }
 
 void UAnimInstance_Base::PlayHitMotion(FVector Direction)
 {
+}
+
+void UAnimInstance_Base::AnimNotify_SpawnEnd()
+{
+	OnSpawnEnd.Broadcast();
+}
+
+void UAnimInstance_Base::AnimNotify_AttackEnd()
+{
+	OnAttackEnd.Broadcast();
 }

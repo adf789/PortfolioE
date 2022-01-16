@@ -33,8 +33,9 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	virtual void Attack();
-	virtual float GetAttackRange();
+	virtual float GetAttackDistance();
 	virtual void CheckMeleeAttackCollision();
+	virtual float GetAIDetectRange();
 
 	UFUNCTION()
 	virtual void OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -43,6 +44,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual float GetHP();
+
+	virtual ECharacterBehaviorState GetState() const;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Attack)
@@ -71,6 +74,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	class TSubclassOf<class AFloatingDamageText> FloatingDamageClass2;
+
+	ECharacterBehaviorState CharacterState;
 
 	bool ContinousMotion;
 	

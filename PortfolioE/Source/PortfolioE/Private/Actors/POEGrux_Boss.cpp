@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "POEGrux_Boss.h"
-#include "POEMonsterAIController.h"
-#include "POEGruxAnimInstance.h"
 
 APOEGrux_Boss::APOEGrux_Boss() {
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
@@ -10,6 +8,7 @@ APOEGrux_Boss::APOEGrux_Boss() {
 	if (SM_GRUX.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SM_GRUX.Object);
 		GetMesh()->SetWorldLocationAndRotation(FVector(.0f, .0f, -90.0f), FRotator(.0f, -90.0f, .0f));
+		GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 	}
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>
@@ -18,53 +17,10 @@ APOEGrux_Boss::APOEGrux_Boss() {
 		GetMesh()->SetAnimInstanceClass(ANIM_GRUX_C.Class);
 	}
 
-	AIControllerClass = APOEMonsterAIController::StaticClass();
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	GetCapsuleComponent()->SetWorldScale3D(FVector(2.0f, 2.0f, 2.0f));
 
 	CharacterStatus->InitValue(10000.0f, 100.0f, 100.0f);
-
-	IsSpawned = false;
-}
-
-void APOEGrux_Boss::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void APOEGrux_Boss::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-void APOEGrux_Boss::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
-
-	auto GruxAnim = Cast<UPOEGruxAnimInstance>(AnimInstance);
-	CHECKRETURN(GruxAnim == nullptr);
-
-	AIController = Cast<APOEMonsterAIController>(GetController());
-	CHECKRETURN(AIController == nullptr);
-	GruxAnim->OnSpawnEnd.AddUObject(AIController, &APOEMonsterAIController::RunAI);
-
-	bUseControllerRotationYaw = false;
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(.0f, 480.0f, .0f);
-}
-
-float APOEGrux_Boss::GetAttackRange()
-{
-	return 400.0f;
-}
-
-float APOEGrux_Boss::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
-{
-	float TempDamage = DamageAmount - CharacterStatus->DefenseValue;
-	if (TempDamage < KINDA_SMALL_NUMBER) TempDamage = .0f;
-
-	Super::TakeDamage(TempDamage, DamageEvent, EventInstigator, DamageCauser);
-	return TempDamage;
+	MaxSpeed = 400.0f;
+	AttackDistance = 600.0f;
+	AIDetectDistance = 2000.0f;
 }

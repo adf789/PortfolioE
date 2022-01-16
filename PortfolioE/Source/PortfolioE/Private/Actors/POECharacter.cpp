@@ -65,6 +65,7 @@ void APOECharacter::MeleeAttack()
 {
 	if (!IsAttacking) {
 		IsAttacking = true;
+		CharacterState = ECharacterBehaviorState::ATTACKING;
 		AlreadyAttackColiision = false;
 		CharacterAnim->PlayAttackCombo(1);
 	}

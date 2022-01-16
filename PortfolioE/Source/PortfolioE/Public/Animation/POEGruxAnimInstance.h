@@ -6,7 +6,6 @@
 #include "AnimInstance_Base.h"
 #include "POEGruxAnimInstance.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnAnimEvent);
 /**
  * 
  */
@@ -18,11 +17,6 @@ class PORTFOLIOE_API UPOEGruxAnimInstance : public UAnimInstance_Base
 public:
 	UPOEGruxAnimInstance();
 
-	FOnAnimEvent OnSpawnEnd;
-	FOnAnimEvent OnAttackEnd;
-
-	FName GetMeleeAttackName(int8 Section);
-
 protected:
 	/*Define function to attack motion */
 	virtual void PlayAttackMotion() override;
@@ -31,20 +25,14 @@ protected:
 	virtual void PlayHitMotion(FVector Direction) override;
 
 private:
-	UFUNCTION()
-	void AnimNotify_SpawnEnd();
-
-	UFUNCTION()
-	void AnimNotify_AttackEnd();
-
-private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
-	class UAnimMontage* GruxMeleeAttackAnim;
+	class UAnimMontage* GruxMeleeAttack1Anim;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
+	class UAnimMontage* GruxMeleeAttack2Anim;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	class UAnimMontage* GruxHitAnim;
 
-	static const FString MeleeAttackNames[];
 	static const int8 MaxMeleeAttackIndex;
-	int8 CurMeleeAttackIndex;
+	int8 PlayedAttackAnimIndex;
 };

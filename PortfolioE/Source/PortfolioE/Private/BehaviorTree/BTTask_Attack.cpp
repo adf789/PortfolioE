@@ -7,6 +7,8 @@
 
 UBTTask_Attack::UBTTask_Attack() {
 	NodeName = TEXT("Attack");
+	bNotifyTick = true;
+	IsAttacking = false;
 }
 
 EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
@@ -19,28 +21,25 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerCo
 		UE_LOG(POE, Error, TEXT("Attacker is null"));
 		return EBTNodeResult::Failed;
 	}
-	
-	if (!IsAttacking) {
-		BTComponent = &OwnerComp;
-		SetAttackState(true);
+
+	if (Attacker->GetState() == ECharacterBehaviorState::IDLE) {
+		IsAttacking = true;
 		Attacker->Attack();
-		Attacker->OnAttackEndDelegate.AddLambda([this]() -> void {
-			SetAttackState(false);
-			});
+		if (!IsAddFunction) {
+			IsAddFunction = true;
+			Attacker->OnAttackEndDelegate.AddLambda([this]() -> void {
+				IsAttacking = false;
+				});
+		}
+		return EBTNodeResult::InProgress;
 	}
-	return EBTNodeResult::Succeeded;
+	return Result;
 }
 
 void UBTTask_Attack::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	/*if (!IsAttacking) {
+	if (!IsAttacking) {
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}*/
-}
-
-void UBTTask_Attack::SetAttackState(bool Active)
-{
-	if(BTComponent != nullptr) BTComponent->GetBlackboardComponent()->SetValueAsFloat(APOEMonsterAIController::BBKEY_IsAttack, Active);
-	IsAttacking = Active;
+	}
 }

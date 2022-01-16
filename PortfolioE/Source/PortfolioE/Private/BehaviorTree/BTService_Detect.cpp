@@ -14,12 +14,12 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8 * Node
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	APawn* ControlPawn = OwnerComp.GetAIOwner()->GetPawn();
+	APOECharacter_Base* ControlPawn = Cast<APOECharacter_Base>(OwnerComp.GetAIOwner()->GetPawn());
 	CHECKRETURN(ControlPawn == nullptr);
 
 	UWorld* World = GetWorld();
 	FVector Center = ControlPawn->GetActorLocation();
-	float DetectedRange = 1000.0f;
+	float DetectedRange = ControlPawn->GetAIDetectRange();
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams ConllisionQueryParams(NAME_None, false, ControlPawn);

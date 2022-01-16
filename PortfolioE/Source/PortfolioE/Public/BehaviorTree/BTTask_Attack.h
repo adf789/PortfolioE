@@ -22,13 +22,10 @@ public:
 	
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
-	void SetAttackState(bool Active);
-
 private:
+
 	bool IsAttacking;
+	bool IsAddFunction;
 	float PassTimer;
 	float BaseTimer;
-
-	UPROPERTY()
-	UBehaviorTreeComponent* BTComponent;
 };

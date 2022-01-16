@@ -33,16 +33,16 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Status, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float CurrentHPValue;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Status, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float MaxHPValue;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Status, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float AttackValue;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Status, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float DefenseValue;
 	
 };

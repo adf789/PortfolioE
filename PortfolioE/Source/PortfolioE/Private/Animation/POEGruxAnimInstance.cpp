@@ -1,19 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "POEGruxAnimInstance.h"
+#include "POEGrux_Boss.h"
 #include <cstdlib>
 
-const FString UPOEGruxAnimInstance::MeleeAttackNames[] = {TEXT("Default"), TEXT("Attack_Right"), TEXT("Attack_Double")};
 const int8 UPOEGruxAnimInstance::MaxMeleeAttackIndex = 2;
 
 UPOEGruxAnimInstance::UPOEGruxAnimInstance() {
-	IsDead = false;
-	CurMeleeAttackIndex = 1;
-
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>
 		GRUX_ATTACK1_MONTAGE(TEXT("/Game/POE/Animations/Grux/GruxAttack_Montage.GruxAttack_Montage"));
 	if (GRUX_ATTACK1_MONTAGE.Succeeded()) {
-		GruxMeleeAttackAnim = GRUX_ATTACK1_MONTAGE.Object;
+		GruxMeleeAttack1Anim = GRUX_ATTACK1_MONTAGE.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
+		GRUX_ATTACK2_MONTAGE(TEXT("/Game/POE/Animations/Grux/GruxDoubleAttack_Montage.GruxDoubleAttack_Montage"));
+	if (GRUX_ATTACK2_MONTAGE.Succeeded()) {
+		GruxMeleeAttack2Anim = GRUX_ATTACK2_MONTAGE.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>
@@ -23,21 +26,22 @@ UPOEGruxAnimInstance::UPOEGruxAnimInstance() {
 	}
 }
 
-FName UPOEGruxAnimInstance::GetMeleeAttackName(int8 Section)
-{
-	if (FMath::IsWithinInclusive<int8>(Section, 1, 3)) {
-		return FName(*MeleeAttackNames[Section - 1]);
-	}
-	return NAME_None;
-}
-
 void UPOEGruxAnimInstance::PlayAttackMotion()
 {
 	Super::PlayAttackMotion();
 
-	Montage_Play(GruxMeleeAttackAnim);
-	/*Montage_JumpToSection(GetMeleeAttackName(CurMeleeAttackIndex++), GruxMeleeAttackAnim);
-	if (CurMeleeAttackIndex > MaxMeleeAttackIndex) CurMeleeAttackIndex = 1;*/
+	if (Montage_IsPlaying(GruxHitAnim)) return;
+	else if (PlayedAttackAnimIndex == 2 && Montage_IsPlaying(GruxMeleeAttack2Anim)) return;
+	else if (Montage_IsPlaying(GruxMeleeAttack1Anim)) return;
+
+	PlayedAttackAnimIndex = FMath::RoundToInt(FMath::RandRange(1.0f, 2.0f));
+
+	if (PlayedAttackAnimIndex == 2) {
+		Montage_Play(GruxMeleeAttack2Anim);
+	}
+	else {
+		Montage_Play(GruxMeleeAttack1Anim);
+	}
 }
 
 void UPOEGruxAnimInstance::PlayHitMotion(FVector Direction)
@@ -51,17 +55,4 @@ void UPOEGruxAnimInstance::PlayHitMotion(FVector Direction)
 	if (DotProduct <= 1 && DotProduct > 0.5) {
 		Montage_JumpToSection(TEXT("Hit_Back"), GruxHitAnim);
 	}
-	else if (DotProduct >= -1 && DotProduct < -0.5) {
-		// Basic
-	}
-}
-
-void UPOEGruxAnimInstance::AnimNotify_SpawnEnd()
-{
-	OnSpawnEnd.Broadcast();
-}
-
-void UPOEGruxAnimInstance::AnimNotify_AttackEnd()
-{
-	OnAttackEnd.Broadcast();
 }

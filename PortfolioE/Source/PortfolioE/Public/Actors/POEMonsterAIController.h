@@ -32,6 +32,7 @@ private:
 
 public:
 	static const FName BBKEY_Target;
-	static const FName BBKEY_IsAttack;
+	static const FName BBKEY_TargetDirection;
+	static const FName BBKEY_TargetDist;
 	
 };

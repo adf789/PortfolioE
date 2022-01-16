@@ -39,13 +39,13 @@ APOECharacter_Base::APOECharacter_Base()
 		StatusWidget->SetWidgetClass(UI_STATUS_VIEW_C.Class);
 		StatusWidget->SetDrawSize(FVector2D(200.0f, 60.0f));
 	}
-	StatusWidget->SetHiddenInGame(true);
 }
 
 // Called when the game starts or when spawned
 void APOECharacter_Base::BeginPlay()
 {
 	Super::BeginPlay();
+	if(StatusWidget != nullptr) StatusWidget->SetHiddenInGame(true);
 }
 
 // Called every frame
@@ -62,6 +62,7 @@ void APOECharacter_Base::PostInitializeComponents()
 	CHECKRETURN(AnimInstance == nullptr);
 
 	AnimInstance->OnMontageEnded.AddDynamic(this, &APOECharacter_Base::OnAnimMontageEnded);
+	AnimInstance->BindCharacter(this);
 
 	StatusWidget->InitWidget();
 	UPOECharacterHPWidget* TempWidget = Cast<UPOECharacterHPWidget>(StatusWidget->GetUserWidgetObject());
@@ -74,6 +75,7 @@ void APOECharacter_Base::Attack()
 {
 	if (AnimInstance != nullptr) {
 		IsAttacking = true;
+		CharacterState = ECharacterBehaviorState::ATTACKING;
 		if (!DontMotion) {
 			AnimInstance->PlayAttack();
 		}
@@ -82,7 +84,7 @@ void APOECharacter_Base::Attack()
 	}
 }
 
-float APOECharacter_Base::GetAttackRange()
+float APOECharacter_Base::GetAttackDistance()
 {
 	return AttackRange;
 }
@@ -91,11 +93,17 @@ void APOECharacter_Base::CheckMeleeAttackCollision()
 {
 }
 
+float APOECharacter_Base::GetAIDetectRange()
+{
+	return 0.0f;
+}
+
 float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float totalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (AnimInstance != nullptr) {
 		IsHitting = true;
+		CharacterState = ECharacterBehaviorState::HITTING;
 
 		FVector AttackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
 		if (!DontMotion) {
@@ -121,8 +129,8 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 		}
 
 		TempDamageText->ShowDamage(DamageAmount);
-		CharacterStatus->SetHPValue(CharacterStatus->CurrentHPValue - DamageAmount);
 		StatusWidget->SetHiddenInGame(false);
+		CharacterStatus->SetHPValue(CharacterStatus->CurrentHPValue - DamageAmount);
 	}
 	return totalDamage;
 }
@@ -137,6 +145,7 @@ void APOECharacter_Base::OnAnimMontageEnded(UAnimMontage * Montage, bool bInterr
 		if(OnHitEndDelegate.IsBound()) OnHitEndDelegate.Broadcast();
 		IsHitting = false;
 	}
+	CharacterState = ECharacterBehaviorState::IDLE;
 }
 
 void APOECharacter_Base::DontMotionAtOnce()
@@ -154,5 +163,10 @@ void APOECharacter_Base::SetDontMotion(bool DontMontion)
 float APOECharacter_Base::GetHP()
 {
 	return CharacterStatus->CurrentHPValue;
+}
+
+ECharacterBehaviorState APOECharacter_Base::GetState() const
+{
+	return CharacterState;
 }
 
