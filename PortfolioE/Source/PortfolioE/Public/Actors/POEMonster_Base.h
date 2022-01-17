@@ -16,11 +16,13 @@ class PORTFOLIOE_API APOEMonster_Base : public APOECharacter_Base
 public:
 	APOEMonster_Base();
 
-public:
 	virtual void PostInitializeComponents() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual float GetAIDetectRange() override;
 	virtual float GetAttackDistance() override;
+
+protected:
+	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))

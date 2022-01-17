@@ -3,6 +3,7 @@
 #include "POEMonster_Base.h"
 #include "Animinstance_Base.h"
 #include "POEMonsterAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 APOEMonster_Base::APOEMonster_Base() {
 	AIControllerClass = APOEMonsterAIController::StaticClass();
@@ -17,7 +18,7 @@ void APOEMonster_Base::PostInitializeComponents()
 
 	GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 
-	auto AIController = Cast<APOEMonsterAIController>(GetController());
+	APOEMonsterAIController* AIController = Cast<APOEMonsterAIController>(GetController());
 	CHECKRETURN(AIController == nullptr);
 	AnimInstance->OnSpawnEnd.AddUObject(AIController, &APOEMonsterAIController::RunAI);
 
@@ -44,4 +45,9 @@ float APOEMonster_Base::GetAIDetectRange()
 float APOEMonster_Base::GetAttackDistance()
 {
 	return AttackDistance;
+}
+
+void APOEMonster_Base::BeginPlay()
+{
+	Super::BeginPlay();
 }

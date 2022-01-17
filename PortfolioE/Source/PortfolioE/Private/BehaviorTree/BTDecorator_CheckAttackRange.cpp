@@ -23,6 +23,7 @@ bool UBTDecorator_CheckAttackRange::CalculateRawConditionValue(UBehaviorTreeComp
 	float dot = FVector::DotProduct(Direction.GetSafeNormal(), ControllingPawn->GetActorForwardVector());
 	OwnerComp.GetBlackboardComponent()->SetValueAsFloat(APOEMonsterAIController::BBKEY_TargetDirection, dot);
 
+	OwnerComp.GetBlackboardComponent()->SetValueAsFloat(APOEMonsterAIController::BBKEY_AttackDist, ControllingPawn->GetAttackDistance());
 	bResult = ControllingPawn->GetDistanceTo(Target) <= ControllingPawn->GetAttackDistance();
 	return bResult;
 }
