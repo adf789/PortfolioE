@@ -19,7 +19,7 @@ EBTNodeResult::Type UBTTask_AroundTo::ExecuteTask(UBehaviorTreeComponent & Owner
 	AActor* Target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BlackboardKey.SelectedKeyName));
 	CHECKRETURN(Target == nullptr, EBTNodeResult::Failed);
 
-	float RandomXDistance = MaxMovableRadius;
+	float RandomXDistance = MaxAroundableRadius;
 	APOEMonster_Base* ControllingPawn = Cast<APOEMonster_Base>(OwnerComp.GetAIOwner()->GetPawn());
 	CHECKRETURN(ControllingPawn == nullptr, EBTNodeResult::Failed);
 	/*if (ControllingPawn == nullptr) RandomXDistance = 1;
@@ -43,12 +43,11 @@ EBTNodeResult::Type UBTTask_AroundTo::ExecuteTask(UBehaviorTreeComponent & Owner
 void UBTTask_AroundTo::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-
-	if (IsSetDistance) {
+	/*if (IsSetDistance) {
 		float DestinationDistance = FVector::Dist(OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation(), FinalToLocation);
 		if (DestinationDistance <= 80.0f) IsSetDistance = false;
 	}else {
 		IsSetDistance = false;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
+	}*/
 }

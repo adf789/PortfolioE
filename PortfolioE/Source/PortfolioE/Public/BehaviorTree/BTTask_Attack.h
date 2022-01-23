@@ -25,7 +25,8 @@ public:
 private:
 
 	bool IsAttacking;
+	bool CanAttack;
 	bool IsAddFunction;
 	float PassTimer;
-	float BaseTimer;
+	float DelayTime;
 };

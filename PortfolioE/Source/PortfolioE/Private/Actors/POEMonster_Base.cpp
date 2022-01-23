@@ -41,13 +41,8 @@ float APOEMonster_Base::GetAIDetectRange()
 {
 	return AIDetectDistance;
 }
-
-float APOEMonster_Base::GetAttackDistance()
+float APOEMonster_Base::GetAttackDelay()
 {
-	return AttackDistance;
+	return DelayAfterAttack;
 }
-
-void APOEMonster_Base::BeginPlay()
-{
-	Super::BeginPlay();
-}
+\

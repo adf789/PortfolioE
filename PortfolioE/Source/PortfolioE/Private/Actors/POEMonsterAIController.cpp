@@ -7,7 +7,6 @@
 
 const FName APOEMonsterAIController::BBKEY_Target(TEXT("Target"));
 const FName APOEMonsterAIController::BBKEY_TargetDirection(TEXT("TargetDirection"));
-const FName APOEMonsterAIController::BBKEY_TargetDist(TEXT("TargetDist"));
 const FName APOEMonsterAIController::BBKEY_AttackDist(TEXT("AttackDist"));
 
 APOEMonsterAIController::APOEMonsterAIController() {

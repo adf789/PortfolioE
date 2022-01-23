@@ -48,7 +48,7 @@ public:
 	virtual ECharacterBehaviorState GetState() const;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Attack)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
 	float AttackRange;
 
 	UPROPERTY()
@@ -57,7 +57,7 @@ protected:
 	UPROPERTY()
 	class UWidgetComponent* StatusWidget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = StatusValue, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = CombatValue, Meta = (AllowPrivateAccess = true))
 	UPOECharacterStat* CharacterStatus;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))

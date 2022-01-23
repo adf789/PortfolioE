@@ -37,8 +37,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8 * Node
 		for (FOverlapResult const& OverlapResult : OverlapResults) {
 			APOECharacter* Character = Cast<APOECharacter>(OverlapResult.GetActor());
 
-			if (Character) {
-				//DrawDebugSphere(World, Center, DetectedRange, 16, FColor::Green, false, .2f);
+			if (Character != nullptr) {
+				DrawDebugSphere(World, Center, DetectedRange, 16, FColor::Green, false, .2f);
 
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(APOEMonsterAIController::BBKEY_Target, Character);
 				return;
@@ -47,5 +47,5 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8 * Node
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(APOEMonsterAIController::BBKEY_Target, nullptr);
-	//DrawDebugSphere(World, Center, DetectedRange, 16, FColor::Red, false, .2f);
+	DrawDebugSphere(World, Center, DetectedRange, 16, FColor::Red, false, .2f);
 }

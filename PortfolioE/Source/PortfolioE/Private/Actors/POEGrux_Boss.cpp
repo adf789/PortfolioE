@@ -21,6 +21,6 @@ APOEGrux_Boss::APOEGrux_Boss() {
 
 	CharacterStatus->InitValue(10000.0f, 100.0f, 100.0f);
 	MaxSpeed = 400.0f;
-	AttackDistance = 600.0f;
+	AttackRange = 600.0f;
 	AIDetectDistance = 2000.0f;
 }
