@@ -34,5 +34,6 @@ public:
 	static const FName BBKEY_Target;
 	static const FName BBKEY_TargetDirection;
 	static const FName BBKEY_AttackDist;
-	
+	static const FName BBKEY_WaypointLocation;
+	static const FName BBKEY_SetWaypointDirection;
 };

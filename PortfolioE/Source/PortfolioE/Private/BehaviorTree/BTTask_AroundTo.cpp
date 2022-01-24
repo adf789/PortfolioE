@@ -36,18 +36,19 @@ EBTNodeResult::Type UBTTask_AroundTo::ExecuteTask(UBehaviorTreeComponent & Owner
 	FinalToLocation = ResultLocation.Location;
 	//FinalToLocation.Z = ControllingPawn->GetActorLocation().Z;
 	UNavigationSystem::SimpleMoveToLocation(OwnerComp.GetAIOwner(), FinalToLocation);
-	//IsSetDistance = true;
-	return EBTNodeResult::Succeeded;
+	IsSetDistance = true;
+	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_AroundTo::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	/*if (IsSetDistance) {
+	if (IsSetDistance) {
 		float DestinationDistance = FVector::Dist(OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation(), FinalToLocation);
 		if (DestinationDistance <= 80.0f) IsSetDistance = false;
-	}else {
+	}
+	else {
 		IsSetDistance = false;
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}*/
+	}
 }

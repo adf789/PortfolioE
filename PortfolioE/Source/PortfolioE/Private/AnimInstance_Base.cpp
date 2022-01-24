@@ -35,7 +35,6 @@ void UAnimInstance_Base::NativeUpdateAnimation(float DeltaSeconds)
 
 					if (FMath::Abs(PawnRotateValue) <= 1.0f) PawnRotateValue = .0f;
 					else PawnRotateValue += (PawnRotateValue > .0f ? -1.0f : 1.0f);
-					//PawnRotateValue = TempVector.Size() * 100;
 				}
 				else {
 					BufferedCalculateCount++;

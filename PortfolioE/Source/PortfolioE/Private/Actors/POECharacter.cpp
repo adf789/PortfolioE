@@ -63,8 +63,8 @@ APOECharacter::APOECharacter()
 
 void APOECharacter::MeleeAttack()
 {
-	if (!IsAttacking) {
-		IsAttacking = true;
+	if (CharacterState != ECharacterBehaviorState::ATTACKING) {
+		//IsAttacking = true;
 		CharacterState = ECharacterBehaviorState::ATTACKING;
 		AlreadyAttackColiision = false;
 		CharacterAnim->PlayAttackCombo(1);
@@ -82,14 +82,14 @@ void APOECharacter::OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	IsComboInput = false;
 	if(IsSprinting) SmearMaterialInstance->SetScalarParameterValue(TEXT("Amount"), 0);
 	IsSprinting = false;
-	IsCasting = false;
+	//IsCasting = false;
+	CharacterState = ECharacterBehaviorState::IDLE;
 	CurrentCombo = 1;
 }
 
 void APOECharacter::SetAttackType()
 {
 	MaxCombo = 3;
-	AttackRange = 50.0f;
 	IsRangeAttack = false;
 }
 
@@ -100,7 +100,7 @@ void APOECharacter::CheckAttackCombo()
 
 bool APOECharacter::IsPlayingMontionAnything()
 {
-	return IsAttacking || IsCasting || IsSprinting;
+	return CharacterState == ECharacterBehaviorState::ATTACKING || IsSprinting;
 }
 
 // Called when the game starts or when spawned
@@ -347,8 +347,9 @@ void APOECharacter::ClickTarget()
 
 void APOECharacter::CastingSpell(FVector Location)
 {
-	if (IsCasting) return;
-	IsCasting = true;
+	if (CharacterState == ECharacterBehaviorState::ATTACKING) return;
+	//IsCasting = true;
+	CharacterState = ECharacterBehaviorState::ATTACKING;
 	CharacterAnim->PlayCastMagic();
 
 	AEffectDamageActor* NewEffect = nullptr;

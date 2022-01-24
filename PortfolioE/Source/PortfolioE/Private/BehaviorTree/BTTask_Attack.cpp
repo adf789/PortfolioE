@@ -16,32 +16,36 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerCo
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	APOEMonster_Base* Attacker = Cast<APOEMonster_Base>(OwnerComp.GetAIOwner()->GetPawn());
+	APOECharacter_Base* Attacker = Cast<APOEMonster_Base>(OwnerComp.GetAIOwner()->GetPawn());
 
 	if (Attacker == nullptr) {
 		UE_LOG(POE, Error, TEXT("Attacker is null"));
 		return EBTNodeResult::Failed;
 	}
 
-	if (!CanAttack) return EBTNodeResult::InProgress;
-	IsAttacking = true;
-	CanAttack = false;
+	if (Attacker->GetState() == ECharacterBehaviorState::ATTACKING) return EBTNodeResult::InProgress;
+	//IsAttacking = true;
+	//CanAttack = false;
 	Attacker->Attack();
-	DelayTime = Attacker->GetAttackDelay();
-	if (!IsAddFunction) {
+	//DelayTime = Attacker->GetAttackDelay();
+	/*if (!IsAddFunction) {
 		IsAddFunction = true;
 		Attacker->OnAttackEndDelegate.AddLambda([this]() -> void {
 			IsAttacking = false;
 			});
-	}
+	}*/
 	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_Attack::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	if (!IsAttacking) {
-		if (PassTimer >= DelayTime) {
+	APOECharacter_Base* Attacker = Cast<APOECharacter_Base>(OwnerComp.GetAIOwner()->GetPawn());
+	if (Attacker == nullptr) return FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+
+	if (Attacker->GetState() != ECharacterBehaviorState::ATTACKING) {
+		/*if (PassTimer >= DelayTime) {
 			DelayTime = .0f;
 			PassTimer = .0f;
 			CanAttack = true;
@@ -49,6 +53,7 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMe
 		}
 		else {
 			PassTimer += DeltaSeconds;
-		}
+		}*/
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

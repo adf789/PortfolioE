@@ -45,7 +45,8 @@ APOECharacter_Base::APOECharacter_Base()
 void APOECharacter_Base::BeginPlay()
 {
 	Super::BeginPlay();
-	if(StatusWidget != nullptr) StatusWidget->SetHiddenInGame(true);
+	if (StatusWidget != nullptr) StatusWidget->SetHiddenInGame(true);
+	CharacterState = ECharacterBehaviorState::IDLE;
 }
 
 // Called every frame
@@ -73,8 +74,8 @@ void APOECharacter_Base::PostInitializeComponents()
 
 void APOECharacter_Base::Attack()
 {
-	if (AnimInstance != nullptr) {
-		IsAttacking = true;
+	if (AnimInstance != nullptr && CharacterState != ECharacterBehaviorState::ATTACKING && CharacterState != ECharacterBehaviorState::HITTING) {
+		//IsAttacking = true;
 		CharacterState = ECharacterBehaviorState::ATTACKING;
 		if (!DontMotion) {
 			AnimInstance->PlayAttack();
@@ -102,7 +103,7 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 {
 	float totalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (AnimInstance != nullptr) {
-		IsHitting = true;
+		//IsHitting = true;
 		CharacterState = ECharacterBehaviorState::HITTING;
 
 		FVector AttackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
@@ -137,15 +138,16 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 
 void APOECharacter_Base::OnAnimMontageEnded(UAnimMontage * Montage, bool bInterrupted)
 {
-	if (IsAttacking) {
+	if (CharacterState == ECharacterBehaviorState::ATTACKING) {
 		if(OnAttackEndDelegate.IsBound()) OnAttackEndDelegate.Broadcast();
-		IsAttacking = false;
+		//IsAttacking = false;
+		CharacterState = ECharacterBehaviorState::IDLE;
 	}
-	if (IsHitting) {
+	else if (CharacterState == ECharacterBehaviorState::HITTING) {
 		if(OnHitEndDelegate.IsBound()) OnHitEndDelegate.Broadcast();
-		IsHitting = false;
+		//IsHitting = false;
+		CharacterState = ECharacterBehaviorState::IDLE;
 	}
-	CharacterState = ECharacterBehaviorState::IDLE;
 }
 
 void APOECharacter_Base::DontMotionAtOnce()

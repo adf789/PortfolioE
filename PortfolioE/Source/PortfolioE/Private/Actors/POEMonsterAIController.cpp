@@ -8,6 +8,8 @@
 const FName APOEMonsterAIController::BBKEY_Target(TEXT("Target"));
 const FName APOEMonsterAIController::BBKEY_TargetDirection(TEXT("TargetDirection"));
 const FName APOEMonsterAIController::BBKEY_AttackDist(TEXT("AttackDist"));
+const FName APOEMonsterAIController::BBKEY_WaypointLocation(TEXT("WaypointLocation"));
+const FName APOEMonsterAIController::BBKEY_SetWaypointDirection(TEXT("SetWaypointLocation"));
 
 APOEMonsterAIController::APOEMonsterAIController() {
 	static ConstructorHelpers::FObjectFinder<UBehaviorTree>

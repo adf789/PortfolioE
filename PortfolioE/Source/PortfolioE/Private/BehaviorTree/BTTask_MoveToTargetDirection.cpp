@@ -4,46 +4,34 @@
 #include "POEMonster_Base.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
-#include "AIController.h"
+#include "POEMonsterAIController.h"
 
 
 UBTTask_MoveToTargetDirection::UBTTask_MoveToTargetDirection() {
 	NodeName = TEXT("MoveToTargetDirection");
-	bNotifyTick = true;
 }
 
 EBTNodeResult::Type UBTTask_MoveToTargetDirection::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) {
 	EBTNodeResult::Type ResultType = Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	Target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BlackboardKey.SelectedKeyName));
+	AActor* Target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BlackboardKey.SelectedKeyName));
 	CHECKRETURN(Target == nullptr, EBTNodeResult::Failed);
 
-	APOEMonster_Base* ControllingPawn = Cast<APOEMonster_Base>(OwnerComp.GetAIOwner()->GetPawn());
-	CHECKRETURN(ControllingPawn == nullptr, EBTNodeResult::Failed);
+	int32 SetWaypointDirection = OwnerComp.GetBlackboardComponent()->GetValueAsInt(APOEMonsterAIController::BBKEY_SetWaypointDirection);
+	if (SetWaypointDirection != 0) {
+		FVector WaypointLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(APOEMonsterAIController::BBKEY_WaypointLocation);
 
-	IsSetDestination = true;
-	StopDistanceMax = ControllingPawn->GetAttackDistance();
-	return EBTNodeResult::InProgress;
-}
+		float WaypointDistance = FVector::Distance(WaypointLocation, OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation());
 
-void UBTTask_MoveToTargetDirection::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds)
-{
-	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-
-	if (IsSetDestination) {
-		FVector TargetLocation = Target->GetActorLocation();
-		float TargetDistance = FVector::Distance(TargetLocation, OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation());
-
-		if (TargetDistance <= StopDistanceMax) {
-			IsSetDestination = false;
-			UNavigationSystem::SimpleMoveToLocation(OwnerComp.GetAIOwner(), OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation());
-			return;
+		if (WaypointDistance <= 50.0f) {
+			OwnerComp.GetBlackboardComponent()->SetValueAsInt(APOEMonsterAIController::BBKEY_SetWaypointDirection, 0);
 		}
 		else {
-			UNavigationSystem::SimpleMoveToLocation(OwnerComp.GetAIOwner(), TargetLocation);
+			UNavigationSystem::SimpleMoveToLocation(OwnerComp.GetAIOwner(), WaypointLocation);
 		}
 	}
 	else {
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		UNavigationSystem::SimpleMoveToLocation(OwnerComp.GetAIOwner(), Target->GetActorLocation());
 	}
+	return EBTNodeResult::Succeeded;
 }

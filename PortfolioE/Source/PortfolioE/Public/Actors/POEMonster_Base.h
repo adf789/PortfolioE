@@ -34,4 +34,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float AIDetectDistance;
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
+	float RestTimer;
 };
