@@ -20,10 +20,10 @@ enum EViewportLevel {
 	NORMAL_PANEL UMETA(DisplayName = "ViewportLevel NORMAL_PANEL"),
 };
 
-UENUM()
-enum ECharacterBehaviorState {
-	IDLE UMETA(DisplayName = "CharacterBehaviorState IDLE"),
-	ATTACKING UMETA(DisplayName = "CharacterBehaviorState ATTACKING"),
-	HITTING UMETA(DisplayName = "CharacterBehaviorState HITTING"),
-	WALKING UMETA(DisplayName = "CharacterBehaviorState WALKING"),
+UENUM(BlueprintType)
+enum class ECharacterBehaviorState : uint8 {
+	IDLE,
+	ATTACKING,
+	HITTING,
+	DEAD,
 };

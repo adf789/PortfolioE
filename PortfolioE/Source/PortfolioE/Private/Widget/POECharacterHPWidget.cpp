@@ -16,6 +16,7 @@ void UPOECharacterHPWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	HpBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_HpBar")));
+	UpdateHPWidget();
 }
 
 void UPOECharacterHPWidget::BindCharacterStat(UPOECharacterStat* CharacterStatComponent) {

@@ -41,6 +41,14 @@ float APOEMonster_Base::GetAIDetectRange()
 {
 	return AIDetectDistance;
 }
+void APOEMonster_Base::Die()
+{
+	Super::Die();
+	APOEMonsterAIController* MonsterAIController = Cast<APOEMonsterAIController>(GetController());
+	if (MonsterAIController != nullptr) {
+		MonsterAIController->StopAI();
+	}
+}
 float APOEMonster_Base::GetAttackDelay()
 {
 	return DelayAfterAttack;

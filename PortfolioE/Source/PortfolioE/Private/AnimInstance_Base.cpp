@@ -66,6 +66,11 @@ void UAnimInstance_Base::PlayHit(FVector Direction)
 	PlayHitMotion(Direction);
 }
 
+void UAnimInstance_Base::PlayDie()
+{
+	IsDead = true;
+}
+
 void UAnimInstance_Base::BindCharacter(APOECharacter_Base* Actor)
 {
 	CharacterActor = Actor;

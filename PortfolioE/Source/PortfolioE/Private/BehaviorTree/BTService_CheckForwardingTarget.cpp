@@ -3,7 +3,7 @@
 #include "BTService_CheckForwardingTarget.h"
 #include "POEMonsterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "DrawDebugHelpers.h"
+//#include "DrawDebugHelpers.h"
 
 UBTService_CheckForwardingTarget::UBTService_CheckForwardingTarget() {
 	NodeName = TEXT("Check forwarding target");
@@ -24,7 +24,7 @@ void UBTService_CheckForwardingTarget::TickNode(UBehaviorTreeComponent & OwnerCo
 	bool bResult = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		MyMonsterActor->GetActorLocation(),
-		MyMonsterActor->GetActorForwardVector() * 300.0f + MyMonsterActor->GetActorLocation(),
+		MyMonsterActor->GetActorForwardVector() * 200.0f + MyMonsterActor->GetActorLocation(),
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(5.0f),
@@ -41,13 +41,13 @@ void UBTService_CheckForwardingTarget::TickNode(UBehaviorTreeComponent & OwnerCo
 
 		FVector TempWaypointLocation = MyMonsterActor->GetActorForwardVector().RotateAngleAxis(30.0f * WaypointDirection, MyMonsterActor->GetActorUpVector());
 
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(APOEMonsterAIController::BBKEY_WaypointLocation, MyMonsterActor->GetActorLocation() + TempWaypointLocation * 200.0f);
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(APOEMonsterAIController::BBKEY_WaypointLocation, MyMonsterActor->GetActorLocation() + TempWaypointLocation * 250.0f);
 		OwnerComp.GetBlackboardComponent()->SetValueAsInt(APOEMonsterAIController::BBKEY_SetWaypointDirection, WaypointDirection);
 
 #if ENABLE_DRAW_DEBUG
 		DrawDebugCylinder(GetWorld(),
 			MyMonsterActor->GetActorLocation(),
-			MyMonsterActor->GetActorForwardVector() * 300.0f + MyMonsterActor->GetActorLocation(),
+			MyMonsterActor->GetActorForwardVector() * 200.0f + MyMonsterActor->GetActorLocation(),
 			5.0f,
 			10,
 			bResult ? FColor::Green : FColor::Red,
@@ -55,7 +55,7 @@ void UBTService_CheckForwardingTarget::TickNode(UBehaviorTreeComponent & OwnerCo
 			0.1f);
 
 		DrawDebugPoint(GetWorld(),
-			MyMonsterActor->GetActorLocation() + TempWaypointLocation * 200.0f,
+			MyMonsterActor->GetActorLocation() + TempWaypointLocation * 250.0f,
 			10.0f,
 			FColor::Green,
 			false,

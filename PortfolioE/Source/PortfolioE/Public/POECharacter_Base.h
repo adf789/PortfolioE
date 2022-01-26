@@ -33,6 +33,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	virtual void Attack();
+	virtual void Die();
 	virtual float GetAttackDistance();
 	virtual void CheckMeleeAttackCollision();
 	virtual float GetAIDetectRange();
@@ -75,8 +76,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	class TSubclassOf<class AFloatingDamageText> FloatingDamageClass2;
 
-	ECharacterBehaviorState CharacterState;
-
 	bool ContinousMotion;
+
+	ECharacterBehaviorState CharacterState;
 	
 };

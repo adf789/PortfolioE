@@ -70,6 +70,7 @@ void APOECharacter_Base::PostInitializeComponents()
 	if (TempWidget != nullptr) {
 		TempWidget->BindCharacterStat(CharacterStatus);
 	}
+	CharacterStatus->OnDyingAction.AddUObject(this, &APOECharacter_Base::Die);
 }
 
 void APOECharacter_Base::Attack()
@@ -83,6 +84,13 @@ void APOECharacter_Base::Attack()
 
 		if (!ContinousMotion) DontMotion = false;
 	}
+}
+
+void APOECharacter_Base::Die()
+{
+	CharacterState = ECharacterBehaviorState::DEAD;
+	AnimInstance->PlayDie();
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 float APOECharacter_Base::GetAttackDistance()
@@ -131,6 +139,7 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 
 		TempDamageText->ShowDamage(DamageAmount);
 		StatusWidget->SetHiddenInGame(false);
+		StatusWidget->Activate();
 		CharacterStatus->SetHPValue(CharacterStatus->CurrentHPValue - DamageAmount);
 	}
 	return totalDamage;

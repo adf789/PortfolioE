@@ -23,6 +23,7 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	void PlayAttack();
 	void PlayHit(FVector Direction);
+	void PlayDie();
 
 	FOnAnimEvent OnSpawnEnd;
 	FOnAnimEvent OnAttackEnd;

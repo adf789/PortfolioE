@@ -23,7 +23,7 @@ EBTNodeResult::Type UBTTask_MoveToTargetDirection::ExecuteTask(UBehaviorTreeComp
 
 		float WaypointDistance = FVector::Distance(WaypointLocation, OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation());
 
-		if (WaypointDistance <= 50.0f) {
+		if (WaypointDistance <= 30.0f) {
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt(APOEMonsterAIController::BBKEY_SetWaypointDirection, 0);
 		}
 		else {
