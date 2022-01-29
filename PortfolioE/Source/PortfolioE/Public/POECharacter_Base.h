@@ -35,6 +35,8 @@ public:
 	virtual void Attack();
 	virtual void Die();
 	virtual float GetAttackDistance();
+
+	UFUNCTION()
 	virtual void CheckMeleeAttackCollision();
 	virtual float GetAIDetectRange();
 
@@ -60,15 +62,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = CombatValue, Meta = (AllowPrivateAccess = true))
 	UPOECharacterStat* CharacterStatus;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
-	bool IsAttacking;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
-	bool IsHitting;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
-	bool IsDead;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
 	bool DontMotion;

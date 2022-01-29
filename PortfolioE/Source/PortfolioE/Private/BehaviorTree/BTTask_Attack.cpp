@@ -8,8 +8,6 @@
 UBTTask_Attack::UBTTask_Attack() {
 	NodeName = TEXT("Attack");
 	bNotifyTick = true;
-	IsAttacking = false;
-	CanAttack = true;
 }
 
 EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
@@ -24,16 +22,9 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerCo
 	}
 
 	if (Attacker->GetState() == ECharacterBehaviorState::ATTACKING) return EBTNodeResult::InProgress;
-	//IsAttacking = true;
-	//CanAttack = false;
+
+	UNavigationSystem::SimpleMoveToLocation(OwnerComp.GetAIOwner(), Attacker->GetActorLocation());
 	Attacker->Attack();
-	//DelayTime = Attacker->GetAttackDelay();
-	/*if (!IsAddFunction) {
-		IsAddFunction = true;
-		Attacker->OnAttackEndDelegate.AddLambda([this]() -> void {
-			IsAttacking = false;
-			});
-	}*/
 	return EBTNodeResult::InProgress;
 }
 
@@ -45,15 +36,6 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMe
 
 
 	if (Attacker->GetState() != ECharacterBehaviorState::ATTACKING) {
-		/*if (PassTimer >= DelayTime) {
-			DelayTime = .0f;
-			PassTimer = .0f;
-			CanAttack = true;
-			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		}
-		else {
-			PassTimer += DeltaSeconds;
-		}*/
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

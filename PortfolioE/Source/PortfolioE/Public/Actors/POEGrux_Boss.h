@@ -16,4 +16,7 @@ class PORTFOLIOE_API APOEGrux_Boss : public APOEMonster_Base
 public:
 	// Sets default values for this character's properties
 	APOEGrux_Boss();
+
+private:
+	void InitializeValues();
 };

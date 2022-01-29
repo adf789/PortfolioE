@@ -8,6 +8,7 @@
 #include "AnimInstance_Base.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnAnimEvent);
+DECLARE_DELEGATE(FOnAttackCollision);
 /**
  * 
  */
@@ -27,6 +28,7 @@ public:
 
 	FOnAnimEvent OnSpawnEnd;
 	FOnAnimEvent OnAttackEnd;
+	FOnAttackCollision OnAttackCollision;
 
 	virtual void BindCharacter(class APOECharacter_Base* Actor);
 
@@ -39,10 +41,13 @@ protected:
 
 private:
 	UFUNCTION()
-		void AnimNotify_SpawnEnd();
+	void AnimNotify_SpawnEnd();
 
 	UFUNCTION()
-		void AnimNotify_AttackEnd();
+	void AnimNotify_AttackEnd();
+
+	UFUNCTION()
+	void AnimNotify_AttackCollision();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pawn)

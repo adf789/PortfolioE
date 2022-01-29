@@ -18,6 +18,7 @@ public:
 
 	virtual void PostInitializeComponents() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void CheckMeleeAttackCollision() override;
 	virtual float GetAIDetectRange() override;
 	virtual void Die() override;
 
@@ -35,6 +36,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float AIDetectDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, Meta = (AllowPrivateAccess = true))
+	float AttackCollisionScale;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)

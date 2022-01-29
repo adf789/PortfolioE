@@ -17,10 +17,16 @@ APOEGrux_Boss::APOEGrux_Boss() {
 		GetMesh()->SetAnimInstanceClass(ANIM_GRUX_C.Class);
 	}
 
+	InitializeValues();
+}
+
+void APOEGrux_Boss::InitializeValues()
+{
 	GetCapsuleComponent()->SetWorldScale3D(FVector(2.0f, 2.0f, 2.0f));
 
-	CharacterStatus->InitValue(10000.0f, 100.0f, 100.0f);
+	CharacterStatus->InitValue(10000.0f, 5.0f, 100.0f);
 	MaxSpeed = 400.0f;
-	AttackRange = 600.0f;
+	AttackRange = 400.0f;
 	AIDetectDistance = 2000.0f;
+	AttackCollisionScale = 50.0f;
 }

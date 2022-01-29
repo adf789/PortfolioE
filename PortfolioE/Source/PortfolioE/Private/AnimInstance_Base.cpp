@@ -86,10 +86,15 @@ void UAnimInstance_Base::PlayHitMotion(FVector Direction)
 
 void UAnimInstance_Base::AnimNotify_SpawnEnd()
 {
-	OnSpawnEnd.Broadcast();
+	if(OnSpawnEnd.IsBound()) OnSpawnEnd.Broadcast();
 }
 
 void UAnimInstance_Base::AnimNotify_AttackEnd()
 {
-	OnAttackEnd.Broadcast();
+	if(OnAttackEnd.IsBound()) OnAttackEnd.Broadcast();
+}
+
+void UAnimInstance_Base::AnimNotify_AttackCollision()
+{
+	if(OnAttackCollision.IsBound()) OnAttackCollision.Execute();
 }

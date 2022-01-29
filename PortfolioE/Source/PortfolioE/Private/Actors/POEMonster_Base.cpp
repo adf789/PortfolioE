@@ -4,6 +4,7 @@
 #include "Animinstance_Base.h"
 #include "POEMonsterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "DrawDebugHelpers.h"
 
 APOEMonster_Base::APOEMonster_Base() {
 	AIControllerClass = APOEMonsterAIController::StaticClass();
@@ -37,6 +38,45 @@ float APOEMonster_Base::TakeDamage(float DamageAmount, FDamageEvent const & Dama
 	return TempDamage;
 }
 
+void APOEMonster_Base::CheckMeleeAttackCollision()
+{
+	Super::CheckMeleeAttackCollision();
+
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	FVector CollisionStartLocation = GetActorLocation();
+	FVector CollisionEndLocation = GetActorLocation() + GetActorForwardVector() * AttackRange;
+	bool bResult = GetWorld()->SweepMultiByChannel(
+		HitResults,
+		CollisionStartLocation,
+		CollisionEndLocation,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel2,
+		FCollisionShape::MakeSphere(AttackCollisionScale),
+		Params
+	);
+
+	if (bResult) {
+		TEST_LOG_WITH_VAR("%s: Detect %d", *GetName(), HitResults.Num());
+		for (FHitResult HitResult : HitResults) {
+			AActor* Actor = HitResult.GetActor();
+			if (Actor == nullptr) continue;
+
+			AController* PlayerController = Actor->GetInstigatorController();
+			if (PlayerController->IsPlayerController()) {
+#if ENABLE_DRAW_DEBUG
+				DrawDebugCylinder(GetWorld(), CollisionStartLocation, CollisionEndLocation, AttackCollisionScale, 10, FColor::Green, false, .1f);
+#endif
+				return;
+			}
+		}
+	}
+
+#if ENABLE_DRAW_DEBUG
+	DrawDebugCylinder(GetWorld(), CollisionStartLocation, CollisionEndLocation, AttackCollisionScale, 10, FColor::Red, false, .1f);
+#endif
+}
+
 float APOEMonster_Base::GetAIDetectRange()
 {
 	return AIDetectDistance;
@@ -48,6 +88,10 @@ void APOEMonster_Base::Die()
 	if (MonsterAIController != nullptr) {
 		MonsterAIController->StopAI();
 	}
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]() {
+		this->SetActorHiddenInGame(true);
+	}), 3.0f, false);
 }
 float APOEMonster_Base::GetAttackDelay()
 {

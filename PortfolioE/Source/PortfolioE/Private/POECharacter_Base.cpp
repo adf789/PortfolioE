@@ -63,6 +63,7 @@ void APOECharacter_Base::PostInitializeComponents()
 	CHECKRETURN(AnimInstance == nullptr);
 
 	AnimInstance->OnMontageEnded.AddDynamic(this, &APOECharacter_Base::OnAnimMontageEnded);
+	AnimInstance->OnAttackCollision.BindUFunction(this, FName("CheckMeleeAttackCollision"));
 	AnimInstance->BindCharacter(this);
 
 	StatusWidget->InitWidget();
@@ -91,6 +92,7 @@ void APOECharacter_Base::Die()
 	CharacterState = ECharacterBehaviorState::DEAD;
 	AnimInstance->PlayDie();
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+	StatusWidget->SetHiddenInGame(true);
 }
 
 float APOECharacter_Base::GetAttackDistance()

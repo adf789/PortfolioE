@@ -20,7 +20,7 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent & O
 	CHECKRETURN(Monster == nullptr, EBTNodeResult::Failed);
 
 	FVector LookVector = Target->GetActorLocation() - Monster->GetActorLocation();
-	LookVector.Z = .0f;
+	//LookVector.Z = .0f;
 	FRotator LookRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 	Monster->SetActorRotation(FMath::RInterpTo(Monster->GetActorRotation(), LookRot, GetWorld()->GetDeltaSeconds() * RotateSpeed, 2.0f));
 
