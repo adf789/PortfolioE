@@ -42,39 +42,41 @@ void APOEMonster_Base::CheckMeleeAttackCollision()
 {
 	Super::CheckMeleeAttackCollision();
 
-	TArray<FHitResult> HitResults;
+	FVector TraceDirection = GetActorForwardVector() * AttackRange;
+	FVector CenterVector = GetActorLocation() + TraceDirection * .5f;
+	FQuat TraceQuat = FRotationMatrix::MakeFromZ(TraceDirection).ToQuat();
 	FCollisionQueryParams Params(NAME_None, false, this);
-	FVector CollisionStartLocation = GetActorLocation();
-	FVector CollisionEndLocation = GetActorLocation() + GetActorForwardVector() * AttackRange;
-	bool bResult = GetWorld()->SweepMultiByChannel(
-		HitResults,
-		CollisionStartLocation,
-		CollisionEndLocation,
-		FQuat::Identity,
+	TArray<FOverlapResult> OverlapResults;
+	bool bResult = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		CenterVector,
+		TraceQuat,
 		ECollisionChannel::ECC_GameTraceChannel2,
-		FCollisionShape::MakeSphere(AttackCollisionScale),
+		FCollisionShape::MakeCapsule(AttackCollisionScale * 1.5f, AttackRange * .5f),
 		Params
 	);
 
 	if (bResult) {
-		TEST_LOG_WITH_VAR("%s: Detect %d", *GetName(), HitResults.Num());
-		for (FHitResult HitResult : HitResults) {
-			AActor* Actor = HitResult.GetActor();
-			if (Actor == nullptr) continue;
+		for (FOverlapResult OverlapResult : OverlapResults) {
+			APOECharacter_Base* DetectCharacter = Cast<APOECharacter_Base>(OverlapResult.GetActor());
+			if (DetectCharacter == nullptr) continue;
 
-			AController* PlayerController = Actor->GetInstigatorController();
+			AController* PlayerController = DetectCharacter->GetInstigatorController();
 			if (PlayerController->IsPlayerController()) {
+				FDamageEvent DamageEvent;
+				DetectCharacter->TakeDamage(CharacterStatus->AttackValue, DamageEvent, PlayerController, this);
 #if ENABLE_DRAW_DEBUG
-				DrawDebugCylinder(GetWorld(), CollisionStartLocation, CollisionEndLocation, AttackCollisionScale, 10, FColor::Green, false, .1f);
+				DrawDebugCapsule(GetWorld(), CenterVector, AttackRange * 0.5f, AttackCollisionScale * 1.5f, TraceQuat, FColor::Green, false, .1f);
 #endif
 				return;
 			}
 		}
 	}
-
+	else {
 #if ENABLE_DRAW_DEBUG
-	DrawDebugCylinder(GetWorld(), CollisionStartLocation, CollisionEndLocation, AttackCollisionScale, 10, FColor::Red, false, .1f);
+		DrawDebugCapsule(GetWorld(), CenterVector, AttackRange * 0.5f, AttackCollisionScale * 1.5f, TraceQuat, FColor::Red, false, .1f);
 #endif
+	}
 }
 
 float APOEMonster_Base::GetAIDetectRange()

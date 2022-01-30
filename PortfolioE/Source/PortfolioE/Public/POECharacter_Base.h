@@ -60,9 +60,6 @@ protected:
 	UPROPERTY()
 	class UWidgetComponent* StatusWidget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = CombatValue, Meta = (AllowPrivateAccess = true))
-	UPOECharacterStat* CharacterStatus;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
 	bool DontMotion;
 
@@ -72,5 +69,9 @@ protected:
 	bool ContinousMotion;
 
 	ECharacterBehaviorState CharacterState;
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = CombatValue, Meta = (AllowPrivateAccess = true))
+		UPOECharacterStat* CharacterStatus;
 	
 };

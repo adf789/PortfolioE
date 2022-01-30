@@ -19,11 +19,18 @@ public:
 
 	virtual void InitializeComponent() override;
 
-	void InitValue(float MaxHp, float Atk, float Def);
 	void SetHPValue(float CurHP);
-	float GetHpRate();
+	void InitHPVale(float MaxHp);
+	void InitAttackValue(float Atk);
+	void InitDefenceValue(float Def);
+	void InitMPValue(float MaxMp);
+	void SetMPValue(float CurMP);
+	float GetHPRate();
+	float GetMPRate();
+
 	FOnChangeStatusDelegate OnDyingAction;
 	FOnChangeStatusDelegate OnChangeHPAction;
+	FOnChangeStatusDelegate OnChangeMPAction;
 
 protected:
 	// Called when the game starts
@@ -44,5 +51,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float DefenseValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
+	float CurrentMPValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
+	float MaxMPValue;
 	
 };

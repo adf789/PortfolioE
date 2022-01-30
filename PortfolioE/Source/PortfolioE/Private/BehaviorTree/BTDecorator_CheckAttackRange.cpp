@@ -20,6 +20,7 @@ bool UBTDecorator_CheckAttackRange::CalculateRawConditionValue(UBehaviorTreeComp
 	CHECKRETURN(Target == nullptr, false);
 
 	FVector Direction = Target->GetActorLocation() - ControllingPawn->GetActorLocation();
+	Direction.Z = .0f;
 	float dot = FVector::DotProduct(Direction.GetSafeNormal(), ControllingPawn->GetActorForwardVector());
 	OwnerComp.GetBlackboardComponent()->SetValueAsFloat(APOEMonsterAIController::BBKEY_TargetDirection, dot);
 	bResult = ControllingPawn->GetDistanceTo(Target) <= ControllingPawn->GetAttackDistance();

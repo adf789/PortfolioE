@@ -36,7 +36,12 @@ public:
 	void HideNpcMenuWidget();
 
 	void BindNpcMenuAction(APOENpcCharacter* npc);
-	UUserWidget* ShowWidget(TSubclassOf<UUserWidget> WidgetClass, EViewportLevel Level, FVector Location);
+	UUserWidget* ShowMenuWidget(TSubclassOf<UUserWidget> WidgetClass, EViewportLevel Level, FVector Location);
+	
+	UFUNCTION()
+	UPOEPlayerHUDWidget* CreateAndInitHUDWidget(class APOECharacter_Base* Character_Base);
+
+	virtual void Possess(APawn* aPawn) override;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI)
@@ -51,8 +56,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	class UPOENpcMenuWidget* npcMenuWidget;
 
+	UPROPERTY(VisibleAnywhere, Category = UI)
+	class UPOEPlayerHUDWidget* HUDWidget;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
 	TSubclassOf<class UPOENpcMenuWidget> menuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UPOEPlayerHUDWidget> HUDWidgetClass;
 
 private:
 	FTimerHandle detectTimer;

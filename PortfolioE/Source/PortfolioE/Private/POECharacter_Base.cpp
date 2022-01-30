@@ -34,7 +34,7 @@ APOECharacter_Base::APOECharacter_Base()
 	StatusWidget->SetWorldLocation(FVector(.0f, .0f, 280.0f));
 	StatusWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	static ConstructorHelpers::FClassFinder<UUserWidget>
-		UI_STATUS_VIEW_C(TEXT("/Game/POE/UIWidget/UI_ActorStatusView.UI_ActorStatusView_c"));
+		UI_STATUS_VIEW_C(TEXT("/Game/POE/UIWidget/UI_CharacterHPWidget.UI_CharacterHPWidget_c"));
 	if (UI_STATUS_VIEW_C.Succeeded()) {
 		StatusWidget->SetWidgetClass(UI_STATUS_VIEW_C.Class);
 		StatusWidget->SetDrawSize(FVector2D(200.0f, 60.0f));
@@ -141,7 +141,6 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 
 		TempDamageText->ShowDamage(DamageAmount);
 		StatusWidget->SetHiddenInGame(false);
-		StatusWidget->Activate();
 		CharacterStatus->SetHPValue(CharacterStatus->CurrentHPValue - DamageAmount);
 	}
 	return totalDamage;

@@ -24,9 +24,12 @@ void APOEGrux_Boss::InitializeValues()
 {
 	GetCapsuleComponent()->SetWorldScale3D(FVector(2.0f, 2.0f, 2.0f));
 
-	CharacterStatus->InitValue(10000.0f, 5.0f, 100.0f);
+	CharacterStatus->InitHPVale(10000.0f);
+	CharacterStatus->InitAttackValue(5.0f);
+	CharacterStatus->InitDefenceValue(100.0f);
+
 	MaxSpeed = 400.0f;
-	AttackRange = 400.0f;
+	AttackRange = 300.0f;
 	AIDetectDistance = 2000.0f;
-	AttackCollisionScale = 50.0f;
+	AttackCollisionScale = 200.0f;
 }

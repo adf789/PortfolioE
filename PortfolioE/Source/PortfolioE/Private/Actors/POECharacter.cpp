@@ -12,6 +12,7 @@
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "POEGameInstance.h"
+#include "WidgetComponent.h"
 
 
 // Sets default values
@@ -58,7 +59,9 @@ APOECharacter::APOECharacter()
 		LightningEffect = PS_LIGHTNING.Object;
 	}
 
-	CharacterStatus->InitValue(10000.0f, 500.0f, 100.0f);
+	CharacterStatus->InitHPVale(10000.0f);
+	CharacterStatus->InitAttackValue(500.0f);
+	CharacterStatus->InitDefenceValue(100.0f);
 }
 
 void APOECharacter::MeleeAttack()
@@ -292,6 +295,13 @@ void APOECharacter::CheckMeleeAttackCollision()
 			AlreadyAttackColiision = true;
 		}
 	}
+}
+
+float APOECharacter::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
+{
+	float TakeDamageValue = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	StatusWidget->SetHiddenInGame(true);
+	return TakeDamageValue;
 }
 
 void APOECharacter::SetDestination()

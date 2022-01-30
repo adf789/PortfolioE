@@ -20,18 +20,12 @@ void UPOECharacterStat::InitializeComponent()
 	CurrentHPValue = MaxHPValue;
 }
 
-void UPOECharacterStat::InitValue(float MaxHp, float Atk, float Def)
-{
-	this->MaxHPValue = MaxHp;
-	this->CurrentHPValue = MaxHPValue;
-	this->AttackValue = Atk;
-	this->DefenseValue = Def;
-}
-
 void UPOECharacterStat::SetHPValue(float CurHP)
 {
 	if (CurrentHPValue == CurHP) return;
 	CurrentHPValue = CurHP;
+
+	if (CurrentHPValue > MaxHPValue) CurrentHPValue = MaxHPValue;
 
 	if (OnChangeHPAction.IsBound()) OnChangeHPAction.Broadcast();
 
@@ -41,11 +35,51 @@ void UPOECharacterStat::SetHPValue(float CurHP)
 	}
 }
 
-float UPOECharacterStat::GetHpRate()
+void UPOECharacterStat::InitHPVale(float MaxHp)
+{
+	this->MaxHPValue = MaxHp;
+	this->CurrentHPValue = MaxHp;
+}
+
+void UPOECharacterStat::InitAttackValue(float Atk)
+{
+	this->AttackValue = Atk;
+}
+
+void UPOECharacterStat::InitDefenceValue(float Def)
+{
+	this->DefenseValue = Def;
+}
+
+void UPOECharacterStat::InitMPValue(float MaxMp)
+{
+	this->MaxMPValue = MaxMp;
+	this->CurrentMPValue = MaxMp;
+}
+
+void UPOECharacterStat::SetMPValue(float CurMP)
+{
+	CurrentMPValue = CurMP;
+	if (CurrentMPValue > MaxMPValue) this->CurrentMPValue = MaxMPValue;
+
+	if (CurrentMPValue > CurMP) CurrentMPValue = CurMP;
+	else if (CurrentMPValue < KINDA_SMALL_NUMBER) CurrentMPValue = .0f;
+
+	if (OnChangeMPAction.IsBound()) OnChangeMPAction.Broadcast();
+}
+
+float UPOECharacterStat::GetHPRate()
 {
 	if (MaxHPValue == .0f) return 1.0f;
 	else if (CurrentHPValue < .0f) return .0f;
 	else return CurrentHPValue / MaxHPValue;
+}
+
+float UPOECharacterStat::GetMPRate()
+{
+	if (MaxMPValue == .0f) return 1.0f;
+	else if (CurrentMPValue < .0f) return .0f;
+	else return CurrentMPValue / MaxMPValue;
 }
 
 // Called when the game starts

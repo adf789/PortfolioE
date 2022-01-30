@@ -17,6 +17,7 @@ UENUM()
 enum EViewportLevel { 
 	DAMAGE_TEXT UMETA(DisplayName = "ViewportLevel DAMAGE_TEXT"),
 	MENU UMETA(DisplayName = "ViewportLevel MENU"),
+	HUD UMETA(DisplayName = "ViewportLevel HUD"),
 	NORMAL_PANEL UMETA(DisplayName = "ViewportLevel NORMAL_PANEL"),
 };
 

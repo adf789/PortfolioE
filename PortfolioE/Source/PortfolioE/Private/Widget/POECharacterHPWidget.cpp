@@ -7,7 +7,7 @@
 void UPOECharacterHPWidget::UpdateHPWidget()
 {
 	if (CharacterStat != nullptr && HpBar != nullptr) {
-		HpBar->SetPercent(CharacterStat->GetHpRate());
+		HpBar->SetPercent(CharacterStat->GetHPRate());
 	}
 }
 
