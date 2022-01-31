@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "POEGrux_Boss.h"
+#include "PaperSpriteComponent.h"
 
 APOEGrux_Boss::APOEGrux_Boss() {
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
@@ -17,6 +18,8 @@ APOEGrux_Boss::APOEGrux_Boss() {
 		GetMesh()->SetAnimInstanceClass(ANIM_GRUX_C.Class);
 	}
 
+	ArrowSprite->SetWorldLocation(FVector(.0f, .0f, 2000.0f));
+	ArrowSprite->SetWorldScale3D(FVector(.075f, .075f, .075f));
 	InitializeValues();
 }
 

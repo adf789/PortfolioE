@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack, Meta = (AllowPrivateAccess = true))
 	float AttackCollisionScale;
 
+	UPROPERTY(EditAnywhere, Category = Minimap)
+	class UPaperSpriteComponent* ArrowSprite;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	float RestTimer;

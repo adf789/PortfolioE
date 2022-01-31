@@ -5,10 +5,26 @@
 #include "POEMonsterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 
 APOEMonster_Base::APOEMonster_Base() {
 	AIControllerClass = APOEMonsterAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	ArrowSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowSprite"));
+
+	ArrowSprite->SetupAttachment(GetCapsuleComponent());
+	ArrowSprite->SetWorldScale3D(FVector(.1f, .1f, .1f));
+	ArrowSprite->SetWorldLocationAndRotation(FVector(.0f, .0f, 4000.0f), FRotator(.0f, .0f, 90.0f));
+	ArrowSprite->SetOwnerNoSee(true);
+
+	static ConstructorHelpers::FObjectFinder<UPaperSprite>
+		SPRITE_ARROW(TEXT("/Game/POE/Effects/Textures/T_TransparentArrow_Sprite.T_TransparentArrow_Sprite"));
+	if (SPRITE_ARROW.Succeeded()) {
+		ArrowSprite->SetSprite(SPRITE_ARROW.Object);
+		ArrowSprite->SetSpriteColor(FLinearColor::Red);
+	}
 
 	IsSpawned = false;
 }

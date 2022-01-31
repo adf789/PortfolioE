@@ -56,13 +56,22 @@ private:
 #pragma region Variables
 public:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-		USpringArmComponent* SpringArm;
+	USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-		UCameraComponent* Camera;
+	UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, Category = Collision)
-		UCapsuleComponent* MeleeCollision;
+	UCapsuleComponent* MeleeCollision;
+
+	UPROPERTY(VisibleAnywhere, Category = Minimap)
+	USpringArmComponent* SpringArmForCapture;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class USceneCaptureComponent2D* CaptureCamera;
+
+	UPROPERTY(EditAnywhere, Category = Minimap)
+	class UPaperSpriteComponent* ArrowSprite;
 
 private:
 	UPROPERTY()

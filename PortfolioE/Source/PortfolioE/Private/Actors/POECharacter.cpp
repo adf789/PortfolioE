@@ -13,6 +13,10 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "POEGameInstance.h"
 #include "WidgetComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 
 
 // Sets default values
@@ -24,9 +28,20 @@ APOECharacter::APOECharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
 	MeleeCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("MELEECOLLISION"));
+	SpringArmForCapture = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmForCapture"));
+	CaptureCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureCamera"));
+	ArrowSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowSprite"));
 
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
+	SpringArmForCapture->SetupAttachment(GetCapsuleComponent());
+	CaptureCamera->SetupAttachment(SpringArmForCapture);
+	CaptureCamera->ShowFlags.SetSkeletalMeshes(false);
+	CaptureCamera->ShowFlags.SetLighting(false);
+	ArrowSprite->SetupAttachment(GetCapsuleComponent());
+	ArrowSprite->SetWorldScale3D(FVector(.2f, .2f, .2f));
+	ArrowSprite->SetWorldLocationAndRotation(FVector(.0f, .0f, 4000.0f), FRotator(.0f, .0f, 90.0f));
+	ArrowSprite->SetOwnerNoSee(true);
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
 		SK_SEVAROG(TEXT("/Game/ParagonSevarog/Characters/Heroes/Sevarog/Meshes/Sevarog.Sevarog"));
@@ -57,6 +72,18 @@ APOECharacter::APOECharacter()
 		PS_LIGHTNING(TEXT("/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Genno/P_Genno_Overhead_Imp_01.P_Genno_Overhead_Imp_01"));
 	if (PS_LIGHTNING.Succeeded()) {
 		LightningEffect = PS_LIGHTNING.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>
+		TEXTURE_RENDER_TARGET(TEXT("/Game/POE/Effects/Textures/MinimapRenderTexture.MinimapRenderTexture"));
+	if (TEXTURE_RENDER_TARGET.Succeeded()) {
+		CaptureCamera->TextureTarget = TEXTURE_RENDER_TARGET.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UPaperSprite>
+		SPRITE_ARROW(TEXT("/Game/POE/Effects/Textures/T_TransparentArrow_Sprite.T_TransparentArrow_Sprite"));
+	if (SPRITE_ARROW.Succeeded()) {
+		ArrowSprite->SetSprite(SPRITE_ARROW.Object);
 	}
 
 	CharacterStatus->InitHPVale(10000.0f);
@@ -237,6 +264,16 @@ void APOECharacter::PossessedBy(AController * NewController)
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 		GetCharacterMovement()->bUseControllerDesiredRotation = false;
 		GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
+
+		SpringArmForCapture->TargetArmLength = 20000.0f;
+		SpringArmForCapture->SetRelativeRotation(FRotator(-90.0f, .0f, .0f));
+		SpringArmForCapture->bUsePawnControlRotation = false;
+		SpringArmForCapture->bInheritPitch = false;
+		SpringArmForCapture->bInheritRoll = false;
+		SpringArmForCapture->bInheritYaw = false;
+		SpringArmForCapture->bDoCollisionTest = false;
+		CaptureCamera->ProjectionType = ECameraProjectionMode::Orthographic;
+		CaptureCamera->OrthoWidth = 1500.0f;
 	}
 
 	POEPlayerController = Cast<APOEPlayerController>(NewController);
