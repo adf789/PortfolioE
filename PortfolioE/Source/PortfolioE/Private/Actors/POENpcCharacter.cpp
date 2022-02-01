@@ -15,20 +15,6 @@ APOENpcCharacter::APOENpcCharacter()
 
 	// Compare NPC
 	Tags.Add(TEXT("NPC"));
-
-	/*MenuBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("MENUBARWIDGET"));
-	MenuBarWidget->SetRelativeLocation(FVector(.0f, .0f, 300.0f));
-	MenuBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	MenuBarWidget->SetupAttachment(GetMesh());
-
-	static ConstructorHelpers::FClassFinder<UUserWidget>
-		MENUBAR_WC(TEXT("/Game/POE/UIWidget/MenuWidget.MenuWidget_c"));
-	if (MENUBAR_WC.Succeeded()) {
-		MenuBarWidget->SetWidgetClass(MENUBAR_WC.Class);
-		MenuBarWidget->SetDrawSize(FVector2D(100.0f, 150.0f));
-	}
-
-	OnShowMenuBar(false);*/
 }
 
 // Called when the game starts or when spawned

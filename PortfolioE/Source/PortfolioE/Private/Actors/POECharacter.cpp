@@ -17,6 +17,8 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "PaperSpriteComponent.h"
 #include "PaperSprite.h"
+#include "MyInventoryComponent.h"
+#include "InventoryItem_Equipment.h"
 
 
 // Sets default values
@@ -31,6 +33,7 @@ APOECharacter::APOECharacter()
 	SpringArmForCapture = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmForCapture"));
 	CaptureCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureCamera"));
 	ArrowSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowSprite"));
+	Inventory = CreateDefaultSubobject<UMyInventoryComponent>(TEXT("Inventory"));
 
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
@@ -141,6 +144,32 @@ void APOECharacter::BeginPlay()
 	SetAttackType();
 
 	GetWorld()->GetTimerManager().SetTimer(CoolTimeHandle, this, &APOECharacter::CalculateCoolTime, 1.0f, true);
+	LoadInventoryData();
+}
+
+void APOECharacter::LoadInventoryData()
+{
+	UInventoryItem_Equipment TestItem1;
+	TestItem1.SetDisplayName(FName(TEXT("TestItem1")));
+	TestItem1.SetHaveCount(2);
+	TestItem1.SetDescription(FText::FromString(TEXT("Desc1")));
+	TestItem1.SetTextureId(0);
+
+	UInventoryItem_Equipment TestItem2;
+	TestItem1.SetDisplayName(FName(TEXT("TestItem2")));
+	TestItem1.SetHaveCount(100);
+	TestItem1.SetDescription(FText::FromString(TEXT("Desc2")));
+	TestItem1.SetTextureId(1);
+
+	UInventoryItem_Equipment TestItem3;
+	TestItem1.SetDisplayName(FName(TEXT("TestItem3")));
+	TestItem1.SetHaveCount(20);
+	TestItem1.SetDescription(FText::FromString(TEXT("Desc3")));
+	TestItem1.SetTextureId(2);
+
+	Inventory->InsertItem(&TestItem1);
+	Inventory->InsertItem(&TestItem2);
+	Inventory->InsertItem(&TestItem3);
 }
 
 void APOECharacter::ActiveAction()

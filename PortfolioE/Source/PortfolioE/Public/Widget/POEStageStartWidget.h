@@ -13,6 +13,16 @@ UCLASS()
 class PORTFOLIOE_API UPOEStageStartWidget : public UUserWidget
 {
 	GENERATED_BODY()
+	
+public:
+	UFUNCTION(BlueprintCallable)
+		void OnCancel();
+
+	UFUNCTION(BlueprintCallable)
+		void OnStageStart();
+
+	UFUNCTION()
+		void InitInventoryView(class UMyInventoryComponent* Inventory);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -23,12 +33,11 @@ protected:
 
 	UPROPERTY()
 	class UButton* cancelButton;
-	
-public:
 
-	UFUNCTION(BlueprintCallable)
-	void OnCancel();
+	UPROPERTY()
+	class UWrapBox* inventoyBox; 
 
-	UFUNCTION(BlueprintCallable)
-	void OnStageStart();	
+private:
+	UPROPERTY()
+	TSubclassOf<class UPOEItemSlotWidget> ItemSlotWidgetClass;
 };

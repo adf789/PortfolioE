@@ -39,6 +39,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void LoadInventoryData();
 
 	void ActiveAction();
 	void Dash();
@@ -72,6 +73,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Minimap)
 	class UPaperSpriteComponent* ArrowSprite;
+
+	UPROPERTY(VisibleInstanceOnly, Category = Inventory)
+	class UMyInventoryComponent* Inventory;
 
 private:
 	UPROPERTY()

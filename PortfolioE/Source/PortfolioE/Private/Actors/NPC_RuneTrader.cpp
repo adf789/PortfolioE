@@ -4,6 +4,7 @@
 #include "POEStageStartWidget.h"
 #include "Components/WidgetComponent.h"
 #include "POEPlayerController.h"
+#include "POECharacter.h"
 
 ANPC_RuneTrader::ANPC_RuneTrader() : Super() {
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
@@ -42,6 +43,10 @@ void ANPC_RuneTrader::OnAction()
 	CHECKRETURN(POEPlayerController == nullptr);
 
 	POEPlayerController->HideNpcMenuWidget();
+
+	APOECharacter* Player = Cast<APOECharacter>(POEPlayerController->GetPawn());
+	CHECKRETURN(Player == nullptr);
+	stageStartWidget->InitInventoryView(Player->Inventory);
 }
 
 void ANPC_RuneTrader::OnCancel()
