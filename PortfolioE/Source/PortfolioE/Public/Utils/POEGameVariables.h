@@ -28,3 +28,9 @@ enum class ECharacterBehaviorState : uint8 {
 	HITTING,
 	DEAD,
 };
+
+UENUM(BlueprintType)
+enum class EUIPanelName : uint8 {
+	INVENTORY,
+	STAGE_START,
+};

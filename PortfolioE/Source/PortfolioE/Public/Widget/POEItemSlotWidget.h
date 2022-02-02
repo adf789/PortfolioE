@@ -21,18 +21,25 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 
+	UFUNCTION()
+	virtual void OnUse();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+		class UTextBlock* ItemNameText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+		class UImage* ItemImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+		class UButton* UseButton;
+
 private:
 	void OnTextureAssetLoadCompleted();
 	
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Item, meta = (AllowPrivateAccess = true))
 	class UInventoryItem_Base* ItemData;
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	class UTextBlock* ItemNameText;
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	class UImage* ItemImage;
 
 	FSoftObjectPath TextureAssetToLoad = FSoftObjectPath(nullptr);
 	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;

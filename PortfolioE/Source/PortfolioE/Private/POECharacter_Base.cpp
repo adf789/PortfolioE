@@ -3,7 +3,6 @@
 #include "POECharacter_Base.h"
 #include "AnimInstance_Base.h"
 #include "POEPlayerController.h"
-#include "POEDamageWidget.h"
 #include "Components/TextBlock.h"
 #include "FloatingDamageText.h"
 #include "POEGameInstance.h"

@@ -4,6 +4,7 @@
 
 #include "PortfolioE.h"
 #include "POECharacter_Base.h"
+#include "UIScreenInteraction.h"
 #include "POECharacter.generated.h"
 
 UCLASS()
@@ -76,6 +77,9 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, Category = Inventory)
 	class UMyInventoryComponent* Inventory;
+
+	UPROPERTY(VisibleInstanceOnly, Category = UI)
+	UUIScreenInteraction* UIScreens;
 
 private:
 	UPROPERTY()

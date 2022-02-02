@@ -7,7 +7,7 @@ UInventoryItem_Equipment::UInventoryItem_Equipment() {
 }
 
 void UInventoryItem_Equipment::Use() {
-	Super::Use();
+	TEST_LOG_WITH_VAR("Use: %s", *GetDisplayName().ToString());
 }
 
 

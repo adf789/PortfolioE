@@ -24,9 +24,15 @@ public:
 	virtual void OnCancel() override;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
 	TSubclassOf<class UPOEStageStartWidget> stageUIClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
+	TSubclassOf<class UPOEInventoryAndEquipWidget> InventoryUIClass;
 
 	UPROPERTY()
 	class UPOEStageStartWidget* stageStartWidget;
+
+	UPROPERTY()
+	class UPOEInventoryAndEquipWidget* InventoryAndEquipWidget;
 };

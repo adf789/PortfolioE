@@ -2,6 +2,10 @@
 
 #include "InventoryItem_Base.h"
 
+UInventoryItem_Base::UInventoryItem_Base() {
+
+}
+
 void UInventoryItem_Base::SetDisplayName(FName Name)
 {
 	this->DisplayName = Name;

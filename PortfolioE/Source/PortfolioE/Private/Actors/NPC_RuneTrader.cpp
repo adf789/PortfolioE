@@ -5,8 +5,9 @@
 #include "Components/WidgetComponent.h"
 #include "POEPlayerController.h"
 #include "POECharacter.h"
+#include "POEInventoryAndEquipWidget.h"
 
-ANPC_RuneTrader::ANPC_RuneTrader() : Super() {
+ANPC_RuneTrader::ANPC_RuneTrader() {
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
 		SK_MODEL(TEXT("/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Forge.SK_CharM_Forge"));
 	if (SK_MODEL.Succeeded()) {
@@ -17,7 +18,13 @@ ANPC_RuneTrader::ANPC_RuneTrader() : Super() {
 	static ConstructorHelpers::FClassFinder<UUserWidget>
 		UI_STAGE_START_C(TEXT("/Game/POE/UIWidget/UI_StageStartPanel.UI_StageStartPanel_c"));
 	if (UI_STAGE_START_C.Succeeded()) {
-		this->stageUIClass = UI_STAGE_START_C.Class;
+		stageUIClass = UI_STAGE_START_C.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget>
+		UI_INVENTORY_EQUIP_C(TEXT("/Game/POE/UIWidget/UI_InventoryAndEquipWidget.UI_InventoryAndEquipWidget_C"));
+	if (UI_INVENTORY_EQUIP_C.Succeeded()) {
+		InventoryUIClass = UI_INVENTORY_EQUIP_C.Class;
 	}
 }
 
@@ -35,8 +42,6 @@ void ANPC_RuneTrader::OnAction()
 {
 	Super::OnAction();
 
-	stageStartWidget = CreateWidget<UPOEStageStartWidget>(GetWorld()->GetFirstPlayerController(), stageUIClass);
-	stageStartWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
 	GetWorld()->GetFirstPlayerController()->SetPause(true);
 
 	auto POEPlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
@@ -44,9 +49,17 @@ void ANPC_RuneTrader::OnAction()
 
 	POEPlayerController->HideNpcMenuWidget();
 
+	/*stageStartWidget = CreateWidget<UPOEStageStartWidget>(GetWorld()->GetFirstPlayerController(), stageUIClass);
+	stageStartWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
+
+	InventoryAndEquipWidget = CreateWidget<UPOEInventoryAndEquipWidget>(GetWorld()->GetFirstPlayerController(), InventoryUIClass);
+	InventoryAndEquipWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);*/
+
 	APOECharacter* Player = Cast<APOECharacter>(POEPlayerController->GetPawn());
 	CHECKRETURN(Player == nullptr);
-	stageStartWidget->InitInventoryView(Player->Inventory);
+	//InventoryAndEquipWidget->InitInventoryView(Player->Inventory);
+	Player->UIScreens->ShowPanel(EUIPanelName::INVENTORY);
+	Player->UIScreens->ShowPanel(EUIPanelName::STAGE_START);
 }
 
 void ANPC_RuneTrader::OnCancel()

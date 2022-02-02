@@ -9,12 +9,14 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS(Abstract, DefaultToInstanced)
 class PORTFOLIOE_API UInventoryItem_Base : public UObject
 {
 	GENERATED_BODY()
 
 public:
+	UInventoryItem_Base();
+
 	void SetDisplayName(FName Name);
 	FName GetDisplayName();
 

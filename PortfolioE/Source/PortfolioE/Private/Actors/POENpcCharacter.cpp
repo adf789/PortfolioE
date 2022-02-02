@@ -45,18 +45,16 @@ void APOENpcCharacter::PostInitializeComponents()
 
 void APOENpcCharacter::OnTalk()
 {
-	TEST_LOG("On Talk");
+	
 }
 
 void APOENpcCharacter::OnAction()
 {
-	TEST_LOG("On Action");
+	
 }
 
 void APOENpcCharacter::OnCancel()
 {
-	TEST_LOG("On Cancel");
-
 	auto POEPlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
 	CHECKRETURN(POEPlayerController == nullptr);
 

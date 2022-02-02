@@ -21,9 +21,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void OnStageStart();
 
-	UFUNCTION()
-		void InitInventoryView(class UMyInventoryComponent* Inventory);
-
 protected:
 	virtual void NativeConstruct() override;
 
@@ -34,10 +31,4 @@ protected:
 	UPROPERTY()
 	class UButton* cancelButton;
 
-	UPROPERTY()
-	class UWrapBox* inventoyBox; 
-
-private:
-	UPROPERTY()
-	TSubclassOf<class UPOEItemSlotWidget> ItemSlotWidgetClass;
 };

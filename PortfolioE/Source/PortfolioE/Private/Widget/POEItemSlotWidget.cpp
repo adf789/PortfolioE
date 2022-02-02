@@ -6,6 +6,7 @@
 #include "POEGameInstance.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/Button.h"
 
 void UPOEItemSlotWidget::SetItemAndInitView(UInventoryItem_Base * ItemData)
 {
@@ -27,6 +28,15 @@ void UPOEItemSlotWidget::NativeConstruct()
 
 	ItemImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_Item")));
 	ItemNameText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_ItemName")));
+	UseButton = Cast<UButton>(GetWidgetFromName(TEXT("EquipButton")));
+	CHECKRETURN(UseButton == nullptr);
+	UseButton->OnClicked.AddDynamic(this, &UPOEItemSlotWidget::OnUse);
+}
+
+void UPOEItemSlotWidget::OnUse()
+{
+	CHECKRETURN(ItemData == nullptr);
+	ItemData->Use();
 }
 
 void UPOEItemSlotWidget::OnTextureAssetLoadCompleted()
