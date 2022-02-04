@@ -5,6 +5,8 @@
 #include "Components/WrapBox.h"
 #include "POEItemSlotWidget.h"
 #include "MyInventoryComponent.h"
+#include "POEGameInstance.h"
+#include "UIScreenInteraction.h"
 
 void UPOEStageStartWidget::OnStageStart()
 {
@@ -13,6 +15,11 @@ void UPOEStageStartWidget::OnStageStart()
 void UPOEStageStartWidget::OnCancel()
 {
 	RemoveFromParent();
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+	if (GameInstance != nullptr) {
+		UUserWidget* InventoryWidget = GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY);
+		if (InventoryWidget != nullptr) InventoryWidget->RemoveFromParent();
+	}
 	GetOwningPlayer()->SetPause(false);
 }
 

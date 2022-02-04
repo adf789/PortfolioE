@@ -320,6 +320,9 @@ void APOECharacter::PostInitializeComponents()
 
 	GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
 	GetCharacterMovement()->MaxWalkSpeed = 450.0f;
+
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+	if (GameInstance != nullptr) GameInstance->UIScreenInteraction = UIScreens;
 }
 
 void APOECharacter::CheckMeleeAttackCollision()

@@ -3,7 +3,10 @@
 #include "UIScreenInteraction.h"
 #include "UserWidget.h"
 #include "POEUIClassPaths.h"
-
+#include "Components/Widget.h"
+#include "POEGameInstance.h"
+#include "Engine/AssetManager.h"
+#include "POECharacter.h"
 
 // Sets default values for this component's properties
 UUIScreenInteraction::UUIScreenInteraction()
@@ -30,20 +33,28 @@ void UUIScreenInteraction::DestroyComponent(bool bPromoteChildren)
 
 void UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName)
 {
-	FString ScreenNameStr;
-	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EUIPanelName"), true);
-	if (enumPtr) {
-		ScreenNameStr = enumPtr->GetNameStringByIndex((int8)ScreenName);
-	}
-
-	if (ScreenNameStr.Equals(TEXT(""))) return;
-
-	TEST_LOG_WITH_VAR("UI Count: %d", GetDefault<UPOEUIClassPaths>()->UIClassPaths.Num());
 	if (GetDefault<UPOEUIClassPaths>()->UIClassPaths.Num() > (int8)ScreenName) {
-		TEST_LOG_WITH_VAR("Show: %s", *GetDefault<UPOEUIClassPaths>()->UIClassPaths[(int8)ScreenName].GetAssetPathString());
+		FSoftObjectPath UIClassPath = GetDefault<UPOEUIClassPaths>()->UIClassPaths[(int8)ScreenName];
+
+		TSubclassOf<UUserWidget> UIWidgetClass = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<UUserWidget>(UIClassPath));
+		if (UIWidgetClass.Get() != nullptr) {
+			//TEST_LOG_WITH_VAR("Loaded asset: %s", *UIWidget->GetName());
+			UUserWidget* UIWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), UIWidgetClass);
+			UIWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
+			UIPanels.Add(ScreenName, UIWidget);
+		}
+		else {
+			//TEST_LOG_WITH_VAR("Can't Load: %s", *AssetStreamingHandle->GetLoadedAsset()->GetName());
+		}
 	}
 	else {
-		TEST_LOG_WITH_VAR("Invalid: %s", *ScreenNameStr);
+		FString ScreenNameStr;
+		const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EUIPanelName"), true);
+		if (enumPtr) {
+			ScreenNameStr = enumPtr->GetNameStringByIndex((int8)ScreenName);
+			TEST_LOG_WITH_VAR("Invalid: %s", *ScreenNameStr);
+		}
+		else TEST_LOG_WITH_VAR("Invalid");
 	}
 }
 
@@ -61,5 +72,10 @@ UUserWidget * UUIScreenInteraction::GetPanel(EUIPanelName ScreenName)
 {
 	if (UIPanels.Contains(ScreenName)) return UIPanels[ScreenName];
 	return nullptr;
+}
+
+int UUIScreenInteraction::PanelCount()
+{
+	return UIPanels.Num();
 }
 

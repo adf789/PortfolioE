@@ -49,17 +49,14 @@ void ANPC_RuneTrader::OnAction()
 
 	POEPlayerController->HideNpcMenuWidget();
 
-	/*stageStartWidget = CreateWidget<UPOEStageStartWidget>(GetWorld()->GetFirstPlayerController(), stageUIClass);
-	stageStartWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
-
-	InventoryAndEquipWidget = CreateWidget<UPOEInventoryAndEquipWidget>(GetWorld()->GetFirstPlayerController(), InventoryUIClass);
-	InventoryAndEquipWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);*/
-
 	APOECharacter* Player = Cast<APOECharacter>(POEPlayerController->GetPawn());
 	CHECKRETURN(Player == nullptr);
-	//InventoryAndEquipWidget->InitInventoryView(Player->Inventory);
+
 	Player->UIScreens->ShowPanel(EUIPanelName::INVENTORY);
 	Player->UIScreens->ShowPanel(EUIPanelName::STAGE_START);
+
+	UPOEInventoryAndEquipWidget* InventoryAndEquipWidget = Cast<UPOEInventoryAndEquipWidget>(Player->UIScreens->GetPanel(EUIPanelName::INVENTORY));
+	if(InventoryAndEquipWidget != nullptr) InventoryAndEquipWidget->InitInventoryView(Player->Inventory);
 }
 
 void ANPC_RuneTrader::OnCancel()

@@ -20,11 +20,15 @@ public:
 	void ShowPanel(EUIPanelName ScreenName);
 	void ClosePanel(EUIPanelName ScreenName);
 	class UUserWidget* GetPanel(EUIPanelName ScreenName);
+	int PanelCount();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-		
+
 public:
 	TMap<EUIPanelName, class UUserWidget*> UIPanels;
+
+private:
+	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;
 };

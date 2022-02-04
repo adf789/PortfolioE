@@ -23,4 +23,5 @@ public:
 
 	class ActorObjectPool* EffectPooling;
 	class ActorObjectPool* DamageTextPooling;
+	class UUIScreenInteraction* UIScreenInteraction;
 };
