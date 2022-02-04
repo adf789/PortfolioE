@@ -4,22 +4,30 @@
 #include "Components/WrapBox.h"
 #include "POEItemSlotWidget.h"
 #include "MyInventoryComponent.h"
+#include "Components/Image.h"
 
 void UPOEInventoryAndEquipWidget::InitInventoryView(class UMyInventoryComponent* Inventory) {
-	inventoyBox->ClearChildren();
+	InventoyBox->ClearChildren();
 	
 	CHECKRETURN(ItemSlotWidgetClass == nullptr);
 	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
 	for (auto It = Inventory->GetItems().CreateConstIterator(); It; ++It) {
 		UPOEItemSlotWidget* InventorySlotWidget = CreateWidget<UPOEItemSlotWidget>(GameInstance, ItemSlotWidgetClass);
-		inventoyBox->AddChildWrapBox(InventorySlotWidget);
+		InventoyBox->AddChildWrapBox(InventorySlotWidget);
 		InventorySlotWidget->SetItemAndInitView(It->Value);
 	}
+}
+
+void UPOEInventoryAndEquipWidget::SetEquipItemView(UTexture2D* ItemImage)
+{
+	EquippedSlot->SetBrushFromTexture(ItemImage);
+	EquippedSlot->SetColorAndOpacity(FLinearColor::White);
 }
 
 void UPOEInventoryAndEquipWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	inventoyBox = Cast<UWrapBox>(GetWidgetFromName(TEXT("InventoryBox")));
+	InventoyBox = Cast<UWrapBox>(GetWidgetFromName(TEXT("InventoryBox")));
+	EquippedSlot = Cast<UImage>(GetWidgetFromName(TEXT("EquipSlotItemImage")));
 }

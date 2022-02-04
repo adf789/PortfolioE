@@ -19,8 +19,6 @@ class PORTFOLIOE_API UPOEGameInstance : public UGameInstance
 public:
 	UPOEGameInstance();
 
-	FStreamableManager StreamableManager;
-
 	class ActorObjectPool* EffectPooling;
 	class ActorObjectPool* DamageTextPooling;
 	class UUIScreenInteraction* UIScreenInteraction;

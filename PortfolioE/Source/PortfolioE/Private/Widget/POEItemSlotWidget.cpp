@@ -7,6 +7,9 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Components/Button.h"
+#include "engine/AssetManager.h"
+#include "POEInventoryAndEquipWidget.h"
+#include "UIScreenInteraction.h"
 
 void UPOEItemSlotWidget::SetItemAndInitView(UInventoryItem_Base * ItemData)
 {
@@ -17,9 +20,7 @@ void UPOEItemSlotWidget::SetItemAndInitView(UInventoryItem_Base * ItemData)
 
 	CHECKRETURN(ItemImage == nullptr);
 	TextureAssetToLoad = GetDefault<UPOEItemTexturePath>()->TexturePaths[ItemData->GetTextureId()];
-	auto POEGameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
-	CHECKRETURN(POEGameInstance == nullptr);
-	AssetStreamingHandle = POEGameInstance->StreamableManager.RequestAsyncLoad(TextureAssetToLoad, FStreamableDelegate::CreateUObject(this, &UPOEItemSlotWidget::OnTextureAssetLoadCompleted));
+	AssetStreamingHandle = UAssetManager::GetStreamableManager().RequestAsyncLoad(TextureAssetToLoad, FStreamableDelegate::CreateUObject(this, &UPOEItemSlotWidget::OnTextureAssetLoadCompleted));
 }
 
 void UPOEItemSlotWidget::NativeConstruct()
@@ -37,13 +38,20 @@ void UPOEItemSlotWidget::OnUse()
 {
 	CHECKRETURN(ItemData == nullptr);
 	ItemData->Use();
+	if (ItemData->GetItemType() == EItemType::EQUIPMENT) {
+		UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+		if (GameInstance != nullptr) {
+			UPOEInventoryAndEquipWidget* InventoryAndEquipWidget = Cast<UPOEInventoryAndEquipWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY));
+			if (InventoryAndEquipWidget != nullptr) InventoryAndEquipWidget->SetEquipItemView(ItemImage_Texture);
+		}
+	}
 }
 
 void UPOEItemSlotWidget::OnTextureAssetLoadCompleted()
 {
-	UTexture2D* LoadedTexture = Cast<UTexture2D>(AssetStreamingHandle->GetLoadedAsset());
+	ItemImage_Texture = Cast<UTexture2D>(AssetStreamingHandle->GetLoadedAsset());
 	AssetStreamingHandle.Reset();
-	CHECKRETURN(LoadedTexture == nullptr);
+	CHECKRETURN(ItemImage_Texture == nullptr);
 
-	ItemImage->SetBrushFromTexture(LoadedTexture);
+	ItemImage->SetBrushFromTexture(ItemImage_Texture);
 }

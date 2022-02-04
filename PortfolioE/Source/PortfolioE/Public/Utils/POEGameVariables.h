@@ -34,3 +34,9 @@ enum class EUIPanelName : uint8 {
 	INVENTORY,
 	STAGE_START,
 };
+
+UENUM(BlueprintType)
+enum class EItemType : uint8 {
+	EQUIPMENT,
+	ETC,
+};

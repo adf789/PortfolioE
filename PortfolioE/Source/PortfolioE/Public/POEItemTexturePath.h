@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PortfolioE.h"
 #include "UObject/NoExportTypes.h"
 #include "POEItemTexturePath.generated.h"
 

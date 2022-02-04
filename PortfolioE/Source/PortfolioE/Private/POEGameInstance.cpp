@@ -7,5 +7,3 @@ UPOEGameInstance::UPOEGameInstance() {
 	this->EffectPooling = new ActorObjectPool();
 	this->DamageTextPooling = new ActorObjectPool();
 }
-
-

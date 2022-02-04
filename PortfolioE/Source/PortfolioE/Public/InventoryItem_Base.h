@@ -32,6 +32,9 @@ public:
 	void SetOwningInventory(class UMyInventoryComponent* OwningInventory);
 	class UMyInventoryComponent* GetOwningInventory();
 
+	void SetItemType(EItemType ItemType);
+	EItemType GetItemType();
+
 	virtual void Use() PURE_VIRTUAL(UInventoryItem_Base, );
 
 protected:	
@@ -49,4 +52,6 @@ protected:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	class UMyInventoryComponent* OwningInventory;
+
+	EItemType ItemType;
 };

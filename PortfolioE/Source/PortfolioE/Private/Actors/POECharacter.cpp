@@ -155,18 +155,21 @@ void APOECharacter::LoadInventoryData()
 	TestItem1->SetHaveCount(2);
 	TestItem1->SetDescription(FText::FromString(TEXT("Desc1")));
 	TestItem1->SetTextureId(0);
+	TestItem1->SetItemType(EItemType::EQUIPMENT);
 
 	UInventoryItem_Equipment* TestItem2 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem2"));
 	TestItem2->SetDisplayName(FName(TEXT("TestItem2")));
 	TestItem2->SetHaveCount(20);
 	TestItem2->SetDescription(FText::FromString(TEXT("Desc2")));
 	TestItem2->SetTextureId(1);
+	TestItem2->SetItemType(EItemType::EQUIPMENT);
 
 	UInventoryItem_Equipment* TestItem3 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem3"));
 	TestItem3->SetDisplayName(FName(TEXT("TestItem3")));
 	TestItem3->SetHaveCount(200);
 	TestItem3->SetDescription(FText::FromString(TEXT("Desc3")));
 	TestItem3->SetTextureId(2);
+	TestItem3->SetItemType(EItemType::EQUIPMENT);
 
 	Inventory->InsertItem(TestItem1);
 	Inventory->InsertItem(TestItem2);

@@ -55,3 +55,13 @@ UMyInventoryComponent * UInventoryItem_Base::GetOwningInventory()
 {
 	return OwningInventory;
 }
+
+void UInventoryItem_Base::SetItemType(EItemType ItemType)
+{
+	this->ItemType = ItemType;
+}
+
+EItemType UInventoryItem_Base::GetItemType()
+{
+	return ItemType;
+}

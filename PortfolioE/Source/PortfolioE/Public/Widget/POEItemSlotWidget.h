@@ -26,13 +26,15 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		class UTextBlock* ItemNameText;
+	class UTextBlock* ItemNameText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		class UImage* ItemImage;
+	class UImage* ItemImage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		class UButton* UseButton;
+	class UButton* UseButton;
+
+	class UTexture2D* ItemImage_Texture;
 
 private:
 	void OnTextureAssetLoadCompleted();

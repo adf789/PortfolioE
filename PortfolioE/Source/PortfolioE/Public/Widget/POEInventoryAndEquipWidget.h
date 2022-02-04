@@ -17,13 +17,17 @@ class PORTFOLIOE_API UPOEInventoryAndEquipWidget : public UUserWidget
 public:
 	UFUNCTION()
 	void InitInventoryView(class UMyInventoryComponent* Inventory);
+	void SetEquipItemView(class UTexture2D* ItemImage);
 
 protected:
 	virtual void NativeConstruct() override;	
 
 protected:
 	UPROPERTY()
-		class UWrapBox* inventoyBox;
+		class UWrapBox* InventoyBox;
+
+	UPROPERTY()
+		class UImage* EquippedSlot;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
