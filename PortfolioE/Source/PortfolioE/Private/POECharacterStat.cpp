@@ -8,7 +8,7 @@ UPOECharacterStat::UPOECharacterStat()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -46,9 +46,9 @@ void UPOECharacterStat::InitAttackValue(float Atk)
 	this->AttackValue = Atk;
 }
 
-void UPOECharacterStat::InitDefenceValue(float Def)
+void UPOECharacterStat::InitMoveSpeedValue(float Speed)
 {
-	this->DefenseValue = Def;
+	this->MoveSpeedValue = Speed;
 }
 
 void UPOECharacterStat::InitMPValue(float MaxMp)
@@ -80,23 +80,5 @@ float UPOECharacterStat::GetMPRate()
 	if (MaxMPValue == .0f) return 1.0f;
 	else if (CurrentMPValue < .0f) return .0f;
 	else return CurrentMPValue / MaxMPValue;
-}
-
-// Called when the game starts
-void UPOECharacterStat::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
-void UPOECharacterStat::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 

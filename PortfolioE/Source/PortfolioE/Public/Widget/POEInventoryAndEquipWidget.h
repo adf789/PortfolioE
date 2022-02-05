@@ -19,6 +19,9 @@ public:
 	void InitInventoryView(class UMyInventoryComponent* Inventory);
 	void SetEquipItemView(class UTexture2D* ItemImage);
 
+	UFUNCTION()
+	void OnUnEuquipButtonClick();
+
 protected:
 	virtual void NativeConstruct() override;	
 

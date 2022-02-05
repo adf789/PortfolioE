@@ -16,6 +16,10 @@ class PORTFOLIOE_API UInventoryItem_Equipment : public UInventoryItem_Base
 	
 public:
 	UInventoryItem_Equipment();
+	
+	virtual void SetItemData(struct FPOEItemData* ItemData) override;
 
-	virtual void Use() override;
+	float ItemAttackValue;
+	float ItemHpValue;
+	float ItemMoveSpeedValue;
 };
