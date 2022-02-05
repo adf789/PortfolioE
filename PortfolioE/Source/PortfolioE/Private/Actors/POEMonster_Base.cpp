@@ -33,8 +33,7 @@ void APOEMonster_Base::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	CHECKRETURN(CharacterStatus);
-	GetCharacterMovement()->MaxWalkSpeed = CharacterStatus->MoveSpeedValue;
+	GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 
 	APOEMonsterAIController* AIController = Cast<APOEMonsterAIController>(GetController());
 	CHECKRETURN(AIController == nullptr);
@@ -48,7 +47,7 @@ void APOEMonster_Base::PostInitializeComponents()
 
 float APOEMonster_Base::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {
-	float TempDamage = DamageAmount;
+	float TempDamage = DamageAmount - CharacterStatus->DefenseValue;
 	if (TempDamage < KINDA_SMALL_NUMBER) TempDamage = .0f;
 
 	Super::TakeDamage(TempDamage, DamageEvent, EventInstigator, DamageCauser);

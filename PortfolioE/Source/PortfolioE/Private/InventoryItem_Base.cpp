@@ -6,10 +6,6 @@ UInventoryItem_Base::UInventoryItem_Base() {
 
 }
 
-void UInventoryItem_Base::SetItemData(FPOEItemData * ItemData)
-{
-}
-
 void UInventoryItem_Base::SetDisplayName(FName Name)
 {
 	this->DisplayName = Name;
@@ -20,24 +16,14 @@ FName UInventoryItem_Base::GetDisplayName()
 	return DisplayName;
 }
 
-void UInventoryItem_Base::SetRequireExp(int32 RequireExp)
+void UInventoryItem_Base::SetHaveCount(int32 HaveCount)
 {
-	this->RequireExp = RequireExp;
+	this->HaveCount = HaveCount;
 }
 
-int32 UInventoryItem_Base::GetRequireExp()
+int32 UInventoryItem_Base::GetHaveCount()
 {
-	return RequireExp;
-}
-
-void UInventoryItem_Base::SetCurrentExp(int32 CurrentExp)
-{
-	this->CurrentExp = CurrentExp;
-}
-
-int32 UInventoryItem_Base::GetCurrentExp()
-{
-	return CurrentExp;
+	return HaveCount;
 }
 
 void UInventoryItem_Base::SetTextureId(int32 TextureId)

@@ -41,9 +41,6 @@ public:
 	UFUNCTION()
 	UPOEPlayerHUDWidget* CreateAndInitHUDWidget(class APOECharacter_Base* Character_Base);
 
-	UFUNCTION()
-	void UpdateValueHUDWidget();
-
 	virtual void Possess(APawn* aPawn) override;
 
 public:

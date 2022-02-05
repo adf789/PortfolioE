@@ -26,9 +26,8 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void CheckMeleeAttackCollision() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-	
+
 	void MeleeAttack();
-	void ApplyCharacterStatus();
 
 	UFUNCTION()
 	virtual void OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;

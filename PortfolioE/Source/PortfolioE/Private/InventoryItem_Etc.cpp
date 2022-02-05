@@ -5,3 +5,7 @@
 UInventoryItem_Etc::UInventoryItem_Etc() {
 
 }
+
+void UInventoryItem_Etc::Use() {
+	
+}

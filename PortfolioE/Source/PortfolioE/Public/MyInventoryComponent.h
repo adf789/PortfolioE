@@ -38,33 +38,14 @@ public:
 	UFUNCTION()
 	const TMap<FName, class UInventoryItem_Base*>& GetItems();
 
-	UFUNCTION()
-	bool TrySetEquipmentItem(class UInventoryItem_Equipment* TryEquipItem);
-
-	UFUNCTION()
-	bool TryUnsetEquipmentItem();
-
-	UFUNCTION()
-	class UInventoryItem_Equipment* GetEquippedItem();
-
-	UFUNCTION()
-	void SetDefaultItem();
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	virtual void OnRegister() override;
 
 
 protected:
 	UPROPERTY()
 	TMap<FName, class UInventoryItem_Base*> HaveItems;
-
-	UPROPERTY()
-	class UInventoryItem_Equipment* EquippedItem;
-
-	UPROPERTY()
-	class APOECharacter* OwningCharacter;
 
 	UPROPERTY()
 	int32 MaxCapacity;

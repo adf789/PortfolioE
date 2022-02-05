@@ -92,7 +92,7 @@ APOECharacter::APOECharacter()
 
 	CharacterStatus->InitHPVale(10000.0f);
 	CharacterStatus->InitAttackValue(500.0f);
-	CharacterStatus->InitMoveSpeedValue(450.0f);
+	CharacterStatus->InitDefenceValue(100.0f);
 }
 
 void APOECharacter::MeleeAttack()
@@ -109,12 +109,6 @@ void APOECharacter::MeleeAttack()
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 2, MaxCombo);
 		CharacterAnim->PlayAttackCombo(CurrentCombo);
 	}
-}
-
-void APOECharacter::ApplyCharacterStatus()
-{
-	POEPlayerController->UpdateValueHUDWidget();
-	GetCharacterMovement()->MaxWalkSpeed = 450 + CharacterStatus->MoveSpeedValue;
 }
 
 void APOECharacter::OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
@@ -156,7 +150,30 @@ void APOECharacter::BeginPlay()
 
 void APOECharacter::LoadInventoryData()
 {
-	Inventory->SetDefaultItem();
+	UInventoryItem_Equipment* TestItem1 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem1"));
+	TestItem1->SetDisplayName(FName(TEXT("TestItem1")));
+	TestItem1->SetHaveCount(2);
+	TestItem1->SetDescription(FText::FromString(TEXT("Desc1")));
+	TestItem1->SetTextureId(0);
+	TestItem1->SetItemType(EItemType::EQUIPMENT);
+
+	UInventoryItem_Equipment* TestItem2 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem2"));
+	TestItem2->SetDisplayName(FName(TEXT("TestItem2")));
+	TestItem2->SetHaveCount(20);
+	TestItem2->SetDescription(FText::FromString(TEXT("Desc2")));
+	TestItem2->SetTextureId(1);
+	TestItem2->SetItemType(EItemType::EQUIPMENT);
+
+	UInventoryItem_Equipment* TestItem3 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem3"));
+	TestItem3->SetDisplayName(FName(TEXT("TestItem3")));
+	TestItem3->SetHaveCount(200);
+	TestItem3->SetDescription(FText::FromString(TEXT("Desc3")));
+	TestItem3->SetTextureId(2);
+	TestItem3->SetItemType(EItemType::EQUIPMENT);
+
+	Inventory->InsertItem(TestItem1);
+	Inventory->InsertItem(TestItem2);
+	Inventory->InsertItem(TestItem3);
 }
 
 void APOECharacter::ActiveAction()
@@ -304,10 +321,8 @@ void APOECharacter::PostInitializeComponents()
 
 	CharacterAnim->OnNextComboCheck.AddUObject(this, &APOECharacter::CheckAttackCombo);
 
-	CHECKRETURN(CharacterStatus == nullptr)
-
 	GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
-	GetCharacterMovement()->MaxWalkSpeed = CharacterStatus->MoveSpeedValue;
+	GetCharacterMovement()->MaxWalkSpeed = 450.0f;
 
 	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	if (GameInstance != nullptr) GameInstance->UIScreenInteraction = UIScreens;

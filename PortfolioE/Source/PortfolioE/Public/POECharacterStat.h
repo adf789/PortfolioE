@@ -22,7 +22,7 @@ public:
 	void SetHPValue(float CurHP);
 	void InitHPVale(float MaxHp);
 	void InitAttackValue(float Atk);
-	void InitMoveSpeedValue(float Speed);
+	void InitDefenceValue(float Def);
 	void InitMPValue(float MaxMp);
 	void SetMPValue(float CurMP);
 	float GetHPRate();
@@ -32,7 +32,13 @@ public:
 	FOnChangeStatusDelegate OnChangeHPAction;
 	FOnChangeStatusDelegate OnChangeMPAction;
 
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
 public:	
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float CurrentHPValue;
@@ -44,7 +50,7 @@ public:
 	float AttackValue;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
-	float MoveSpeedValue;
+	float DefenseValue;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, Meta = (AllowPrivateAccess = true))
 	float CurrentMPValue;

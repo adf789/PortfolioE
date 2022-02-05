@@ -1,10 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyInventoryComponent.h"
-#include "POECharacterStat.h"
-#include "POECharacter.h"
-#include "POEGameInstance.h"
-#include "InventoryItem_Equipment.h"
+#include "InventoryItem_Base.h"
 
 
 // Sets default values for this component's properties
@@ -63,73 +60,8 @@ const TMap<FName, class UInventoryItem_Base*> & UMyInventoryComponent::GetItems(
 	return HaveItems;
 }
 
-bool UMyInventoryComponent::TrySetEquipmentItem(UInventoryItem_Equipment * TryEquipItem)
-{
-	CHECKRETURN(TryEquipItem == nullptr || OwningCharacter == nullptr, false);
-
-	if(!TryUnsetEquipmentItem()) return false;
-
-	OwningCharacter->CharacterStatus->AttackValue += TryEquipItem->ItemAttackValue;
-	OwningCharacter->CharacterStatus->MaxHPValue += TryEquipItem->ItemHpValue;
-	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
-	OwningCharacter->CharacterStatus->MoveSpeedValue += TryEquipItem->ItemMoveSpeedValue;
-	DeleteItem(TryEquipItem);
-	EquippedItem = TryEquipItem;
-
-	OwningCharacter->ApplyCharacterStatus();
-
-	return true;
-}
-
-bool UMyInventoryComponent::TryUnsetEquipmentItem()
-{
-	CHECKRETURN(OwningCharacter == nullptr, false);
-	if (EquippedItem == nullptr) return true;
-
-	OwningCharacter->CharacterStatus->AttackValue -= EquippedItem->ItemAttackValue;
-	OwningCharacter->CharacterStatus->MaxHPValue -= EquippedItem->ItemHpValue;
-	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
-	OwningCharacter->CharacterStatus->MoveSpeedValue -= EquippedItem->ItemMoveSpeedValue;
-	InsertItem(EquippedItem);
-	EquippedItem = nullptr;
-
-	OwningCharacter->ApplyCharacterStatus();
-
-	return true;
-}
-
-UInventoryItem_Equipment * UMyInventoryComponent::GetEquippedItem()
-{
-	return EquippedItem;
-}
-
-void UMyInventoryComponent::SetDefaultItem()
-{
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
-	CHECKRETURN(GameInstance == nullptr);
-
-	UInventoryItem_Equipment* DefaultItem1 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem1"));
-	DefaultItem1->SetItemData(GameInstance->GetPOEItemData(1));
-
-	UInventoryItem_Equipment* DefaultItem2 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem2"));
-	DefaultItem2->SetItemData(GameInstance->GetPOEItemData(2));
-
-	UInventoryItem_Equipment* DefaultItem3 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem3"));
-	DefaultItem3->SetItemData(GameInstance->GetPOEItemData(3));
-
-	InsertItem(DefaultItem1);
-	InsertItem(DefaultItem2);
-	InsertItem(DefaultItem3);
-}
-
 // Called when the game starts
 void UMyInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void UMyInventoryComponent::OnRegister()
-{
-	Super::OnRegister();
-	OwningCharacter = Cast<APOECharacter>(GetOwner());
 }
