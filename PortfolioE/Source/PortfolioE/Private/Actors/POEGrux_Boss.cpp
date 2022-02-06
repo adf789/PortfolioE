@@ -29,9 +29,8 @@ void APOEGrux_Boss::InitializeValues()
 
 	CharacterStatus->InitHPVale(10000.0f);
 	CharacterStatus->InitAttackValue(5.0f);
-	CharacterStatus->InitDefenceValue(100.0f);
+	CharacterStatus->InitMoveSpeedValue(400.0f);
 
-	MaxSpeed = 400.0f;
 	AttackRange = 300.0f;
 	AIDetectDistance = 2000.0f;
 	AttackCollisionScale = 200.0f;

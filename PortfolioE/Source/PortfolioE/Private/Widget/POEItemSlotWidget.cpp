@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "POEItemSlotWidget.h"
-#include "InventoryItem_Base.h"
+#include "InventoryItem_Equipment.h"
 #include "POEItemTexturePath.h"
 #include "POEGameInstance.h"
 #include "Components/TextBlock.h"
@@ -10,6 +10,7 @@
 #include "engine/AssetManager.h"
 #include "POEInventoryAndEquipWidget.h"
 #include "UIScreenInteraction.h"
+#include "MyInventoryComponent.h"
 
 void UPOEItemSlotWidget::SetItemAndInitView(UInventoryItem_Base * ItemData)
 {
@@ -37,12 +38,18 @@ void UPOEItemSlotWidget::NativeConstruct()
 void UPOEItemSlotWidget::OnUse()
 {
 	CHECKRETURN(ItemData == nullptr);
-	ItemData->Use();
 	if (ItemData->GetItemType() == EItemType::EQUIPMENT) {
-		UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
-		if (GameInstance != nullptr) {
+		UInventoryItem_Equipment* Equipment = Cast<UInventoryItem_Equipment>(ItemData);
+
+		CHECKRETURN(Equipment == nullptr);
+		if (ItemData->GetOwningInventory()->TrySetEquipmentItem(Equipment)) {
+			UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+			CHECKRETURN(GameInstance == nullptr);
+
 			UPOEInventoryAndEquipWidget* InventoryAndEquipWidget = Cast<UPOEInventoryAndEquipWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY));
-			if (InventoryAndEquipWidget != nullptr) InventoryAndEquipWidget->SetEquipItemView(ItemImage_Texture);
+			if (InventoryAndEquipWidget != nullptr) {
+				InventoryAndEquipWidget->InitInventoryView(ItemData->GetOwningInventory());
+			}
 		}
 	}
 }

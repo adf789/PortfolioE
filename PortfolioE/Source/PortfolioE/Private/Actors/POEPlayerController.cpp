@@ -133,6 +133,12 @@ UPOEPlayerHUDWidget* APOEPlayerController::CreateAndInitHUDWidget(APOECharacter_
 	return HUDWidget;
 }
 
+void APOEPlayerController::UpdateValueHUDWidget()
+{
+	HUDWidget->UpdateHpBar();
+	HUDWidget->UpdateMpBar();
+}
+
 void APOEPlayerController::Possess(APawn * aPawn)
 {
 	Super::Possess(aPawn);

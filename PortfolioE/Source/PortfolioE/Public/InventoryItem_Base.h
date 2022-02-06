@@ -17,11 +17,16 @@ class PORTFOLIOE_API UInventoryItem_Base : public UObject
 public:
 	UInventoryItem_Base();
 
+	virtual void SetItemData(struct FPOEItemData* ItemData);
+
 	void SetDisplayName(FName Name);
 	FName GetDisplayName();
 
-	void SetHaveCount(int32 HaveCount);
-	int32 GetHaveCount();
+	void SetRequireExp(int32 RequireExp);
+	int32 GetRequireExp();
+
+	void SetCurrentExp(int32 CurrentExp);
+	int32 GetCurrentExp();
 
 	void SetTextureId(int32 TextureId);
 	int32 GetTextureId();
@@ -35,14 +40,15 @@ public:
 	void SetItemType(EItemType ItemType);
 	EItemType GetItemType();
 
-	virtual void Use() PURE_VIRTUAL(UInventoryItem_Base, );
-
 protected:	
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	FName DisplayName;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
-	int32 HaveCount;
+	int32 RequireExp;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	int32 CurrentExp;
 	
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	int32 TextureId;

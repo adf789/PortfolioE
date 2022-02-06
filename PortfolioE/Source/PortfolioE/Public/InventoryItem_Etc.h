@@ -16,7 +16,5 @@ class PORTFOLIOE_API UInventoryItem_Etc : public UInventoryItem_Base
 	
 public:
 	UInventoryItem_Etc();
-
-	virtual void Use() override;
 	
 };
