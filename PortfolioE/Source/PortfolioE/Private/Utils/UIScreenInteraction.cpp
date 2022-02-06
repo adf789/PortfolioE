@@ -37,15 +37,11 @@ void UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName)
 		FSoftObjectPath UIClassPath = GetDefault<UPOEUIClassPaths>()->UIClassPaths[(int8)ScreenName];
 
 		TSubclassOf<UUserWidget> UIWidgetClass = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<UUserWidget>(UIClassPath));
-		if (UIWidgetClass.Get() != nullptr) {
-			//TEST_LOG_WITH_VAR("Loaded asset: %s", *UIWidget->GetName());
-			UUserWidget* UIWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), UIWidgetClass);
-			UIWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
-			UIPanels.Add(ScreenName, UIWidget);
-		}
-		else {
-			//TEST_LOG_WITH_VAR("Can't Load: %s", *AssetStreamingHandle->GetLoadedAsset()->GetName());
-		}
+		CHECKRETURN(UIWidgetClass.Get() == nullptr);
+		
+		UUserWidget* UIWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), UIWidgetClass);
+		UIWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
+		UIPanels.Add(ScreenName, UIWidget);
 	}
 	else {
 		FString ScreenNameStr;

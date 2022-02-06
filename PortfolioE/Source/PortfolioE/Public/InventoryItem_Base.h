@@ -19,6 +19,9 @@ public:
 
 	virtual void SetItemData(struct FPOEItemData* ItemData);
 
+	void SetItemId(int32 ItemId);
+	int32 GetItemId();
+
 	void SetDisplayName(FName Name);
 	FName GetDisplayName();
 
@@ -41,6 +44,9 @@ public:
 	EItemType GetItemType();
 
 protected:	
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	int32 ItemId;
+
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	FName DisplayName;
 

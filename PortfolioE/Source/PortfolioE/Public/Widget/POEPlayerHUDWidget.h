@@ -20,6 +20,7 @@ protected:
 public:
 	void UpdateHpBar();
 	void UpdateMpBar();
+	void InitQuickSlotView();
 
 	void BindCharacterStat(class UPOECharacterStat* CharacterStat);
 	
@@ -36,6 +37,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	class UTextBlock* MpValueText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	class UImage* ActiveSlotImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	class UImage* PassiveSlotImage;
 	
 	UPROPERTY()
 	class UPOECharacterStat* CharacterStat;

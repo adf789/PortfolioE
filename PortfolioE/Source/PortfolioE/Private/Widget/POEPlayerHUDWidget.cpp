@@ -3,7 +3,12 @@
 #include "POEPlayerHUDWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 #include "POECharacterStat.h"
+#include "POECharacter.h"
+#include "MyInventoryComponent.h"
+#include "POEGameInstance.h"
+#include "InventoryItem_Equipment.h"
 
 void UPOEPlayerHUDWidget::UpdateHpBar()
 {
@@ -31,6 +36,30 @@ void UPOEPlayerHUDWidget::UpdateMpBar()
 	}
 }
 
+void UPOEPlayerHUDWidget::InitQuickSlotView()
+{
+	APOECharacter* Character = Cast<APOECharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	CHECKRETURN(Character == nullptr);
+
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+	CHECKRETURN(GameInstance == nullptr);
+
+	UTexture2D* ActiveItemTexture = nullptr;
+	UTexture2D* PassiveItemTexture = nullptr;
+
+	if (Character->Inventory->GetEquippedActiveItem() != nullptr) {
+		ActiveItemTexture = GameInstance->GetItemTextureForId(Character->Inventory->GetEquippedActiveItem()->GetItemId());
+	}
+	ActiveSlotImage->SetBrushFromTexture(ActiveItemTexture);
+	ActiveSlotImage->SetColorAndOpacity(ActiveItemTexture != nullptr ? FLinearColor::White : FLinearColor::Transparent);
+
+	if (Character->Inventory->GetEquippedPassiveItem() != nullptr) {
+		PassiveItemTexture = GameInstance->GetItemTextureForId(Character->Inventory->GetEquippedPassiveItem()->GetItemId());
+	}
+	PassiveSlotImage->SetBrushFromTexture(PassiveItemTexture);
+	PassiveSlotImage->SetColorAndOpacity(PassiveItemTexture != nullptr ? FLinearColor::White : FLinearColor::Transparent);
+}
+
 void UPOEPlayerHUDWidget::BindCharacterStat(UPOECharacterStat * CharacterStat)
 {
 	this->CharacterStat = CharacterStat;
@@ -46,10 +75,24 @@ void UPOEPlayerHUDWidget::NativeConstruct() {
 	Super::NativeConstruct();
 
 	MpBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_MpBar")));
+	CHECKRETURN(MpBar == nullptr);
+
 	HpBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_HpBar")));
+	CHECKRETURN(HpBar == nullptr);
+
 	HpValueText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_HpValue")));
+	CHECKRETURN(HpValueText == nullptr);
+
 	MpValueText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_MpValue")));
+	CHECKRETURN(MpValueText == nullptr);
+
+	ActiveSlotImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_QuickActiveSlot")));
+	CHECKRETURN(ActiveSlotImage == nullptr);
+
+	PassiveSlotImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_QuickPassiveSlot")));
+	CHECKRETURN(PassiveSlotImage == nullptr);
 
 	UpdateHpBar();
 	UpdateMpBar();
+	InitQuickSlotView();
 }

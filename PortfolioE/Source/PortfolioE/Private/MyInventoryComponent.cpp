@@ -63,44 +63,94 @@ const TMap<FName, class UInventoryItem_Base*> & UMyInventoryComponent::GetItems(
 	return HaveItems;
 }
 
-bool UMyInventoryComponent::TrySetEquipmentItem(UInventoryItem_Equipment * TryEquipItem)
+bool UMyInventoryComponent::TryEquipActiveItem(UInventoryItem_Equipment * TryEquipItem)
 {
 	CHECKRETURN(TryEquipItem == nullptr || OwningCharacter == nullptr, false);
 
-	if(!TryUnsetEquipmentItem()) return false;
+	if(!TryUnEquipActiveItem()) return false;
 
 	OwningCharacter->CharacterStatus->AttackValue += TryEquipItem->ItemAttackValue;
 	OwningCharacter->CharacterStatus->MaxHPValue += TryEquipItem->ItemHpValue;
 	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
 	OwningCharacter->CharacterStatus->MoveSpeedValue += TryEquipItem->ItemMoveSpeedValue;
 	DeleteItem(TryEquipItem);
-	EquippedItem = TryEquipItem;
+	EquippedActiveItem = TryEquipItem;
 
 	OwningCharacter->ApplyCharacterStatus();
 
 	return true;
 }
 
-bool UMyInventoryComponent::TryUnsetEquipmentItem()
+bool UMyInventoryComponent::TryUnEquipActiveItem()
 {
 	CHECKRETURN(OwningCharacter == nullptr, false);
-	if (EquippedItem == nullptr) return true;
+	if (EquippedActiveItem == nullptr) return true;
 
-	OwningCharacter->CharacterStatus->AttackValue -= EquippedItem->ItemAttackValue;
-	OwningCharacter->CharacterStatus->MaxHPValue -= EquippedItem->ItemHpValue;
+	OwningCharacter->CharacterStatus->AttackValue -= EquippedActiveItem->ItemAttackValue;
+	OwningCharacter->CharacterStatus->MaxHPValue -= EquippedActiveItem->ItemHpValue;
 	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
-	OwningCharacter->CharacterStatus->MoveSpeedValue -= EquippedItem->ItemMoveSpeedValue;
-	InsertItem(EquippedItem);
-	EquippedItem = nullptr;
+	OwningCharacter->CharacterStatus->MoveSpeedValue -= EquippedActiveItem->ItemMoveSpeedValue;
+	InsertItem(EquippedActiveItem);
+	EquippedActiveItem = nullptr;
 
 	OwningCharacter->ApplyCharacterStatus();
 
 	return true;
 }
 
-UInventoryItem_Equipment * UMyInventoryComponent::GetEquippedItem()
+bool UMyInventoryComponent::TryEquipPassiveItem(UInventoryItem_Equipment * TryEquipItem)
 {
-	return EquippedItem;
+	CHECKRETURN(TryEquipItem == nullptr || OwningCharacter == nullptr, false);
+
+	if (!TryUnEquipPassiveItem()) return false;
+
+	OwningCharacter->CharacterStatus->AttackValue += TryEquipItem->ItemAttackValue;
+	OwningCharacter->CharacterStatus->MaxHPValue += TryEquipItem->ItemHpValue;
+	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
+	OwningCharacter->CharacterStatus->MoveSpeedValue += TryEquipItem->ItemMoveSpeedValue;
+	DeleteItem(TryEquipItem);
+	EquippedPassiveItem = TryEquipItem;
+
+	OwningCharacter->ApplyCharacterStatus();
+
+	return true;
+}
+
+bool UMyInventoryComponent::TryUnEquipPassiveItem()
+{
+	CHECKRETURN(OwningCharacter == nullptr, false);
+	if (EquippedPassiveItem == nullptr) return true;
+
+	OwningCharacter->CharacterStatus->AttackValue -= EquippedPassiveItem->ItemAttackValue;
+	OwningCharacter->CharacterStatus->MaxHPValue -= EquippedPassiveItem->ItemHpValue;
+	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
+	OwningCharacter->CharacterStatus->MoveSpeedValue -= EquippedPassiveItem->ItemMoveSpeedValue;
+	InsertItem(EquippedPassiveItem);
+	EquippedPassiveItem = nullptr;
+
+	OwningCharacter->ApplyCharacterStatus();
+
+	return true;
+}
+
+bool UMyInventoryComponent::TryEquipItem(UInventoryItem_Equipment * TryEquipItem)
+{
+	if (TryEquipItem->IsPassive) {
+		return TryEquipPassiveItem(TryEquipItem);
+	}
+	else {
+		return TryEquipActiveItem(TryEquipItem);
+	}
+}
+
+UInventoryItem_Equipment * UMyInventoryComponent::GetEquippedActiveItem()
+{
+	return EquippedActiveItem;
+}
+
+UInventoryItem_Equipment * UMyInventoryComponent::GetEquippedPassiveItem()
+{
+	return EquippedPassiveItem;
 }
 
 void UMyInventoryComponent::SetDefaultItem()
@@ -108,18 +158,28 @@ void UMyInventoryComponent::SetDefaultItem()
 	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	CHECKRETURN(GameInstance == nullptr);
 
+	HaveItems.Reset();
+
 	UInventoryItem_Equipment* DefaultItem1 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem1"));
-	DefaultItem1->SetItemData(GameInstance->GetPOEItemData(1));
+	DefaultItem1->SetItemData(GameInstance->GetPOEItemData(0));
 
 	UInventoryItem_Equipment* DefaultItem2 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem2"));
-	DefaultItem2->SetItemData(GameInstance->GetPOEItemData(2));
+	DefaultItem2->SetItemData(GameInstance->GetPOEItemData(1));
 
 	UInventoryItem_Equipment* DefaultItem3 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem3"));
-	DefaultItem3->SetItemData(GameInstance->GetPOEItemData(3));
+	DefaultItem3->SetItemData(GameInstance->GetPOEItemData(2));
+
+	UInventoryItem_Equipment* DefaultItem4 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem4"));
+	DefaultItem4->SetItemData(GameInstance->GetPOEItemData(3));
+
+	UInventoryItem_Equipment* DefaultItem5 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem5"));
+	DefaultItem5->SetItemData(GameInstance->GetPOEItemData(4));
 
 	InsertItem(DefaultItem1);
 	InsertItem(DefaultItem2);
 	InsertItem(DefaultItem3);
+	InsertItem(DefaultItem4);
+	InsertItem(DefaultItem5);
 }
 
 // Called when the game starts

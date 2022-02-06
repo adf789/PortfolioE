@@ -39,13 +39,25 @@ public:
 	const TMap<FName, class UInventoryItem_Base*>& GetItems();
 
 	UFUNCTION()
-	bool TrySetEquipmentItem(class UInventoryItem_Equipment* TryEquipItem);
+	bool TryEquipActiveItem(class UInventoryItem_Equipment* TryEquipItem);
 
 	UFUNCTION()
-	bool TryUnsetEquipmentItem();
+	bool TryUnEquipActiveItem();
 
 	UFUNCTION()
-	class UInventoryItem_Equipment* GetEquippedItem();
+	bool TryEquipPassiveItem(class UInventoryItem_Equipment* TryEquipItem);
+
+	UFUNCTION()
+	bool TryUnEquipPassiveItem();
+
+	UFUNCTION()
+	bool TryEquipItem(class UInventoryItem_Equipment* TryEquipItem);
+
+	UFUNCTION()
+	class UInventoryItem_Equipment* GetEquippedActiveItem();
+
+	UFUNCTION()
+	class UInventoryItem_Equipment* GetEquippedPassiveItem();
 
 	UFUNCTION()
 	void SetDefaultItem();
@@ -61,7 +73,10 @@ protected:
 	TMap<FName, class UInventoryItem_Base*> HaveItems;
 
 	UPROPERTY()
-	class UInventoryItem_Equipment* EquippedItem;
+	class UInventoryItem_Equipment* EquippedActiveItem;
+
+	UPROPERTY()
+	class UInventoryItem_Equipment* EquippedPassiveItem;
 
 	UPROPERTY()
 	class APOECharacter* OwningCharacter;

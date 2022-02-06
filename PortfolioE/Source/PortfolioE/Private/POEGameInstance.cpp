@@ -2,6 +2,8 @@
 
 #include "POEGameInstance.h"
 #include "ActorObjectPool.h"
+#include "Engine/AssetManager.h"
+#include "POEItemTexturePath.h"
 
 UPOEGameInstance::UPOEGameInstance() {
 	this->EffectPooling = new ActorObjectPool();
@@ -20,10 +22,15 @@ UPOEGameInstance::UPOEGameInstance() {
 	CHECKRETURN(POEItemStatTable->RowMap.Num() == 0);
 }
 
+UPOEGameInstance::~UPOEGameInstance() {
+	delete EffectPooling;
+	delete DamageTextPooling;
+}
+
 FPOEItemData * UPOEGameInstance::GetPOEItemData(int32 ItemId)
 {
 	CHECKRETURN(POEItemDataTable == nullptr, nullptr);
-	return POEItemDataTable->FindRow<FPOEItemData>(*FString::FromInt(ItemId), TEXT(""));
+	return POEItemDataTable->FindRow<FPOEItemData>(*FString::FromInt(ItemId + 1), TEXT(""));
 }
 
 FPOEItemStatData * UPOEGameInstance::GetPOEItemStatData(int32 ItemId, int32 Level)
@@ -36,5 +43,18 @@ FPOEItemStatData * UPOEGameInstance::GetPOEItemStatData(int32 ItemId, int32 Leve
 		if (FetchedItemStatData->ItemId == ItemId && FetchedItemStatData->Level == Level) return FetchedItemStatData;
 	}
 
+	TEST_LOG_WITH_VAR("Not found stat data id: %d, level: %d", ItemId, Level);
 	return nullptr;
+}
+
+UTexture2D * UPOEGameInstance::GetItemTextureForId(int32 ItemId)
+{
+	if (LoadedTexture.Contains(ItemId)) return LoadedTexture[ItemId];
+	else if (GetDefault<UPOEItemTexturePath>()->TexturePaths.Num() <= ItemId) return nullptr;
+
+	UTexture2D* TempTexture = Cast<UTexture2D>(UAssetManager::GetStreamableManager().LoadSynchronous(GetDefault<UPOEItemTexturePath>()->TexturePaths[ItemId]));
+	CHECKRETURN(TempTexture == nullptr, nullptr);
+
+	LoadedTexture.Add(ItemId, TempTexture);
+	return TempTexture;
 }

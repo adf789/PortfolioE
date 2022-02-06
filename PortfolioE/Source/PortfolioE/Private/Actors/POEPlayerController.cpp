@@ -133,10 +133,19 @@ UPOEPlayerHUDWidget* APOEPlayerController::CreateAndInitHUDWidget(APOECharacter_
 	return HUDWidget;
 }
 
+UMyInventoryComponent * APOEPlayerController::GetPlayerInventory()
+{
+	APOECharacter* Character = Cast<APOECharacter>(GetPawn());
+	CHECKRETURN(Character == nullptr, nullptr);
+
+	return Character->Inventory;
+}
+
 void APOEPlayerController::UpdateValueHUDWidget()
 {
 	HUDWidget->UpdateHpBar();
 	HUDWidget->UpdateMpBar();
+	HUDWidget->InitQuickSlotView();
 }
 
 void APOEPlayerController::Possess(APawn * aPawn)

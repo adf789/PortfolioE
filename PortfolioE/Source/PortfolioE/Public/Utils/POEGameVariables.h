@@ -33,6 +33,7 @@ UENUM(BlueprintType)
 enum class EUIPanelName : uint8 {
 	INVENTORY,
 	STAGE_START,
+	DETAIL_VIEW,
 };
 
 UENUM(BlueprintType)

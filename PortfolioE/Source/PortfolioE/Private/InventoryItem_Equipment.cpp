@@ -8,6 +8,8 @@ UInventoryItem_Equipment::UInventoryItem_Equipment() {
 }
 
 void UInventoryItem_Equipment::SetItemData(FPOEItemData* ItemData) {
+	Super::SetItemData(ItemData);
+
 	CHECKRETURN(ItemData == nullptr);
 
 	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
@@ -17,7 +19,8 @@ void UInventoryItem_Equipment::SetItemData(FPOEItemData* ItemData) {
 	CHECKRETURN(ItemStatData == nullptr);
 
 	SetDisplayName(FName(*ItemData->ItemName));
-	SetTextureId(ItemStatData->ItemId - 1);
+	SetItemId(ItemData->ItemId);
+	SetTextureId(ItemStatData->ItemId);
 	SetDescription(FText::FromString(ItemData->Description));
 	SetCurrentExp(0);
 	SetRequireExp(ItemStatData->RequireExp);
@@ -25,4 +28,5 @@ void UInventoryItem_Equipment::SetItemData(FPOEItemData* ItemData) {
 	this->ItemAttackValue = ItemStatData->AttackValue;
 	this->ItemHpValue = ItemStatData->HpValue;
 	this->ItemMoveSpeedValue = ItemStatData->SpeedValue;
+	this->IsPassive = ItemData->Passive;
 }

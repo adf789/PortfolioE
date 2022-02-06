@@ -10,6 +10,16 @@ void UInventoryItem_Base::SetItemData(FPOEItemData * ItemData)
 {
 }
 
+void UInventoryItem_Base::SetItemId(int32 ItemId)
+{
+	this->ItemId = ItemId;
+}
+
+int32 UInventoryItem_Base::GetItemId()
+{
+	return ItemId;
+}
+
 void UInventoryItem_Base::SetDisplayName(FName Name)
 {
 	this->DisplayName = Name;

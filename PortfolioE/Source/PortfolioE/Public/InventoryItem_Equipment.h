@@ -22,4 +22,5 @@ public:
 	float ItemAttackValue;
 	float ItemHpValue;
 	float ItemMoveSpeedValue;
+	bool IsPassive;
 };

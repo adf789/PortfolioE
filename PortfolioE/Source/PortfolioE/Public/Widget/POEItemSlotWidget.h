@@ -24,6 +24,16 @@ protected:
 	UFUNCTION()
 	virtual void OnUse();
 
+	UFUNCTION()
+	virtual void OnShowDetailPanel();
+	
+	UFUNCTION()
+	virtual void OnHideDetailPanel();
+
+	UFUNCTION()
+	virtual void SetDetailPanelLocationForCursor();
+
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	class UTextBlock* ItemNameText;
@@ -45,4 +55,6 @@ private:
 
 	FSoftObjectPath TextureAssetToLoad = FSoftObjectPath(nullptr);
 	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;
+
+	FTimerHandle DetailPanelLocationHandler;
 };

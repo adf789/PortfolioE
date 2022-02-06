@@ -68,6 +68,7 @@ class PORTFOLIOE_API UPOEGameInstance : public UGameInstance
 	
 public:
 	UPOEGameInstance();
+	~UPOEGameInstance();
 
 	FPOEItemData* GetPOEItemData(int32 ItemId);
 	FPOEItemStatData* GetPOEItemStatData(int32 ItemId, int32 Level);
@@ -76,10 +77,16 @@ public:
 	class ActorObjectPool* DamageTextPooling;
 	class UUIScreenInteraction* UIScreenInteraction;
 
+	UFUNCTION()
+	class UTexture2D* GetItemTextureForId(int32 ItemId);
+
 private:
 	UPROPERTY()
 	class UDataTable* POEItemDataTable;
 
 	UPROPERTY()
 	class UDataTable* POEItemStatTable;
+
+	UPROPERTY()
+	TMap<int32, class UTexture2D*> LoadedTexture;
 };
