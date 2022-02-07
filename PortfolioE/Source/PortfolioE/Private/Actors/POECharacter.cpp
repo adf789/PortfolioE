@@ -35,17 +35,24 @@ APOECharacter::APOECharacter()
 	ArrowSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowSprite"));
 	Inventory = CreateDefaultSubobject<UMyInventoryComponent>(TEXT("Inventory"));
 	UIScreens = CreateDefaultSubobject<UUIScreenInteraction>(TEXT("UIScreens"));
+	BuffEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("BuffEffect"));
 
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
 	SpringArmForCapture->SetupAttachment(GetCapsuleComponent());
 	CaptureCamera->SetupAttachment(SpringArmForCapture);
+	BuffEffect->SetupAttachment(GetCapsuleComponent());
+	ArrowSprite->SetupAttachment(GetCapsuleComponent());
+
 	CaptureCamera->ShowFlags.SetSkeletalMeshes(false);
 	CaptureCamera->ShowFlags.SetLighting(false);
-	ArrowSprite->SetupAttachment(GetCapsuleComponent());
+
 	ArrowSprite->SetWorldScale3D(FVector(.2f, .2f, .2f));
 	ArrowSprite->SetWorldLocationAndRotation(FVector(.0f, .0f, 4000.0f), FRotator(.0f, .0f, 90.0f));
 	ArrowSprite->SetOwnerNoSee(true);
+
+	BuffEffect->SetVisibility(false);
+	BuffEffect->bAutoActivate = true;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
 		SK_SEVAROG(TEXT("/Game/ParagonSevarog/Characters/Heroes/Sevarog/Meshes/Sevarog.Sevarog"));
@@ -67,15 +74,33 @@ APOECharacter::APOECharacter()
 	}
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>
-		PS_LAVA(TEXT("/Game/InfinityBladeEffects/Effects/FX_Ambient/Fire/P_Lava_Splashes.P_Lava_Splashes"));
+		PS_LAVA(TEXT("/Game/POE/Effects/Particle/P_MagicSpray_Fire_01.P_MagicSpray_Fire_01"));
 	if (PS_LAVA.Succeeded()) {
 		LavaEffect = PS_LAVA.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>
-		PS_LIGHTNING(TEXT("/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Genno/P_Genno_Overhead_Imp_01.P_Genno_Overhead_Imp_01"));
+		PS_LIGHTNING(TEXT("/Game/POE/Effects/Particle/P_GruntLightning_gun_01.P_GruntLightning_gun_01"));
 	if (PS_LIGHTNING.Succeeded()) {
 		LightningEffect = PS_LIGHTNING.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>
+		PS_ICE(TEXT("/Game/POE/Effects/Particle/P_LazerIceAttack.P_LazerIceAttack"));
+	if (PS_ICE.Succeeded()) {
+		IceEffect = PS_ICE.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>
+		PS_STRENGTH(TEXT("/Game/POE/Effects/Particle/P_DeadMans_Loot.P_DeadMans_Loot"));
+	if (PS_STRENGTH.Succeeded()) {
+		StrengthEffect = PS_STRENGTH.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>
+		PS_DEMON(TEXT("/Game/POE/Effects/Particle/P_Enrage_Base.P_Enrage_Base"));
+	if (PS_DEMON.Succeeded()) {
+		DemonEffect = PS_DEMON.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>
@@ -114,7 +139,20 @@ void APOECharacter::MeleeAttack()
 void APOECharacter::ApplyCharacterStatus()
 {
 	POEPlayerController->UpdateValueHUDWidget();
-	GetCharacterMovement()->MaxWalkSpeed = 450 + CharacterStatus->MoveSpeedValue;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterStatus->MoveSpeedValue;
+
+	UInventoryItem_Equipment* PassiveEquipment = Inventory->GetEquippedPassiveItem();
+	if (PassiveEquipment == nullptr) BuffEffect->SetVisibility(false);
+	else if (PassiveEquipment->GetItemId() == 3) {
+		BuffEffect->SetVisibility(true);
+		BuffEffect->SetTemplate(StrengthEffect);
+		BuffEffect->SetRelativeLocation(FVector::ZeroVector);
+	}
+	else if (PassiveEquipment->GetItemId() == 4) {
+		BuffEffect->SetVisibility(true);
+		BuffEffect->SetTemplate(DemonEffect);
+		BuffEffect->SetRelativeLocation(FVector(.0f, .0f, 250.0f));
+	}
 }
 
 void APOECharacter::OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted) {
@@ -159,7 +197,7 @@ void APOECharacter::LoadInventoryData()
 	Inventory->SetDefaultItem();
 }
 
-void APOECharacter::ActiveAction()
+void APOECharacter::PrepareMeleeAttack()
 {
 	if (IsPlayingMontionAnything() && !IsComboInput) return;
 	GetCharacterMovement()->StopActiveMovement();
@@ -177,8 +215,7 @@ void APOECharacter::ActiveAction()
 		SetActorRotation(Rot);
 	}
 
-	if(!IsRangeAttack) MeleeAttack();
-	else CastingSpell(hitResult.Location);
+	MeleeAttack();
 }
 
 void APOECharacter::Dash()
@@ -253,13 +290,9 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->AddActionBinding(Pressed);
 	PlayerInputComponent->AddActionBinding(Released);
-	PlayerInputComponent->BindAction(TEXT("ActiveAction"), EInputEvent::IE_Pressed, this, &APOECharacter::ActiveAction);
+	PlayerInputComponent->BindAction(TEXT("ActiveAction"), EInputEvent::IE_Pressed, this, &APOECharacter::PrepareMeleeAttack);
 	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &APOECharacter::Dash);
-	DECLARE_DELEGATE_OneParam(FCustomDelegate, int);
-	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveQ"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 0);
-	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveW"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 1);
-	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveE"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 2);
-	PlayerInputComponent->BindAction<FCustomDelegate, APOECharacter, int>(TEXT("ChangeActiveR"), EInputEvent::IE_Pressed, this, &APOECharacter::ChangeActive, 3);
+	PlayerInputComponent->BindAction(TEXT("QuckSlotQ"), EInputEvent::IE_Pressed, this, &APOECharacter::PrepareCastingSpell);
 }
 
 void APOECharacter::PossessedBy(AController * NewController)
@@ -427,46 +460,66 @@ void APOECharacter::CastingSpell(FVector Location)
 		NewEffect = Cast<AEffectDamageActor>(PoeInstance->EffectPooling->GetUnUseObject());
 	}
 
+	FVector ForwardDirection = GetActorForwardVector();
+	FVector SpawnLocation = GetActorLocation() + ForwardDirection * 70.0f;
+
+	ForwardDirection.Z = .0f;
+	FRotator Rot = FRotationMatrix::MakeFromX(ForwardDirection).Rotator();
+
 	if (NewEffect == nullptr) {
-		NewEffect = GetWorld()->SpawnActor<AEffectDamageActor>(AEffectDamageActor::StaticClass(), Location, FRotator::ZeroRotator);
+		NewEffect = GetWorld()->SpawnActor<AEffectDamageActor>(AEffectDamageActor::StaticClass(), SpawnLocation + FVector::UpVector * 20.0f, Rot);
 		bPooling = false;
 	}
-	else NewEffect->SetActorLocation(Location);
+	else {
+		NewEffect->SetActorLocationAndRotation(SpawnLocation + FVector::UpVector * 20.0f, Rot);
+	}
 
 	NewEffect->SetParticleSystem(SelectedEffect);
 	NewEffect->Active();
+	NewEffect->SetDirection(GetActorForwardVector());
+	NewEffect->SetDistance(800.0f);
 	if(!bPooling && PoeInstance != nullptr) PoeInstance->EffectPooling->AddObject(NewEffect);
-
-	FTimerHandle effectSpawnHandle;
-	GetWorld()->GetTimerManager().SetTimer(effectSpawnHandle, [NewEffect]() {
-			if (NewEffect != nullptr && ::IsValid(NewEffect)) {
-				NewEffect->InActive();
-			}
-		}, 3.0f, false);
 }
 
-void APOECharacter::ChangeActive(int index)
+void APOECharacter::PrepareCastingSpell()
 {
-	switch (index)
+	UInventoryItem_Equipment* ActiveEquipmentItem = Inventory->GetEquippedActiveItem();
+
+	if (ActiveEquipmentItem == nullptr) return;
+
+	switch (ActiveEquipmentItem->GetItemId())
 	{
 	case 0:
-		TEST_LOG("Change melee!");
-		IsRangeAttack = false;
+		SelectedEffect = LavaEffect;
 		break;
 	case 1:
-		SelectedEffect = LavaEffect;
-		TEST_LOG("Change Fire!");
-		IsRangeAttack = true;
+		SelectedEffect = LightningEffect;
 		break;
 	case 2:
-	case 3:
-		SelectedEffect = LightningEffect;
-		TEST_LOG("Change Lightning!");
-		IsRangeAttack = true;
+		SelectedEffect = IceEffect;
 		break;
 	default:
+		SelectedEffect = LavaEffect;
 		break;
 	}
+
+	if (IsPlayingMontionAnything()) return;
+	GetCharacterMovement()->StopActiveMovement();
+
+	FHitResult hitResult;
+	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
+
+	if (!bResult) return;
+
+	FVector Direction = hitResult.Location - GetActorLocation();
+	Direction.Z = .0f;
+	FRotator Rot = FRotationMatrix::MakeFromX(Direction).Rotator();
+
+	if (!IsPlayingMontionAnything()) {
+		SetActorRotation(Rot);
+	}
+
+	CastingSpell(hitResult.Location);
 }
 
 void APOECharacter::CalculateCoolTime()

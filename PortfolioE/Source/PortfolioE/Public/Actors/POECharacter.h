@@ -43,13 +43,13 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void LoadInventoryData();
 
-	void ActiveAction();
+	void PrepareMeleeAttack();
 	void Dash();
 	bool GetCurDestination(FHitResult& HitResult);
 	void SetDestination();
 	void ClickTarget();
 	void CastingSpell(FVector Location);
-	void ChangeActive(int index);
+	void PrepareCastingSpell();
 
 private:
 	UFUNCTION()
@@ -82,6 +82,9 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category = UI)
 	UUIScreenInteraction* UIScreens;
 
+	UPROPERTY(VisibleInstanceOnly, Category = Effect)
+	class UParticleSystemComponent* BuffEffect;
+
 private:
 	UPROPERTY()
 		class APOEPlayerController* POEPlayerController;
@@ -97,6 +100,15 @@ private:
 
 	UPROPERTY()
 		class UParticleSystem* LightningEffect;
+
+	UPROPERTY()
+		class UParticleSystem* IceEffect;
+
+	UPROPERTY()
+		class UParticleSystem* StrengthEffect;
+
+	UPROPERTY()
+		class UParticleSystem* DemonEffect;
 
 	UPROPERTY()
 		class UParticleSystem* SelectedEffect;
