@@ -19,6 +19,7 @@
 #include "PaperSprite.h"
 #include "MyInventoryComponent.h"
 #include "InventoryItem_Equipment.h"
+#include "POEPlayerHUDWidget.h"
 
 
 // Sets default values
@@ -33,9 +34,9 @@ APOECharacter::APOECharacter()
 	SpringArmForCapture = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmForCapture"));
 	CaptureCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureCamera"));
 	ArrowSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowSprite"));
-	Inventory = CreateDefaultSubobject<UMyInventoryComponent>(TEXT("Inventory"));
 	UIScreens = CreateDefaultSubobject<UUIScreenInteraction>(TEXT("UIScreens"));
 	BuffEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("BuffEffect"));
+	Inventory = CreateDefaultSubobject<UMyInventoryComponent>(TEXT("Inventory"));
 
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
@@ -187,9 +188,8 @@ void APOECharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	SetAttackType();
-
-	GetWorld()->GetTimerManager().SetTimer(CoolTimeHandle, this, &APOECharacter::CalculateCoolTime, 1.0f, true);
 	LoadInventoryData();
+	BindCoolTime();
 }
 
 void APOECharacter::LoadInventoryData()
@@ -220,8 +220,8 @@ void APOECharacter::PrepareMeleeAttack()
 
 void APOECharacter::Dash()
 {
-	if (DashCoolTime > .0f) {
-		TEST_LOG("Cooltime now");
+	if (DashCoolTime) {
+		TEST_LOG("Dash Cooltime now");
 		return;
 	}
 	else if (IsPlayingMontionAnything() && !IsComboInput) return;
@@ -230,8 +230,15 @@ void APOECharacter::Dash()
 	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
 
 	if (bResult) {
-		DashCoolTime = 5.0f;
+		DashCoolTime = true;
 		IsSprinting = true;
+
+		UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
+		CHECKRETURN(GameInstance == nullptr);
+		UPOEPlayerHUDWidget* HUDPanel = Cast<UPOEPlayerHUDWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD));
+		if (HUDPanel != nullptr) {
+			HUDPanel->SetTimerDashSlot(5.0f);
+		}
 
 		GetCharacterMovement()->StopActiveMovement();
 		FVector Direction = hitResult.Location - GetActorLocation();
@@ -448,17 +455,22 @@ void APOECharacter::ClickTarget()
 
 void APOECharacter::CastingSpell(FVector Location)
 {
-	if (CharacterState == ECharacterBehaviorState::ATTACKING) return;
-	//IsCasting = true;
-	CharacterState = ECharacterBehaviorState::ATTACKING;
 	CharacterAnim->PlayCastMagic();
+
+	CharacterState = ECharacterBehaviorState::ATTACKING;
 
 	AEffectDamageActor* NewEffect = nullptr;
 	bool bPooling = true;
-	UPOEGameInstance* PoeInstance = Cast<UPOEGameInstance>(GetGameInstance());
-	if (PoeInstance != nullptr) {
-		NewEffect = Cast<AEffectDamageActor>(PoeInstance->EffectPooling->GetUnUseObject());
-	}
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
+	CHECKRETURN(GameInstance == nullptr);
+
+	UPOEPlayerHUDWidget* HUDPanel = Cast<UPOEPlayerHUDWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD));
+	CHECKRETURN(HUDPanel == nullptr);
+
+	ActiveCoolTime = true;
+	HUDPanel->SetTimerActiveSlot(5.0f);
+	
+	NewEffect = Cast<AEffectDamageActor>(GameInstance->EffectPooling->GetUnUseObject());
 
 	FVector ForwardDirection = GetActorForwardVector();
 	FVector SpawnLocation = GetActorLocation() + ForwardDirection * 70.0f;
@@ -478,11 +490,15 @@ void APOECharacter::CastingSpell(FVector Location)
 	NewEffect->Active();
 	NewEffect->SetDirection(GetActorForwardVector());
 	NewEffect->SetDistance(800.0f);
-	if(!bPooling && PoeInstance != nullptr) PoeInstance->EffectPooling->AddObject(NewEffect);
+	if(!bPooling && GameInstance != nullptr) GameInstance->EffectPooling->AddObject(NewEffect);
 }
 
 void APOECharacter::PrepareCastingSpell()
 {
+	if (ActiveCoolTime) return;
+	else if (IsPlayingMontionAnything()) return;
+	GetCharacterMovement()->StopActiveMovement();
+
 	UInventoryItem_Equipment* ActiveEquipmentItem = Inventory->GetEquippedActiveItem();
 
 	if (ActiveEquipmentItem == nullptr) return;
@@ -503,9 +519,6 @@ void APOECharacter::PrepareCastingSpell()
 		break;
 	}
 
-	if (IsPlayingMontionAnything()) return;
-	GetCharacterMovement()->StopActiveMovement();
-
 	FHitResult hitResult;
 	bool bResult = POEPlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), true, hitResult);
 
@@ -522,17 +535,13 @@ void APOECharacter::PrepareCastingSpell()
 	CastingSpell(hitResult.Location);
 }
 
-void APOECharacter::CalculateCoolTime()
-{
-	if (DashCoolTime > .0f) {
-		DashCoolTime -= 1.0f;
+void APOECharacter::BindCoolTime() {
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
+	CHECKRETURN(GameInstance == nullptr);
 
-		if (DashCoolTime <= .0f) {
-			TEST_LOG("Can use dash now");
-			DashCoolTime = .0f;
-		}
-	}
+	UPOEPlayerHUDWidget* HUDPanel = Cast<UPOEPlayerHUDWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD));
+	CHECKRETURN(HUDPanel == nullptr);
+
+	HUDPanel->OnEndActiveCoolTime.BindLambda([this]() {ActiveCoolTime = false;});
+	HUDPanel->OnEndDashCoolTime.BindLambda([this]() {DashCoolTime = false; });
 }
-
-
-

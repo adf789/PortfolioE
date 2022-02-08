@@ -18,6 +18,7 @@ public:
 
 	virtual void DestroyComponent(bool bPromoteChildren = false) override;
 	void ShowPanel(EUIPanelName ScreenName);
+	void ShowPanel(EUIPanelName ScreenName, EViewportLevel ViewportLevel);
 	void ClosePanel(EUIPanelName ScreenName);
 	class UUserWidget* GetPanel(EUIPanelName ScreenName);
 	int PanelCount();

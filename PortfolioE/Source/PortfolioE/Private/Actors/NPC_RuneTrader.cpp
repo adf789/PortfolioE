@@ -56,7 +56,7 @@ void ANPC_RuneTrader::OnAction()
 	Player->UIScreens->ShowPanel(EUIPanelName::STAGE_START);
 
 	UPOEInventoryAndEquipWidget* InventoryAndEquipWidget = Cast<UPOEInventoryAndEquipWidget>(Player->UIScreens->GetPanel(EUIPanelName::INVENTORY));
-	if(InventoryAndEquipWidget != nullptr) InventoryAndEquipWidget->InitInventoryView(Player->Inventory);
+	if(InventoryAndEquipWidget != nullptr) InventoryAndEquipWidget->InitInventoryView();
 }
 
 void ANPC_RuneTrader::OnCancel()

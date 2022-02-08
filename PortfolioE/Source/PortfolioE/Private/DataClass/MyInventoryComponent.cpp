@@ -50,7 +50,7 @@ void UMyInventoryComponent::InsertItem(UInventoryItem_Base * Item)
 
 void UMyInventoryComponent::DeleteItem(FName ItemName)
 {
-	if(HaveItems.Contains(ItemName)) HaveItems.Remove(ItemName);
+	if (HaveItems.Contains(ItemName)) HaveItems.Remove(ItemName);
 }
 
 void UMyInventoryComponent::DeleteItem(UInventoryItem_Base * Item)
@@ -67,7 +67,7 @@ bool UMyInventoryComponent::TryEquipActiveItem(UInventoryItem_Equipment * TryEqu
 {
 	CHECKRETURN(TryEquipItem == nullptr || OwningCharacter == nullptr, false);
 
-	if(!TryUnEquipActiveItem()) return false;
+	if (!TryUnEquipActiveItem()) return false;
 
 	OwningCharacter->CharacterStatus->AttackValue += TryEquipItem->ItemAttackValue;
 	OwningCharacter->CharacterStatus->MaxHPValue += TryEquipItem->ItemHpValue;

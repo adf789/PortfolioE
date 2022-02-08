@@ -42,9 +42,6 @@ public:
 	UPOEPlayerHUDWidget* CreateAndInitHUDWidget(class APOECharacter_Base* Character_Base);
 
 	UFUNCTION()
-	class UMyInventoryComponent* GetPlayerInventory();
-
-	UFUNCTION()
 	void UpdateValueHUDWidget();
 
 	virtual void Possess(APawn* aPawn) override;

@@ -6,6 +6,7 @@
 #include "POENpcMenuWidget.h"
 #include "Components/WidgetComponent.h"
 #include "POEPlayerHUDWidget.h"
+#include "POEGameInstance.h"
 
 APOEPlayerController::APOEPlayerController()
 {
@@ -15,12 +16,12 @@ APOEPlayerController::APOEPlayerController()
 		menuWidgetClass = UI_MENU_C.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<UUserWidget>
+	/*static ConstructorHelpers::FClassFinder<UUserWidget>
 		UI_HUD_C(TEXT("/Game/POE/UIWidget/UI_PlayerHUDWidget.UI_PlayerHUDWidget_c"));
 	if (UI_HUD_C.Succeeded()) {
 		HUDWidgetClass = UI_HUD_C.Class;
 
-	}
+	}*/
 }
 
 void APOEPlayerController::SetupInputComponent() {
@@ -123,26 +124,25 @@ UUserWidget * APOEPlayerController::ShowMenuWidget(TSubclassOf<UUserWidget> Widg
 
 UPOEPlayerHUDWidget* APOEPlayerController::CreateAndInitHUDWidget(APOECharacter_Base * Character_Base)
 {
-	UPOEPlayerHUDWidget* HUDWidget = CreateWidget<UPOEPlayerHUDWidget>(this, HUDWidgetClass);
-	HUDWidget->AddToViewport(EViewportLevel::HUD);
+	/*UPOEPlayerHUDWidget* HUDWidget = CreateWidget<UPOEPlayerHUDWidget>(this, HUDWidgetClass);
+	HUDWidget->AddToViewport(EViewportLevel::HUD);*/
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
 
-	if (Character_Base != nullptr) {
+	if (Character_Base != nullptr && GameInstance != nullptr) {
+		GameInstance->UIScreenInteraction->ShowPanel(EUIPanelName::HUD, EViewportLevel::HUD);
+		HUDWidget = Cast<UPOEPlayerHUDWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD));
+		CHECKRETURN(HUDWidget == nullptr, nullptr);
+
 		HUDWidget->BindCharacterStat(Character_Base->CharacterStatus);
 	}
 
 	return HUDWidget;
 }
 
-UMyInventoryComponent * APOEPlayerController::GetPlayerInventory()
-{
-	APOECharacter* Character = Cast<APOECharacter>(GetPawn());
-	CHECKRETURN(Character == nullptr, nullptr);
-
-	return Character->Inventory;
-}
-
 void APOEPlayerController::UpdateValueHUDWidget()
 {
+	CHECKRETURN(HUDWidget == nullptr);
+
 	HUDWidget->UpdateHpBar();
 	HUDWidget->UpdateMpBar();
 	HUDWidget->InitQuickSlotView();

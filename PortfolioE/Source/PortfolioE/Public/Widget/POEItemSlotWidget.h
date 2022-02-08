@@ -16,7 +16,7 @@ class PORTFOLIOE_API UPOEItemSlotWidget : public UUserWidget
 	
 public:
 	UFUNCTION()
-	virtual void SetItemAndInitView(class UInventoryItem_Base* ItemData);
+	virtual void SetItemAndInitView(UInventoryItem_Base* ItemData);
 
 protected:
 	virtual void NativeConstruct() override;

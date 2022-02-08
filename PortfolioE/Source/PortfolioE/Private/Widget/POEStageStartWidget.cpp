@@ -10,6 +10,7 @@
 
 void UPOEStageStartWidget::OnStageStart()
 {
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("VolatileStage"));
 }
 
 void UPOEStageStartWidget::OnCancel()

@@ -53,14 +53,15 @@ void UPOEItemSlotWidget::OnUse()
 		UInventoryItem_Equipment* Equipment = Cast<UInventoryItem_Equipment>(ItemData);
 
 		CHECKRETURN(Equipment == nullptr);
-		if (ItemData->GetOwningInventory()->TryEquipItem(Equipment)) {
+
+		if (Equipment->GetOwningInventory()->TryEquipItem(Equipment)) {
 			UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 			CHECKRETURN(GameInstance == nullptr);
 
 			UPOEInventoryAndEquipWidget* InventoryAndEquipWidget = Cast<UPOEInventoryAndEquipWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY));
 			if (InventoryAndEquipWidget != nullptr) {
 				OnHideDetailPanel();
-				InventoryAndEquipWidget->InitInventoryView(ItemData->GetOwningInventory());
+				InventoryAndEquipWidget->InitInventoryView();
 			}
 		}
 	}

@@ -10,7 +10,7 @@ public class PortfolioE : ModuleRules
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "AIModule", "UMG", "GameplayTasks", "Paper2D" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "AIModule", "UMG", "GameplayTasks", "Paper2D", "SlateCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

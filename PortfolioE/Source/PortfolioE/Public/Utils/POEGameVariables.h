@@ -34,6 +34,7 @@ enum class EUIPanelName : uint8 {
 	INVENTORY,
 	STAGE_START,
 	DETAIL_VIEW,
+	HUD,
 };
 
 UENUM(BlueprintType)

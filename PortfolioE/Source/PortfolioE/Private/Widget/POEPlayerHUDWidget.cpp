@@ -4,11 +4,13 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/ProgressBar.h"
 #include "POECharacterStat.h"
 #include "POECharacter.h"
 #include "MyInventoryComponent.h"
 #include "POEGameInstance.h"
 #include "InventoryItem_Equipment.h"
+#include "Styling/SlateBrush.h"
 
 void UPOEPlayerHUDWidget::UpdateHpBar()
 {
@@ -44,20 +46,28 @@ void UPOEPlayerHUDWidget::InitQuickSlotView()
 	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	CHECKRETURN(GameInstance == nullptr);
 
+	UMyInventoryComponent* Inventory = Character->Inventory;
+
 	UTexture2D* ActiveItemTexture = nullptr;
 	UTexture2D* PassiveItemTexture = nullptr;
 
-	if (Character->Inventory->GetEquippedActiveItem() != nullptr) {
-		ActiveItemTexture = GameInstance->GetItemTextureForId(Character->Inventory->GetEquippedActiveItem()->GetItemId());
+	if (Inventory->GetEquippedActiveItem() != nullptr) {
+		ActiveItemTexture = GameInstance->GetItemTextureForId(Inventory->GetEquippedActiveItem()->GetItemId());
+		ActiveSlotImage->WidgetStyle.BackgroundImage.SetResourceObject(ActiveItemTexture);
+		ActiveSlotImage->SetVisibility(ESlateVisibility::Visible);
 	}
-	ActiveSlotImage->SetBrushFromTexture(ActiveItemTexture);
-	ActiveSlotImage->SetColorAndOpacity(ActiveItemTexture != nullptr ? FLinearColor::White : FLinearColor::Transparent);
-
-	if (Character->Inventory->GetEquippedPassiveItem() != nullptr) {
-		PassiveItemTexture = GameInstance->GetItemTextureForId(Character->Inventory->GetEquippedPassiveItem()->GetItemId());
+	else {
+		ActiveSlotImage->SetVisibility(ESlateVisibility::Hidden);
 	}
-	PassiveSlotImage->SetBrushFromTexture(PassiveItemTexture);
-	PassiveSlotImage->SetColorAndOpacity(PassiveItemTexture != nullptr ? FLinearColor::White : FLinearColor::Transparent);
+	
+	if (Inventory->GetEquippedPassiveItem() != nullptr) {
+		PassiveItemTexture = GameInstance->GetItemTextureForId(Inventory->GetEquippedPassiveItem()->GetItemId());
+		PassiveSlotImage->SetBrushFromTexture(PassiveItemTexture);
+		PassiveSlotImage->SetVisibility(ESlateVisibility::Visible);
+	}
+	else {
+		PassiveSlotImage->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UPOEPlayerHUDWidget::BindCharacterStat(UPOECharacterStat * CharacterStat)
@@ -86,13 +96,66 @@ void UPOEPlayerHUDWidget::NativeConstruct() {
 	MpValueText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_MpValue")));
 	CHECKRETURN(MpValueText == nullptr);
 
-	ActiveSlotImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_QuickActiveSlot")));
+	ActiveSlotImage = Cast<UProgressBar>(GetWidgetFromName(TEXT("Image_QuickActiveSlot")));
 	CHECKRETURN(ActiveSlotImage == nullptr);
 
 	PassiveSlotImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_QuickPassiveSlot")));
 	CHECKRETURN(PassiveSlotImage == nullptr);
 
+	DashSlotImage = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_DashCoolTime")));
+	CHECKRETURN(DashSlotImage == nullptr);
+
 	UpdateHpBar();
 	UpdateMpBar();
 	InitQuickSlotView();
+}
+
+void UPOEPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	CheckCoolTime(InDeltaTime);
+}
+
+void UPOEPlayerHUDWidget::CheckCoolTime(float DeltaTime) {
+	bool ChangedCoolTime = false;
+
+	if (ActiveSlotCoolTime > 0) {
+		ActiveSlotCoolTime -= DeltaTime;
+
+		if (ActiveSlotCoolTime <= 0 && OnEndActiveCoolTime.IsBound()) OnEndActiveCoolTime.Execute();
+		ChangedCoolTime = true;
+	}
+
+	if (DashSlotCoolTime > 0) {
+		DashSlotCoolTime -= DeltaTime;
+
+		if (DashSlotCoolTime <= 0 && OnEndDashCoolTime.IsBound()) OnEndDashCoolTime.Execute();
+		ChangedCoolTime = true;
+	}
+
+	if (ChangedCoolTime) {
+		OnChangedCoolTime();
+	}
+}
+
+void UPOEPlayerHUDWidget::OnChangedCoolTime() {
+	ActiveSlotImage->SetPercent(ActiveSlotCoolTime / ActiveSlotEndCoolTime);
+
+	if (DashSlotCoolTime > 0) {
+		DashSlotImage->SetVisibility(ESlateVisibility::Visible);
+		DashSlotImage->SetPercent(DashSlotCoolTime / DashSlotEndCoolTime);
+	}
+	else {
+		DashSlotImage->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UPOEPlayerHUDWidget::SetTimerActiveSlot(float EndTime) {
+	ActiveSlotCoolTime = EndTime;
+	ActiveSlotEndCoolTime = EndTime;
+}
+
+void UPOEPlayerHUDWidget::SetTimerDashSlot(float EndTime) {
+	DashSlotCoolTime = EndTime;
+	DashSlotEndCoolTime = EndTime;
 }

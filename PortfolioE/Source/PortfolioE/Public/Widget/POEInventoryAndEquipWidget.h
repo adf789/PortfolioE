@@ -16,18 +16,18 @@ class PORTFOLIOE_API UPOEInventoryAndEquipWidget : public UUserWidget
 	
 public:
 	UFUNCTION()
-	void InitInventoryView(class UMyInventoryComponent* Inventory);
+	void InitInventoryView();
 	void SetActiveEquipImage(class UTexture2D* ItemImage);
 	void SetPassiveEquipImage(class UTexture2D* ItemImage);
 
 	UFUNCTION()
-	void InitActiveEquipSlot(class UInventoryItem_Equipment* EquippedItem);
+	void InitActiveEquipSlot(UInventoryItem_Equipment* EquippedItem);
 
 	UFUNCTION()
 	void OnActiveUnEuquipClick();
 
 	UFUNCTION()
-	void InitPassiveEquipSlot(class UInventoryItem_Equipment* EquippedItem);
+	void InitPassiveEquipSlot(UInventoryItem_Equipment* EquippedItem);
 
 	UFUNCTION()
 	void OnPassiveUnEuquipClick();

@@ -33,7 +33,7 @@ void APOEMonster_Base::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	CHECKRETURN(CharacterStatus);
+	CHECKRETURN(CharacterStatus == nullptr);
 	GetCharacterMovement()->MaxWalkSpeed = CharacterStatus->MoveSpeedValue;
 
 	APOEMonsterAIController* AIController = Cast<APOEMonsterAIController>(GetController());

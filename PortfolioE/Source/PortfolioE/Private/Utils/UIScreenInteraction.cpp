@@ -54,6 +54,13 @@ void UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName)
 	}
 }
 
+void UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName, EViewportLevel ViewportLevel) {
+	ShowPanel(ScreenName);
+	UUserWidget* LoadPanel = GetPanel(ScreenName);
+	LoadPanel->RemoveFromViewport();
+	if (LoadPanel != nullptr) LoadPanel->AddToViewport(ViewportLevel);
+}
+
 void UUIScreenInteraction::ClosePanel(EUIPanelName ScreenName)
 {
 	if (!UIPanels.Contains(ScreenName)) return;

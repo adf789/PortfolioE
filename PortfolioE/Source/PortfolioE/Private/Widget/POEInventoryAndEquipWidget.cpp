@@ -14,22 +14,22 @@
 #include "Engine/AssetManager.h"
 #include "POEGameInstance.h"
 
-void UPOEInventoryAndEquipWidget::InitInventoryView(class UMyInventoryComponent* Inventory) {
+void UPOEInventoryAndEquipWidget::InitInventoryView() {
 	InventoyBox->ClearChildren();
+
+	APOECharacter* Character = Cast<APOECharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	CHECKRETURN(Character == nullptr);
 	
 	CHECKRETURN(ItemSlotWidgetClass == nullptr);
 	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
-	for (auto It = Inventory->GetItems().CreateConstIterator(); It; ++It) {
+	for (auto It = Character->Inventory->GetItems().CreateConstIterator(); It; ++It) {
 		UPOEItemSlotWidget* InventorySlotWidget = CreateWidget<UPOEItemSlotWidget>(GameInstance, ItemSlotWidgetClass);
 		InventoyBox->AddChildWrapBox(InventorySlotWidget);
 		InventorySlotWidget->SetItemAndInitView(It->Value);
 	}
 
-	InitActiveEquipSlot(Inventory->GetEquippedActiveItem());
-	InitPassiveEquipSlot(Inventory->GetEquippedPassiveItem());
-
-	APOECharacter* Character = Cast<APOECharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	CHECKRETURN(Character == nullptr);
+	InitActiveEquipSlot(Character->Inventory->GetEquippedActiveItem());
+	InitPassiveEquipSlot(Character->Inventory->GetEquippedPassiveItem());
 
 	CharacterValueText_Attack->SetText(FText::FromString(FString::Printf(TEXT("Attack: %d"), (int)Character->CharacterStatus->AttackValue)));
 	CharacterValueText_Hp->SetText(FText::FromString(FString::Printf(TEXT("HP: %d"), (int)Character->CharacterStatus->MaxHPValue)));
@@ -82,7 +82,7 @@ void UPOEInventoryAndEquipWidget::OnActiveUnEuquipClick()
 	if (Character->Inventory->TryUnEquipActiveItem()) {
 		EquippedActiveImage->SetColorAndOpacity(FLinearColor::Transparent);
 
-		InitInventoryView(Character->Inventory);
+		InitInventoryView();
 	}
 }
 
@@ -110,7 +110,7 @@ void UPOEInventoryAndEquipWidget::OnPassiveUnEuquipClick()
 	if (Character->Inventory->TryUnEquipPassiveItem()) {
 		EquippedPassiveImage->SetColorAndOpacity(FLinearColor::Transparent);
 
-		InitInventoryView(Character->Inventory);
+		InitInventoryView();
 	}
 }
 

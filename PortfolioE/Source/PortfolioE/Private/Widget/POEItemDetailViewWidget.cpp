@@ -8,6 +8,7 @@
 #include "POEPlayerController.h"
 #include "MyInventoryComponent.h"
 
+
 void UPOEItemDetailViewWidget::SetItemData(UInventoryItem_Base * Item)
 {
 	ItemData = Item;
@@ -45,11 +46,11 @@ void UPOEItemDetailViewWidget::SetAttackValueText(int32 Value)
 	UInventoryItem_Equipment* EquipmentItem = Cast<UInventoryItem_Equipment>(ItemData);
 
 	if (EquipmentItem != nullptr) {
-		if (!EquipmentItem->IsPassive && ItemData->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= ItemData->GetOwningInventory()->GetEquippedActiveItem()->ItemAttackValue;
+		if (!EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->ItemAttackValue;
 		}
-		else if (EquipmentItem->IsPassive && ItemData->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= ItemData->GetOwningInventory()->GetEquippedPassiveItem()->ItemAttackValue;
+		else if (EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->ItemAttackValue;
 		}
 	}
 
@@ -70,11 +71,11 @@ void UPOEItemDetailViewWidget::SetHpValueText(int32 Value)
 	UInventoryItem_Equipment* EquipmentItem = Cast<UInventoryItem_Equipment>(ItemData);
 
 	if (EquipmentItem != nullptr) {
-		if (!EquipmentItem->IsPassive && ItemData->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= ItemData->GetOwningInventory()->GetEquippedActiveItem()->ItemHpValue;
+		if (!EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->ItemHpValue;
 		}
-		else if (EquipmentItem->IsPassive && ItemData->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= ItemData->GetOwningInventory()->GetEquippedPassiveItem()->ItemHpValue;
+		else if (EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->ItemHpValue;
 		}
 	}
 
@@ -95,11 +96,11 @@ void UPOEItemDetailViewWidget::SetSpeedValueText(int32 Value)
 	UInventoryItem_Equipment* EquipmentItem = Cast<UInventoryItem_Equipment>(ItemData);
 
 	if (EquipmentItem != nullptr) {
-		if (!EquipmentItem->IsPassive && ItemData->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= ItemData->GetOwningInventory()->GetEquippedActiveItem()->ItemMoveSpeedValue;
+		if (!EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->ItemMoveSpeedValue;
 		}
-		else if (EquipmentItem->IsPassive && ItemData->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= ItemData->GetOwningInventory()->GetEquippedPassiveItem()->ItemMoveSpeedValue;
+		else if (EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->ItemMoveSpeedValue;
 		}
 	}
 

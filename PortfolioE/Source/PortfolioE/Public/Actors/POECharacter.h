@@ -52,8 +52,7 @@ protected:
 	void PrepareCastingSpell();
 
 private:
-	UFUNCTION()
-	void CalculateCoolTime();
+	void BindCoolTime();
 #pragma endregion
 
 #pragma region Variables
@@ -76,14 +75,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = Minimap)
 	class UPaperSpriteComponent* ArrowSprite;
 
-	UPROPERTY(VisibleInstanceOnly, Category = Inventory)
-	class UMyInventoryComponent* Inventory;
-
 	UPROPERTY(VisibleInstanceOnly, Category = UI)
 	UUIScreenInteraction* UIScreens;
 
 	UPROPERTY(VisibleInstanceOnly, Category = Effect)
 	class UParticleSystemComponent* BuffEffect;
+
+	UPROPERTY(VisibleInstanceOnly, Category = Inventory)
+		class UMyInventoryComponent* Inventory;
 
 private:
 	UPROPERTY()
@@ -93,52 +92,55 @@ private:
 	bool CheckNPC;
 
 	UPROPERTY()
-		class UPOECharacterAnimInstance* CharacterAnim;
+	class UPOECharacterAnimInstance* CharacterAnim;
 
 	UPROPERTY()
-		class UParticleSystem* LavaEffect;
+	class UParticleSystem* LavaEffect;
 
 	UPROPERTY()
-		class UParticleSystem* LightningEffect;
+	class UParticleSystem* LightningEffect;
 
 	UPROPERTY()
-		class UParticleSystem* IceEffect;
+	class UParticleSystem* IceEffect;
 
 	UPROPERTY()
-		class UParticleSystem* StrengthEffect;
+	class UParticleSystem* StrengthEffect;
 
 	UPROPERTY()
-		class UParticleSystem* DemonEffect;
+	class UParticleSystem* DemonEffect;
 
 	UPROPERTY()
-		class UParticleSystem* SelectedEffect;
+	class UParticleSystem* SelectedEffect;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
-		bool IsRangeAttack;
+	bool IsRangeAttack;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
-		bool IsSprinting;
+	bool IsSprinting;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
-		bool IsCasting;
+	bool IsCasting;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-		bool IsComboInput;
+	bool IsComboInput;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-		int32 CurrentCombo;
+	int32 CurrentCombo;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-		int32 MaxCombo;
+	int32 MaxCombo;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
-		bool AlreadyAttackColiision;
+	bool AlreadyAttackColiision;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = CoolTime, Meta = (AllowPrivateAccess = true))
-		float DashCoolTime;
+	bool DashCoolTime;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = CoolTime, Meta = (AllowPrivateAccess = true))
+	bool ActiveCoolTime;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Material, Meta = (AllowPrivateAccess = true))
-		class UMaterialInstanceDynamic* SmearMaterialInstance;
+	class UMaterialInstanceDynamic* SmearMaterialInstance;
 
 	FTimerHandle CoolTimeHandle;
 #pragma endregion
