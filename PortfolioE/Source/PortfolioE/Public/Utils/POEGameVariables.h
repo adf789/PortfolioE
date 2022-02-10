@@ -35,6 +35,8 @@ enum class EUIPanelName : uint8 {
 	STAGE_START,
 	DETAIL_VIEW,
 	HUD,
+	LOTTERY,
+	MERGE_CRAFT,
 };
 
 UENUM(BlueprintType)

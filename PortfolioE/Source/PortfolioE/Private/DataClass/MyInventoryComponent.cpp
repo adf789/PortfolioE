@@ -158,6 +158,8 @@ void UMyInventoryComponent::SetDefaultItem()
 	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	CHECKRETURN(GameInstance == nullptr);
 
+	GameInstance->LotteryCoinCount = 10;
+
 	HaveItems.Reset();
 
 	UInventoryItem_Equipment* DefaultItem1 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem1"));

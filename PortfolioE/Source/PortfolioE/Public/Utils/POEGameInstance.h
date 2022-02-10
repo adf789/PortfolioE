@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "Engine/DataTable.h"
 #include "Engine/StreamableManager.h"
+#include "UIScreenInteraction.h"
 #include "POEGameInstance.generated.h"
 
 USTRUCT(BlueprintType)
@@ -75,7 +76,8 @@ public:
 
 	class ActorObjectPool* EffectPooling;
 	class ActorObjectPool* DamageTextPooling;
-	class UUIScreenInteraction* UIScreenInteraction;
+	UUIScreenInteraction* UIScreenInteraction;
+	int32 LotteryCoinCount;
 
 	UFUNCTION()
 	class UTexture2D* GetItemTextureForId(int32 ItemId);
