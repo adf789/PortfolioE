@@ -15,10 +15,19 @@ class PORTFOLIOE_API UPOEMergeCraftWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
 	void SetBaseSlot(class UInventoryItem_Equipment* BaseItem);
+
+	UFUNCTION()
 	void UnSetBaseSlot();
+
+	UFUNCTION()
 	void SetMaterialSlot(class UInventoryItem_Equipment* BaseItem);
+
+	UFUNCTION()
 	void UnSetMaterialSlot();
+
+	UFUNCTION()
 	void StartMergeCraft();
 
 protected:

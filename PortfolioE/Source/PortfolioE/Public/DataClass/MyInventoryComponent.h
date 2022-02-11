@@ -14,52 +14,45 @@ class PORTFOLIOE_API UMyInventoryComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UMyInventoryComponent();
+	
+	UFUNCTION()
+	bool IsRemainCapacity() const;
+	
+	bool IsExistItemForItemId(class UInventoryItem_Base* TargetItem) const;
 
 	UFUNCTION()
-		class UInventoryItem_Base* GetItemForName(FName ItemName) const;
+	bool TryInsertItem(class UInventoryItem_Base* Item);
+	
+	void DeleteItem(class UInventoryItem_Base* TargetItem);
 
 	UFUNCTION()
-		bool IsRemainCapacity() const;
+	TArray<class UInventoryItem_Base*> GetItems();
+
+	int32 GetItemCount();
 
 	UFUNCTION()
-		bool IsExistItem(FName ItemName) const;
-
-	bool IsExistItem(class UInventoryItem_Base* Item) const;
+	bool TryEquipActiveItem(class UInventoryItem_Equipment* TryEquipItem);
 
 	UFUNCTION()
-		void InsertItem(class UInventoryItem_Base* Item);
+	bool TryUnEquipActiveItem();
 
 	UFUNCTION()
-		void DeleteItem(FName ItemName);
-
-	void DeleteItem(class UInventoryItem_Base* Item);
+	bool TryEquipPassiveItem(class UInventoryItem_Equipment* TryEquipItem);
 
 	UFUNCTION()
-		const TMap<FName, class UInventoryItem_Base*>& GetItems();
+	bool TryUnEquipPassiveItem();
 
 	UFUNCTION()
-		bool TryEquipActiveItem(class UInventoryItem_Equipment* TryEquipItem);
+	bool TryEquipItem(class UInventoryItem_Equipment* TryEquipItem);
 
 	UFUNCTION()
-		bool TryUnEquipActiveItem();
+	class UInventoryItem_Equipment* GetEquippedActiveItem();
 
 	UFUNCTION()
-		bool TryEquipPassiveItem(class UInventoryItem_Equipment* TryEquipItem);
+	class UInventoryItem_Equipment* GetEquippedPassiveItem();
 
 	UFUNCTION()
-		bool TryUnEquipPassiveItem();
-
-	UFUNCTION()
-		bool TryEquipItem(class UInventoryItem_Equipment* TryEquipItem);
-
-	UFUNCTION()
-		class UInventoryItem_Equipment* GetEquippedActiveItem();
-
-	UFUNCTION()
-		class UInventoryItem_Equipment* GetEquippedPassiveItem();
-
-	UFUNCTION()
-		void SetDefaultItem();
+	void SetDefaultItem();
 
 protected:
 	// Called when the game starts
@@ -69,17 +62,19 @@ protected:
 
 protected:
 	UPROPERTY()
-		TMap<FName, class UInventoryItem_Base*> HaveItems;
+	TArray<class UInventoryItem_Base*> HaveItems;
+
+	class TQueue<int> UsableInventoryIds;
 
 	UPROPERTY()
-		class UInventoryItem_Equipment* EquippedActiveItem;
+	class UInventoryItem_Equipment* EquippedActiveItem;
 
 	UPROPERTY()
-		class UInventoryItem_Equipment* EquippedPassiveItem;
+	class UInventoryItem_Equipment* EquippedPassiveItem;
 
 	UPROPERTY()
-		class APOECharacter* OwningCharacter;
+	class APOECharacter* OwningCharacter;
 
 	UPROPERTY()
-		int32 MaxCapacity;
+	int32 MaxCapacity;
 };

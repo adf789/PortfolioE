@@ -20,6 +20,12 @@ UPOEGameInstance::UPOEGameInstance() {
 	CHECKRETURN(!DT_ITEM_STAT_TABLE.Succeeded());
 	POEItemStatTable = DT_ITEM_STAT_TABLE.Object;
 	CHECKRETURN(POEItemStatTable->RowMap.Num() == 0);
+
+	static ConstructorHelpers::FObjectFinder<UDataTable>
+		DT_ITEM_LOTTERY_TABLE(TEXT("/Game/POE/GameData/ItemLotteryTable.ItemLotteryTable"));
+	CHECKRETURN(!DT_ITEM_LOTTERY_TABLE.Succeeded());
+	POEItemLotteryTable = DT_ITEM_LOTTERY_TABLE.Object;
+	CHECKRETURN(POEItemLotteryTable->RowMap.Num() == 0);
 }
 
 UPOEGameInstance::~UPOEGameInstance() {
@@ -45,6 +51,25 @@ FPOEItemStatData * UPOEGameInstance::GetPOEItemStatData(int32 ItemId, int32 Leve
 
 	TEST_LOG_WITH_VAR("Not found stat data id: %d, level: %d", ItemId, Level);
 	return nullptr;
+}
+
+int32 UPOEGameInstance::GetLotteryRandomItemId()
+{
+	FRandomStream Random(FMath::Rand());
+	int8 RandNum = Random.RandRange(0, 100);
+	int8 Sum = 0;
+
+	TArray<FName> LotteryDataRowNames = POEItemLotteryTable->GetRowNames();
+	for (int i = 0; i < LotteryDataRowNames.Num(); i++) {
+		FPOEItemLotteryData* FetchedLotteryData = POEItemLotteryTable->FindRow<FPOEItemLotteryData>(LotteryDataRowNames[i], TEXT(""));
+		CHECKRETURN(FetchedLotteryData == nullptr, 0);
+
+		Sum += FetchedLotteryData->Percent;
+		if (RandNum <= Sum) {
+			return FetchedLotteryData->ItemId;
+		}
+	}
+	return 0;
 }
 
 UTexture2D * UPOEGameInstance::GetItemTextureForId(int32 ItemId)

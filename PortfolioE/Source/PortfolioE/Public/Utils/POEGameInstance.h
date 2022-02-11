@@ -58,6 +58,20 @@ public:
 	int32 SpeedValue;
 };
 
+USTRUCT(BlueprintType)
+struct FPOEItemLotteryData : public FTableRowBase {
+	GENERATED_BODY()
+
+public:
+	FPOEItemLotteryData() : ItemId(0), Percent(0) {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 ItemId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 Percent;
+};
+
 /**
  * 
  */
@@ -73,14 +87,18 @@ public:
 
 	FPOEItemData* GetPOEItemData(int32 ItemId);
 	FPOEItemStatData* GetPOEItemStatData(int32 ItemId, int32 Level);
+	int32 GetLotteryRandomItemId();
+
+	UFUNCTION()
+	class UTexture2D* GetItemTextureForId(int32 ItemId);
+
 
 	class ActorObjectPool* EffectPooling;
 	class ActorObjectPool* DamageTextPooling;
 	UUIScreenInteraction* UIScreenInteraction;
-	int32 LotteryCoinCount;
 
-	UFUNCTION()
-	class UTexture2D* GetItemTextureForId(int32 ItemId);
+	int32 LotteryCoinCount;
+	int32 LotteryCount;
 
 private:
 	UPROPERTY()
@@ -88,6 +106,9 @@ private:
 
 	UPROPERTY()
 	class UDataTable* POEItemStatTable;
+
+	UPROPERTY()
+	class UDataTable* POEItemLotteryTable;
 
 	UPROPERTY()
 	TMap<int32, class UTexture2D*> LoadedTexture;

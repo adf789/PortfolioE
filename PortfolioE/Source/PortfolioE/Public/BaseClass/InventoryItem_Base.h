@@ -19,6 +19,9 @@ public:
 
 	virtual void SetItemData(struct FPOEItemData* ItemData);
 
+	void SetInventoryId(int32 ItemId);
+	int32 GetInventoryId();
+
 	void SetItemId(int32 ItemId);
 	int32 GetItemId();
 
@@ -44,6 +47,9 @@ public:
 	EItemType GetItemType();
 
 protected:	
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	int32 InventoryId;
+
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	int32 ItemId;
 

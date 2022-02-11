@@ -36,6 +36,18 @@ void ANPC_RuneTrader::PostInitializeComponents()
 void ANPC_RuneTrader::OnTalk()
 {
 	Super::OnTalk();
+
+	GetWorld()->GetFirstPlayerController()->SetPause(true);
+
+	auto POEPlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
+	CHECKRETURN(POEPlayerController == nullptr);
+
+	POEPlayerController->HideNpcMenuWidget();
+
+	APOECharacter* Player = Cast<APOECharacter>(POEPlayerController->GetPawn());
+	CHECKRETURN(Player == nullptr);
+
+	Player->UIScreens->ShowPanel(EUIPanelName::LOTTERY);
 }
 
 void ANPC_RuneTrader::OnAction()

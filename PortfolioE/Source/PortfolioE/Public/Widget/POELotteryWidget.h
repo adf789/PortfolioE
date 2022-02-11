@@ -21,10 +21,16 @@ public:
 	UFUNCTION()
 	void ClosePanel();
 
+	void AddRandonStatToItem(class UInventoryItem_Equipment* EquipmentItem);
+
 protected:
 	virtual void NativeConstruct() override;
+	class UInventoryItem_Base* CreateLotteryItem();
+	void ShowMessagePanel(FString Text);
 
 private:
+	int32 GetItemIdForRandom();
+
 	UPROPERTY()
 		class UTextBlock* HaveCoinText;
 	

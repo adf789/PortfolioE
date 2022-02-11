@@ -31,17 +31,19 @@ void UUIScreenInteraction::DestroyComponent(bool bPromoteChildren)
 	UIPanels.Reset();
 }
 
-void UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName)
+UUserWidget* UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName)
 {
 	if (GetDefault<UPOEUIClassPaths>()->UIClassPaths.Num() > (int8)ScreenName) {
 		FSoftObjectPath UIClassPath = GetDefault<UPOEUIClassPaths>()->UIClassPaths[(int8)ScreenName];
 
 		TSubclassOf<UUserWidget> UIWidgetClass = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<UUserWidget>(UIClassPath));
-		CHECKRETURN(UIWidgetClass.Get() == nullptr);
+		CHECKRETURN(UIWidgetClass.Get() == nullptr, nullptr);
 		
 		UUserWidget* UIWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), UIWidgetClass);
 		UIWidget->AddToViewport(EViewportLevel::NORMAL_PANEL);
 		UIPanels.Add(ScreenName, UIWidget);
+
+		return UIWidget;
 	}
 	else {
 		FString ScreenNameStr;
@@ -52,13 +54,16 @@ void UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName)
 		}
 		else TEST_LOG_WITH_VAR("Invalid");
 	}
+
+	return nullptr;
 }
 
-void UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName, EViewportLevel ViewportLevel) {
-	ShowPanel(ScreenName);
-	UUserWidget* LoadPanel = GetPanel(ScreenName);
+UUserWidget* UUIScreenInteraction::ShowPanel(EUIPanelName ScreenName, EViewportLevel ViewportLevel) {
+	UUserWidget* LoadPanel = ShowPanel(ScreenName);
 	LoadPanel->RemoveFromViewport();
 	if (LoadPanel != nullptr) LoadPanel->AddToViewport(ViewportLevel);
+
+	return LoadPanel;
 }
 
 void UUIScreenInteraction::ClosePanel(EUIPanelName ScreenName)

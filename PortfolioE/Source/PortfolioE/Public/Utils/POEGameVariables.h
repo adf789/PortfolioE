@@ -37,6 +37,7 @@ enum class EUIPanelName : uint8 {
 	HUD,
 	LOTTERY,
 	MERGE_CRAFT,
+	MESSAGE_BOX,
 };
 
 UENUM(BlueprintType)

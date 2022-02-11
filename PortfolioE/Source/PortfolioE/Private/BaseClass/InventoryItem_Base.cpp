@@ -10,6 +10,16 @@ void UInventoryItem_Base::SetItemData(FPOEItemData * ItemData)
 {
 }
 
+void UInventoryItem_Base::SetInventoryId(int32 InventoryId)
+{
+	this->InventoryId = InventoryId;
+}
+
+int32 UInventoryItem_Base::GetInventoryId()
+{
+	return InventoryId;
+}
+
 void UInventoryItem_Base::SetItemId(int32 ItemId)
 {
 	this->ItemId = ItemId;

@@ -17,50 +17,54 @@ UMyInventoryComponent::UMyInventoryComponent()
 	MaxCapacity = 20;
 }
 
-
-UInventoryItem_Base * UMyInventoryComponent::GetItemForName(FName ItemName) const
-{
-	if (IsExistItem(ItemName)) return HaveItems[ItemName];
-	else return nullptr;
-}
-
 bool UMyInventoryComponent::IsRemainCapacity() const
 {
-	if (HaveItems.Num() == MaxCapacity) return false;
+	if (HaveItems.Num() == MaxCapacity) {
+
+		return false;
+	}
 	return true;
 }
 
-bool UMyInventoryComponent::IsExistItem(FName ItemName) const
+bool UMyInventoryComponent::IsExistItemForItemId(UInventoryItem_Base * TargetItem) const
 {
-	return HaveItems.Contains(ItemName);
+	CHECKRETURN(TargetItem == nullptr, false);
+	return HaveItems.ContainsByPredicate([TargetItem](UInventoryItem_Base* Item) -> bool { return Item->GetItemId() == TargetItem->GetItemId(); });
 }
 
-bool UMyInventoryComponent::IsExistItem(UInventoryItem_Base * Item) const
+bool UMyInventoryComponent::TryInsertItem(UInventoryItem_Base * Item)
 {
-	return IsExistItem(Item->GetDisplayName());
-}
+	CHECKRETURN(Item == nullptr, false);
+	if (!IsRemainCapacity()) return false;
 
-void UMyInventoryComponent::InsertItem(UInventoryItem_Base * Item)
-{
-	if (!IsRemainCapacity()) return;
+	int InventoryId;
+	if (UsableInventoryIds.IsEmpty()) InventoryId = HaveItems.Num();
+	else UsableInventoryIds.Dequeue(InventoryId);
 
-	HaveItems.Add(Item->GetDisplayName(), Item);
+	Item->SetInventoryId(InventoryId);
+	HaveItems.Add(Item);
 	Item->SetOwningInventory(this);
+
+	return true;
 }
 
-void UMyInventoryComponent::DeleteItem(FName ItemName)
+void UMyInventoryComponent::DeleteItem(UInventoryItem_Base * TargetItem)
 {
-	if (HaveItems.Contains(ItemName)) HaveItems.Remove(ItemName);
+	CHECKRETURN(TargetItem == nullptr);
+
+	if (HaveItems.RemoveSingle(TargetItem) == 1) {
+		UsableInventoryIds.Enqueue(TargetItem->GetInventoryId());
+		TargetItem->SetInventoryId(0);
+	}
 }
 
-void UMyInventoryComponent::DeleteItem(UInventoryItem_Base * Item)
-{
-	DeleteItem(Item->GetDisplayName());
-}
-
-const TMap<FName, class UInventoryItem_Base*> & UMyInventoryComponent::GetItems()
+TArray<class UInventoryItem_Base*> UMyInventoryComponent::GetItems()
 {
 	return HaveItems;
+}
+
+int32 UMyInventoryComponent::GetItemCount() {
+	return HaveItems.Num();
 }
 
 bool UMyInventoryComponent::TryEquipActiveItem(UInventoryItem_Equipment * TryEquipItem)
@@ -85,12 +89,14 @@ bool UMyInventoryComponent::TryUnEquipActiveItem()
 {
 	CHECKRETURN(OwningCharacter == nullptr, false);
 	if (EquippedActiveItem == nullptr) return true;
+	else if (!TryInsertItem(EquippedActiveItem)) {
+		return false;
+	}
 
 	OwningCharacter->CharacterStatus->AttackValue -= EquippedActiveItem->ItemAttackValue;
 	OwningCharacter->CharacterStatus->MaxHPValue -= EquippedActiveItem->ItemHpValue;
 	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
 	OwningCharacter->CharacterStatus->MoveSpeedValue -= EquippedActiveItem->ItemMoveSpeedValue;
-	InsertItem(EquippedActiveItem);
 	EquippedActiveItem = nullptr;
 
 	OwningCharacter->ApplyCharacterStatus();
@@ -120,12 +126,14 @@ bool UMyInventoryComponent::TryUnEquipPassiveItem()
 {
 	CHECKRETURN(OwningCharacter == nullptr, false);
 	if (EquippedPassiveItem == nullptr) return true;
-
+	else if (!TryInsertItem(EquippedPassiveItem)) {
+		return false;
+	}
+	
 	OwningCharacter->CharacterStatus->AttackValue -= EquippedPassiveItem->ItemAttackValue;
 	OwningCharacter->CharacterStatus->MaxHPValue -= EquippedPassiveItem->ItemHpValue;
 	OwningCharacter->CharacterStatus->CurrentHPValue = OwningCharacter->CharacterStatus->MaxHPValue;
 	OwningCharacter->CharacterStatus->MoveSpeedValue -= EquippedPassiveItem->ItemMoveSpeedValue;
-	InsertItem(EquippedPassiveItem);
 	EquippedPassiveItem = nullptr;
 
 	OwningCharacter->ApplyCharacterStatus();
@@ -135,6 +143,8 @@ bool UMyInventoryComponent::TryUnEquipPassiveItem()
 
 bool UMyInventoryComponent::TryEquipItem(UInventoryItem_Equipment * TryEquipItem)
 {
+	CHECKRETURN(TryEquipItem == nullptr, false);
+
 	if (TryEquipItem->IsPassive) {
 		return TryEquipPassiveItem(TryEquipItem);
 	}
@@ -162,26 +172,26 @@ void UMyInventoryComponent::SetDefaultItem()
 
 	HaveItems.Reset();
 
-	UInventoryItem_Equipment* DefaultItem1 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem1"));
+	UInventoryItem_Equipment* DefaultItem1 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem1"));
 	DefaultItem1->SetItemData(GameInstance->GetPOEItemData(0));
 
-	UInventoryItem_Equipment* DefaultItem2 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem2"));
+	UInventoryItem_Equipment* DefaultItem2 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem2"));
 	DefaultItem2->SetItemData(GameInstance->GetPOEItemData(1));
 
-	UInventoryItem_Equipment* DefaultItem3 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem3"));
+	UInventoryItem_Equipment* DefaultItem3 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem3"));
 	DefaultItem3->SetItemData(GameInstance->GetPOEItemData(2));
 
-	UInventoryItem_Equipment* DefaultItem4 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem4"));
+	UInventoryItem_Equipment* DefaultItem4 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem4"));
 	DefaultItem4->SetItemData(GameInstance->GetPOEItemData(3));
 
-	UInventoryItem_Equipment* DefaultItem5 = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), TEXT("TestItem5"));
+	UInventoryItem_Equipment* DefaultItem5 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem5"));
 	DefaultItem5->SetItemData(GameInstance->GetPOEItemData(4));
 
-	InsertItem(DefaultItem1);
-	InsertItem(DefaultItem2);
-	InsertItem(DefaultItem3);
-	InsertItem(DefaultItem4);
-	InsertItem(DefaultItem5);
+	TryInsertItem(DefaultItem1);
+	TryInsertItem(DefaultItem2);
+	TryInsertItem(DefaultItem3);
+	TryInsertItem(DefaultItem4);
+	TryInsertItem(DefaultItem5);
 }
 
 // Called when the game starts

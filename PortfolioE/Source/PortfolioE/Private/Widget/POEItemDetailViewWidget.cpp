@@ -3,6 +3,7 @@
 #include "POEItemDetailViewWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 #include "POEGameInstance.h"
 #include "InventoryItem_Equipment.h"
 #include "POEPlayerController.h"
@@ -35,6 +36,7 @@ void UPOEItemDetailViewWidget::InitView()
 			SetAttackValueText((int)EquipItemData->ItemAttackValue);
 			SetHpValueText((int)EquipItemData->ItemHpValue);
 			SetSpeedValueText((int)EquipItemData->ItemMoveSpeedValue);
+			ExpBar->SetPercent(EquipItemData->GetCurrentExp() / EquipItemData->GetRequireExp());
 			ItemTypeText->SetText(FText::FromString(EquipItemData->IsPassive ? TEXT("(PASSIVE)") : TEXT("(ACTIVE)")));
 		}
 	}
@@ -139,6 +141,9 @@ void UPOEItemDetailViewWidget::NativeConstruct()
 
 	ItemTypeText = Cast<UTextBlock>(GetWidgetFromName(TEXT("TypeText")));
 	CHECKRETURN(ItemTypeText == nullptr);
+
+	ExpBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_ExpBar")));
+	CHECKRETURN(ExpBar == nullptr);
 }
 
 void UPOEItemDetailViewWidget::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)

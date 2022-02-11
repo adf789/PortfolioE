@@ -22,10 +22,11 @@ void UPOEInventoryAndEquipWidget::InitInventoryView() {
 	
 	CHECKRETURN(ItemSlotWidgetClass == nullptr);
 	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
-	for (auto It = Character->Inventory->GetItems().CreateConstIterator(); It; ++It) {
+
+	for (int i = 0; i < Character->Inventory->GetItems().Num(); i++) {
 		UPOEItemSlotWidget* InventorySlotWidget = CreateWidget<UPOEItemSlotWidget>(GameInstance, ItemSlotWidgetClass);
 		InventoyBox->AddChildWrapBox(InventorySlotWidget);
-		InventorySlotWidget->SetItemAndInitView(It->Value);
+		InventorySlotWidget->SetItemAndInitView(Character->Inventory->GetItems()[i]);
 	}
 
 	InitActiveEquipSlot(Character->Inventory->GetEquippedActiveItem());
