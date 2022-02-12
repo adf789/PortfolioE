@@ -12,24 +12,19 @@
 #include "UIScreenInteraction.h"
 #include "MyInventoryComponent.h"
 #include "POEItemDetailViewWidget.h"
+#include "POEMergeCraftWidget.h"
+#include "POEInventoryAndEquipWidget.h"
+#include "POEOnDragItemWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "ItemDragDropOperation.h"
 
 void UPOEItemSlotWidget::SetItemAndInitView(UInventoryItem_Base * ItemData)
 {
 	this->ItemData = ItemData;
 
-	CHECKRETURN(ItemNameText == nullptr);
+	CHECKRETURN(ItemNameText == nullptr || ItemImage == nullptr || GameInstance == nullptr);
 	ItemNameText->SetText(FText::FromName(ItemData->GetDisplayName()));
-
-	CHECKRETURN(ItemImage == nullptr);
-	/*TextureAssetToLoad = GetDefault<UPOEItemTexturePath>()->TexturePaths[ItemData->GetTextureId()];
-	AssetStreamingHandle = UAssetManager::GetStreamableManager().RequestAsyncLoad(TextureAssetToLoad, FStreamableDelegate::CreateUObject(this, &UPOEItemSlotWidget::OnTextureAssetLoadCompleted));*/
-
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
-	CHECKRETURN(GameInstance == nullptr);
-
-	ItemImage_Texture = GameInstance->GetItemTextureForId(ItemData->GetTextureId());
-	CHECKRETURN(ItemImage_Texture == nullptr);
-
+	UTexture2D* ItemImage_Texture = GameInstance->GetItemTextureForId(ItemData->GetTextureId());
 	ItemImage->SetBrushFromTexture(ItemImage_Texture);
 }
 
@@ -41,9 +36,46 @@ void UPOEItemSlotWidget::NativeConstruct()
 	ItemNameText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_ItemName")));
 	UseButton = Cast<UButton>(GetWidgetFromName(TEXT("EquipButton")));
 	CHECKRETURN(UseButton == nullptr);
-	UseButton->OnClicked.AddDynamic(this, &UPOEItemSlotWidget::OnUse);
-	UseButton->OnHovered.AddDynamic(this, &UPOEItemSlotWidget::OnShowDetailPanel);
-	UseButton->OnUnhovered.AddDynamic(this, &UPOEItemSlotWidget::OnHideDetailPanel);
+
+	GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+	CHECKRETURN(GameInstance == nullptr);
+}
+
+void UPOEItemSlotWidget::NativeOnMouseEnter(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+{
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	OnShowDetailPanel();
+}
+
+void UPOEItemSlotWidget::NativeOnMouseLeave(const FPointerEvent & InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+	OnHideDetailPanel();
+}
+
+FReply UPOEItemSlotWidget::NativeOnMouseButtonDown(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+{
+	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton) {
+		Reply.DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
+		return Reply;
+	}
+
+	return Reply;
+}
+
+FReply UPOEItemSlotWidget::NativeOnMouseButtonUp(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent)
+{
+	return Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
+
+	FEventReply Reply;
+	Reply.NativeReply = Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
+	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton) && false) {
+		OnUse();
+		return Reply.NativeReply;
+	}
+
+	return Reply.NativeReply;
 }
 
 void UPOEItemSlotWidget::OnUse()
@@ -55,9 +87,6 @@ void UPOEItemSlotWidget::OnUse()
 		CHECKRETURN(Equipment == nullptr);
 
 		if (Equipment->GetOwningInventory()->TryEquipItem(Equipment)) {
-			UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
-			CHECKRETURN(GameInstance == nullptr);
-
 			UPOEInventoryAndEquipWidget* InventoryAndEquipWidget = Cast<UPOEInventoryAndEquipWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY));
 			if (InventoryAndEquipWidget != nullptr) {
 				OnHideDetailPanel();
@@ -69,9 +98,6 @@ void UPOEItemSlotWidget::OnUse()
 
 void UPOEItemSlotWidget::OnShowDetailPanel()
 {
-	//GetWorld()->GetTimerManager().SetTimer(DetailPanelLocationHandler, this, &UPOEItemSlotWidget::SetDetailPanelLocationForCursor, .1f, true);
-
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	GameInstance->UIScreenInteraction->ShowPanel(EUIPanelName::DETAIL_VIEW);
 	UPOEItemDetailViewWidget* ItemDetailViewWidget = Cast<UPOEItemDetailViewWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::DETAIL_VIEW));
 	CHECKRETURN(ItemDetailViewWidget == nullptr);
@@ -80,23 +106,56 @@ void UPOEItemSlotWidget::OnShowDetailPanel()
 	ItemDetailViewWidget->SetItemData(ItemData);
 }
 
+void UPOEItemSlotWidget::OnShowMergeCraftPanel()
+{
+	GameInstance->UIScreenInteraction->ShowPanel(EUIPanelName::MERGE_CRAFT);
+
+	UPOEMergeCraftWidget* MergeCraftWidget = Cast<UPOEMergeCraftWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::MERGE_CRAFT));
+	CHECKRETURN(MergeCraftWidget == nullptr);
+}
+
 void UPOEItemSlotWidget::OnHideDetailPanel()
 {
-	//GetWorld()->GetTimerManager().ClearTimer(DetailPanelLocationHandler);
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	GameInstance->UIScreenInteraction->ClosePanel(EUIPanelName::DETAIL_VIEW);
 }
 
-void UPOEItemSlotWidget::SetDetailPanelLocationForCursor()
+void UPOEItemSlotWidget::NativeOnDragDetected(const FGeometry & InGeometry, const FPointerEvent & InMouseEvent, UDragDropOperation *& OutOperation)
 {
-	TEST_LOG("SetDetailLocation");
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+	OnHideDetailPanel();
+	CHECKRETURN(!DragWidgetClass);
+
+	UPOEOnDragItemWidget* DragItemWidget = CreateWidget<UPOEOnDragItemWidget>(GameInstance, DragWidgetClass);
+	CHECKRETURN(DragItemWidget == nullptr);
+	DragItemWidget->SetItemData(ItemData);
+
+	UItemDragDropOperation* DragItemOperation = NewObject<UItemDragDropOperation>();
+	DragItemOperation->DefaultDragVisual = DragItemWidget;
+	DragItemOperation->Pivot = EDragPivot::TopLeft;
+
+	OutOperation = DragItemOperation;
+	
+	RemoveFromViewport();
+
 }
 
-void UPOEItemSlotWidget::OnTextureAssetLoadCompleted()
+void UPOEItemSlotWidget::NativeOnDragCancelled(const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
 {
-	ItemImage_Texture = Cast<UTexture2D>(AssetStreamingHandle->GetLoadedAsset());
-	AssetStreamingHandle.Reset();
-	CHECKRETURN(ItemImage_Texture == nullptr);
+	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
+	TEST_LOG("");
 
-	ItemImage->SetBrushFromTexture(ItemImage_Texture);
+	UPOEInventoryAndEquipWidget* InventoryPanel = Cast<UPOEInventoryAndEquipWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY));
+	CHECKRETURN(InventoryPanel == nullptr);
+	InventoryPanel->InitInventoryView();
+}
+
+bool UPOEItemSlotWidget::NativeOnDrop(const FGeometry & InGeometry, const FDragDropEvent & InDragDropEvent, UDragDropOperation * InOperation)
+{
+	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	OnShowMergeCraftPanel();
+
+	UPOEInventoryAndEquipWidget* InventoryPanel = Cast<UPOEInventoryAndEquipWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY));
+	CHECKRETURN(InventoryPanel == nullptr, false);
+	InventoryPanel->InitInventoryView();
+	return true;
 }

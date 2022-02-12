@@ -33,7 +33,7 @@ public:
 	void OnPassiveUnEuquipClick();
 
 protected:
-	virtual void NativeConstruct() override;	
+	virtual void NativeConstruct() override;
 
 protected:
 	UPROPERTY()

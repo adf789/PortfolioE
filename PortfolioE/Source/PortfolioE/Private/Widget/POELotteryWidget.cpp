@@ -50,7 +50,6 @@ void UPOELotteryWidget::StartLottery() {
 	}
 
 	GameInstance->LotteryCoinCount--;
-	GameInstance->LotteryCount++;
 	HaveCoinText->SetText(FText::AsNumber(GameInstance->LotteryCoinCount));
 
 	UInventoryItem_Base* NewItem = CreateLotteryItem();
@@ -64,6 +63,7 @@ UInventoryItem_Base* UPOELotteryWidget::CreateLotteryItem() {
 	CHECKRETURN(GameInstance == nullptr, nullptr);
 
 	UInventoryItem_Equipment* NewItem = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), FName(*FString::Printf(TEXT("Lottery%d"), GameInstance->LotteryCount)));
+	GameInstance->LotteryCount++;
 	NewItem->SetItemData(GameInstance->GetPOEItemData(GameInstance->GetLotteryRandomItemId()));
 	AddRandonStatToItem(NewItem);
 

@@ -19,19 +19,26 @@ public:
 	virtual void SetItemAndInitView(UInventoryItem_Base* ItemData);
 
 protected:
-	virtual void NativeConstruct() override;
-
 	UFUNCTION()
 	virtual void OnUse();
 
 	UFUNCTION()
 	virtual void OnShowDetailPanel();
+
+	UFUNCTION()
+	virtual void OnShowMergeCraftPanel();
 	
 	UFUNCTION()
 	virtual void OnHideDetailPanel();
 
-	UFUNCTION()
-	virtual void SetDetailPanelLocationForCursor();
+	virtual void NativeConstruct() override;
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 
 protected:
@@ -44,10 +51,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	class UButton* UseButton;
 
-	class UTexture2D* ItemImage_Texture;
+	class UPOEGameInstance* GameInstance;
 
-private:
-	void OnTextureAssetLoadCompleted();
+	
 	
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Item, meta = (AllowPrivateAccess = true))
@@ -57,4 +63,8 @@ private:
 	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;
 
 	FTimerHandle DetailPanelLocationHandler;
+	FEventReply DragReply;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class UPOEOnDragItemWidget> DragWidgetClass;
 };
