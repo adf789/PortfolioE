@@ -24,10 +24,9 @@ void UPOEStageStartWidget::OnStageStart()
 
 	TSubclassOf<APOEMonster_Base> NormalMonster = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<APOEMonster_Base>(SlotClassPath));
 	for (TActorIterator<AMonsterSpawner> It(CurrentWorld); It; ++It) {
-		TEST_LOG("Spawn!!");
 		AMonsterSpawner* SpawnPoint = *It;
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 2; i++) {
 			FVector SpawnLocation = SpawnPoint->GetSpawnLocation();
 
 			FRandomStream Random(FMath::Rand());
@@ -42,15 +41,17 @@ void UPOEStageStartWidget::OnStageStart()
 
 			APOEMonster_Base* Monster = GameInstance->MonsterPooling->GetUnUseMonster(MonsterStatData->MonsterId);
 			if (Monster == nullptr) {
+				TEST_LOG("생성!!");
 				Monster = GetWorld()->SpawnActor<APOEMonster_Base>(NormalMonster->GetDefaultObject()->GetClass(), SpawnLocation, FRotator::ZeroRotator);
+				Monster->MonsterId = MonsterStatData->MonsterId;
 				GameInstance->MonsterPooling->AddMonster(Monster);
 			}
 			else TEST_LOG("찾음!!");
 
 			CHECKRETURN(Monster == nullptr);
 			Monster->Active();
-			Monster->CharacterStatus->AttackValue = MonsterStatData->AttackValue;
-			Monster->CharacterStatus->SetHPValue(MonsterStatData->HpValue);
+			Monster->CharacterStatus->InitAttackValue(MonsterStatData->AttackValue);
+			Monster->CharacterStatus->InitHPVale(MonsterStatData->HpValue);
 		}
 	}
 }

@@ -27,5 +27,5 @@ protected:
 	TArray<AActor*> CreatedActors;
 
 	UPROPERTY()
-	TArray<class APOEMonster_Base*> CreatedMonsters;
+	TMap<int32, TArray<class APOEMonster_Base*>> CreatedMonsters;
 };

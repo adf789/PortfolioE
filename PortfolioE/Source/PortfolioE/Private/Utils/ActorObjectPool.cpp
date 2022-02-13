@@ -9,7 +9,8 @@ ActorObjectPool::ActorObjectPool()
 
 ActorObjectPool::~ActorObjectPool()
 {
-	
+	CreatedActors.Reset();
+	CreatedMonsters.Reset();
 }
 
 void ActorObjectPool::AddObject(AActor * poolingObject)
@@ -19,7 +20,17 @@ void ActorObjectPool::AddObject(AActor * poolingObject)
 
 void ActorObjectPool::AddMonster(APOEMonster_Base * poolingObject)
 {
-	CreatedMonsters.Push(poolingObject);
+	if (poolingObject == nullptr) return;
+	
+	if (!CreatedMonsters.Contains(poolingObject->MonsterId)) CreatedMonsters.Add(poolingObject->MonsterId, TArray<APOEMonster_Base*>());
+
+	for (int i = 0; i < CreatedMonsters[poolingObject->MonsterId].Num(); i++) {
+		if (CreatedMonsters[poolingObject->MonsterId][i] == poolingObject) {
+			TEST_LOG("ม฿บน!!");
+			return;
+		}
+	}
+	CreatedMonsters[poolingObject->MonsterId].Push(poolingObject);
 }
 
 AActor * ActorObjectPool::GetUnUseObject()
@@ -42,15 +53,20 @@ AActor * ActorObjectPool::GetUnUseObject()
 
 APOEMonster_Base * ActorObjectPool::GetUnUseMonster(int32 MonsterId)
 {
-	if (CreatedMonsters.Num() == 0) return nullptr;
+	if (!CreatedMonsters.Contains(MonsterId)) return nullptr;
+	else if (CreatedMonsters[MonsterId].Num() == 0) {
+		return nullptr;
+	}
 
-	for (int i = 0; i < CreatedMonsters.Num(); i++) {
-		APOEMonster_Base* Monster = CreatedMonsters[i];
+	while (true) {
+		if (CreatedMonsters[MonsterId].Num() == 0) break;
+
+		APOEMonster_Base* Monster = CreatedMonsters[MonsterId].Pop();
 
 		if (!::IsValid(Monster) || Monster == nullptr || !Monster->bHidden) {
 			continue;
 		}
-		else if (Monster != nullptr && Monster->bHidden && Monster->MonsterId == MonsterId) {
+		else if (Monster != nullptr && Monster->bHidden) {
 			return Monster;
 		}
 	}
@@ -67,13 +83,11 @@ void ActorObjectPool::ResetAllObjects()
 
 void ActorObjectPool::ResetAllMonsters()
 {
-	for (auto it = CreatedMonsters.CreateConstIterator(); it; it++) {
-		if ((*it) == nullptr || (*it)->IsPendingKill()) {
-			CreatedMonsters.RemoveAt(it.GetIndex());
-			continue;
+	for (auto it = CreatedMonsters.CreateConstIterator(); it; ++it) {
+		
+		for (int i = 0; i < it->Value.Num(); i++) {
+			it->Value[i]->SetActorHiddenInGame(true);
 		}
-
-		(*it)->SetActorHiddenInGame(true);
 	}
 }
 

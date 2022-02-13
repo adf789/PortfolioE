@@ -112,13 +112,11 @@ void APOEMonster_Base::Die()
 	}
 
 	if (VisibilityMaterialInstance == nullptr) {
-		TEST_LOG("Destroy 3.0s");
 		GetWorld()->GetTimerManager().SetTimer(InvisibilityTimerHandle, FTimerDelegate::CreateLambda([this]() {
 			this->SetActorHiddenInGame(true);
 			}), 3.0f, false);
 	}
 	else {
-		TEST_LOG("Destroy += 0.03s");
 		GetWorld()->GetTimerManager().SetTimer(InvisibilityTimerHandle, FTimerDelegate::CreateLambda([this]() {
 			if (InvisibilityAmount >= 4.0f) {
 				InActive();
@@ -141,7 +139,7 @@ void APOEMonster_Base::InActive()
 
 	UPOEGameInstance* POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
 	CHECKRETURN(POEGameInstance == nullptr);
-	POEGameInstance->MonsterPooling->AddObject(this);
+	POEGameInstance->MonsterPooling->AddMonster(this);
 }
 float APOEMonster_Base::GetAttackDelay()
 {

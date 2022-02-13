@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MonsterSpawner.h"
-
+#include "POEGameInstance.h"
+#include "POEMonster_Base.h"
+#include "engine/AssetManager.h"
+#include "ActorObjectPool.h"
 
 // Sets default values
 AMonsterSpawner::AMonsterSpawner()
@@ -23,6 +26,5 @@ FVector AMonsterSpawner::GetSpawnLocation()
 void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
