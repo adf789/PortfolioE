@@ -18,6 +18,7 @@ public:
 	UFUNCTION()
 	virtual void SetItemAndInitView(UInventoryItem_Base* ItemData);
 
+
 protected:
 	UFUNCTION()
 	virtual void OnUse();
@@ -26,7 +27,7 @@ protected:
 	virtual void OnShowDetailPanel();
 
 	UFUNCTION()
-	virtual void OnShowMergeCraftPanel();
+	virtual void OnShowMergeCraftPanel(UInventoryItem_Base* MaterialItemData);
 	
 	UFUNCTION()
 	virtual void OnHideDetailPanel();
@@ -35,11 +36,11 @@ protected:
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-
+	virtual FReply NativeOnMouseButtonDoubleClick(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
@@ -61,10 +62,11 @@ private:
 
 	FSoftObjectPath TextureAssetToLoad = FSoftObjectPath(nullptr);
 	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;
-
 	FTimerHandle DetailPanelLocationHandler;
 	FEventReply DragReply;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class UPOEOnDragItemWidget> DragWidgetClass;
+
+	UWidget* SelectedDimImage;
 };

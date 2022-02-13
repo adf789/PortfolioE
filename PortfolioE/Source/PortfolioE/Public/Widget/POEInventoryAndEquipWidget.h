@@ -32,35 +32,41 @@ public:
 	UFUNCTION()
 	void OnPassiveUnEuquipClick();
 
+	UFUNCTION()
+	void SetVisibilityEquipmentPanel(ESlateVisibility Visible);
+
 protected:
 	virtual void NativeConstruct() override;
 
 protected:
 	UPROPERTY()
-		class UWrapBox* InventoyBox;
+	class UWrapBox* InventoyBox;
 
 	UPROPERTY()
-		class UImage* EquippedActiveImage;
+	class UImage* EquippedActiveImage;
 
 	UPROPERTY()
-		class UTextBlock* ActiveInfoText;
+	class UTextBlock* ActiveInfoText;
 
 	UPROPERTY()
-		class UImage* EquippedPassiveImage;
+	class UImage* EquippedPassiveImage;
 
 	UPROPERTY()
-		class UTextBlock* PassiveInfoText;
+	class UTextBlock* PassiveInfoText;
 
 	UPROPERTY()
-		class UTextBlock* CharacterValueText_Attack;
+	class UTextBlock* CharacterValueText_Attack;
 
 	UPROPERTY()
-		class UTextBlock* CharacterValueText_Hp;
+	class UTextBlock* CharacterValueText_Hp;
 
 	UPROPERTY()
-		class UTextBlock* CharacterValueText_Speed;
+	class UTextBlock* CharacterValueText_Speed;
+
+	UPROPERTY()
+	class UWidget* EquipmentPanel;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UPOEItemSlotWidget> ItemSlotWidgetClass;	
+	TSubclassOf<class UPOEItemSlotWidget> ItemSlotWidgetClass;
 };

@@ -22,18 +22,31 @@ public:
 	void UnSetBaseSlot();
 
 	UFUNCTION()
-	void SetMaterialSlot(class UInventoryItem_Equipment* BaseItem);
+	void SetMaterialSlot(class UInventoryItem_Equipment* MaterialItem);
 
 	UFUNCTION()
 	void UnSetMaterialSlot();
 
 	UFUNCTION()
+	void SetItemToSlot(class UInventoryItem_Equipment* Item);
+
+	UFUNCTION()
 	void StartMergeCraft();
+
+	UFUNCTION()
+	void UpdateUIForValues();
+
+	UFUNCTION()
+	void ClosePanel();
 
 protected:
 	virtual void NativeConstruct() override;
 
 private:
+	void UpdateTextForValues();
+	void UpdateExpBarForValues();
+	void UpdateInventoryUI();
+
 	UPROPERTY()
 	class UInventoryItem_Equipment* BaseItem;
 
@@ -63,4 +76,22 @@ private:
 
 	UPROPERTY()
 	class UTextBlock* SpeedValueText;
+
+	UPROPERTY()
+	class UTextBlock* ExpPercentText;
+
+	UPROPERTY()
+	class UTextBlock* BaseItemNameText;
+
+	UPROPERTY()
+	class UTextBlock* MaterialItemNameText;
+
+	UPROPERTY()
+	class UTextBlock* ItemLevelText;
+
+	UPROPERTY()
+	class UTextBlock* LevelUpInfoText;
+
+	UPROPERTY()
+	class UPOEGameInstance* GameInstance;
 };

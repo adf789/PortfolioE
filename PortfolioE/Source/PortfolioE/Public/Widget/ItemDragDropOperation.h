@@ -14,7 +14,6 @@ class PORTFOLIOE_API UItemDragDropOperation : public UDragDropOperation
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+public:
+	class UInventoryItem_Base* SelectedItem;	
 };

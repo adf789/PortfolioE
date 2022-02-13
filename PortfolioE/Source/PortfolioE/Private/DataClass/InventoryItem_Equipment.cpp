@@ -25,8 +25,29 @@ void UInventoryItem_Equipment::SetItemData(FPOEItemData* ItemData) {
 	SetCurrentExp(0);
 	SetRequireExp(ItemStatData->RequireExp);
 	SetItemType(EItemType::EQUIPMENT);
+	SetItemLevel(1);
 	this->ItemAttackValue = ItemStatData->AttackValue;
 	this->ItemHpValue = ItemStatData->HpValue;
 	this->ItemMoveSpeedValue = ItemStatData->SpeedValue;
 	this->IsPassive = ItemData->Passive;
+}
+
+bool UInventoryItem_Equipment::AddExp(int32 Exp)
+{
+	int32 CurrentItemLevel = ItemLevel;
+	if (!Super::AddExp(Exp)) return false;
+
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+	CHECKRETURN(GameInstance == nullptr, false);
+
+	if (CurrentItemLevel + 1 == ItemLevel) {
+		FPOEItemStatData* NextLevelStatData = GameInstance->GetPOEItemStatData(ItemId, ItemLevel);
+		if (NextLevelStatData != nullptr) {
+			ItemAttackValue += NextLevelStatData->AttackValue;
+			ItemHpValue += NextLevelStatData->HpValue;
+			ItemMoveSpeedValue += NextLevelStatData->SpeedValue;
+		}
+	}
+
+	return true;
 }

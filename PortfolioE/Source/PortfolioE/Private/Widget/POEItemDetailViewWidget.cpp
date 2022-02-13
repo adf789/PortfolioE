@@ -24,6 +24,7 @@ void UPOEItemDetailViewWidget::InitView()
 		HpValueText->SetText(FText::FromString(TEXT("")));
 		SpeedValueText->SetText(FText::FromString(TEXT("")));
 		ItemTypeText->SetText(FText::FromString(TEXT("")));
+		ItemLevelText->SetText(FText::FromString(TEXT("")));
 	}
 	else {
 		UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
@@ -38,6 +39,7 @@ void UPOEItemDetailViewWidget::InitView()
 			SetSpeedValueText((int)EquipItemData->ItemMoveSpeedValue);
 			ExpBar->SetPercent(EquipItemData->GetCurrentExp() / EquipItemData->GetRequireExp());
 			ItemTypeText->SetText(FText::FromString(EquipItemData->IsPassive ? TEXT("(PASSIVE)") : TEXT("(ACTIVE)")));
+			ItemLevelText->SetText(FText::FromString(FString::Printf(TEXT("Level: %d"), ItemData->GetItemLevel())));
 		}
 	}
 }
@@ -144,6 +146,9 @@ void UPOEItemDetailViewWidget::NativeConstruct()
 
 	ExpBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_ExpBar")));
 	CHECKRETURN(ExpBar == nullptr);
+
+	ItemLevelText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_Level")));
+	CHECKRETURN(ItemLevelText == nullptr);
 }
 
 void UPOEItemDetailViewWidget::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)

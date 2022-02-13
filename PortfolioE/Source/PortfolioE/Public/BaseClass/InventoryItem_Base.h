@@ -18,6 +18,7 @@ public:
 	UInventoryItem_Base();
 
 	virtual void SetItemData(struct FPOEItemData* ItemData);
+	virtual bool AddExp(int32 Exp);
 
 	void SetInventoryId(int32 ItemId);
 	int32 GetInventoryId();
@@ -40,6 +41,14 @@ public:
 	void SetDescription(FText Description);
 	FText GetDescription();
 
+	void SetItemLevel(int32 Level);
+	int32 GetItemLevel();
+
+	int32 GetAddExp();
+
+	void SetSelect(bool Select);
+	bool IsSelect();
+
 	void SetOwningInventory(class UMyInventoryComponent* OwningInventory);
 	class UMyInventoryComponent* GetOwningInventory();
 
@@ -61,6 +70,9 @@ protected:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	int32 CurrentExp;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	int32 ItemLevel;
 	
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	int32 TextureId;
@@ -70,6 +82,9 @@ protected:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	class UMyInventoryComponent* OwningInventory;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	bool IsSelected;
 
 	EItemType ItemType;
 };

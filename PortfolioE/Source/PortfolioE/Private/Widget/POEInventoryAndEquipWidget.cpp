@@ -15,18 +15,33 @@
 #include "POEGameInstance.h"
 
 void UPOEInventoryAndEquipWidget::InitInventoryView() {
-	InventoyBox->ClearChildren();
-
 	APOECharacter* Character = Cast<APOECharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	CHECKRETURN(Character == nullptr);
 	
-	CHECKRETURN(ItemSlotWidgetClass == nullptr);
+	CHECKRETURN(!ItemSlotWidgetClass);
+	
 	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
+	TArray<UInventoryItem_Base*> InventoryItems = Character->Inventory->GetItems();
+	int Size = FMath::Max(InventoyBox->GetChildrenCount(), InventoryItems.Num());
 
-	for (int i = 0; i < Character->Inventory->GetItems().Num(); i++) {
-		UPOEItemSlotWidget* InventorySlotWidget = CreateWidget<UPOEItemSlotWidget>(GameInstance, ItemSlotWidgetClass);
-		InventoyBox->AddChildWrapBox(InventorySlotWidget);
-		InventorySlotWidget->SetItemAndInitView(Character->Inventory->GetItems()[i]);
+	UPOEItemSlotWidget* InventorySlotWidget = nullptr;
+	for (int i = 0; i < Size; i++) {
+		if (i >= InventoyBox->GetChildrenCount()) {
+			InventorySlotWidget = CreateWidget<UPOEItemSlotWidget>(GameInstance, ItemSlotWidgetClass);
+			InventoyBox->AddChildWrapBox(InventorySlotWidget);
+		}
+		else if (i >= InventoryItems.Num()) {
+			InventoyBox->GetChildAt(i)->SetVisibility(ESlateVisibility::Hidden);
+			continue;
+		}
+		else {
+			InventorySlotWidget = Cast<UPOEItemSlotWidget>(InventoyBox->GetChildAt(i));
+		}
+
+		CHECKRETURN(InventorySlotWidget == nullptr);
+
+		InventorySlotWidget->SetVisibility(ESlateVisibility::Visible);
+		InventorySlotWidget->SetItemAndInitView(InventoryItems[i]);
 	}
 
 	InitActiveEquipSlot(Character->Inventory->GetEquippedActiveItem());
@@ -115,6 +130,11 @@ void UPOEInventoryAndEquipWidget::OnPassiveUnEuquipClick()
 	}
 }
 
+void UPOEInventoryAndEquipWidget::SetVisibilityEquipmentPanel(ESlateVisibility Visible)
+{
+	EquipmentPanel->SetVisibility(Visible);
+}
+
 void UPOEInventoryAndEquipWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -148,6 +168,9 @@ void UPOEInventoryAndEquipWidget::NativeConstruct()
 
 	CharacterValueText_Speed = Cast<UTextBlock>(GetWidgetFromName(TEXT("SpeedValue")));
 	CHECKRETURN(CharacterValueText_Speed == nullptr);
+
+	EquipmentPanel = GetWidgetFromName(TEXT("EquipmentPanel"));
+	CHECKRETURN(EquipmentPanel == nullptr);
 
 	UButton* UnEquipmentActiveItemButton = Cast<UButton>(GetWidgetFromName(TEXT("ActiveEquipmentButton")));
 	if (UnEquipmentActiveItemButton != nullptr) {

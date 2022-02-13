@@ -18,6 +18,7 @@ public:
 	UInventoryItem_Equipment();
 	
 	virtual void SetItemData(struct FPOEItemData* ItemData) override;
+	virtual bool AddExp(int32 Exp) override;
 
 	float ItemAttackValue;
 	float ItemHpValue;
