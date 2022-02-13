@@ -7,6 +7,8 @@
 #include "DrawDebugHelpers.h"
 #include "PaperSpriteComponent.h"
 #include "PaperSprite.h"
+#include "POEGameInstance.h"
+#include "ActorObjectPool.h"
 
 APOEMonster_Base::APOEMonster_Base() {
 	AIControllerClass = APOEMonsterAIController::StaticClass();
@@ -27,6 +29,7 @@ APOEMonster_Base::APOEMonster_Base() {
 	}
 
 	IsSpawned = false;
+	AIControllerClass = APOEMonsterAIController::StaticClass();
 }
 
 void APOEMonster_Base::PostInitializeComponents()
@@ -107,13 +110,46 @@ void APOEMonster_Base::Die()
 	if (MonsterAIController != nullptr) {
 		MonsterAIController->StopAI();
 	}
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]() {
-		this->SetActorHiddenInGame(true);
-	}), 3.0f, false);
+
+	if (VisibilityMaterialInstance == nullptr) {
+		TEST_LOG("Destroy 3.0s");
+		GetWorld()->GetTimerManager().SetTimer(InvisibilityTimerHandle, FTimerDelegate::CreateLambda([this]() {
+			this->SetActorHiddenInGame(true);
+			}), 3.0f, false);
+	}
+	else {
+		TEST_LOG("Destroy += 0.03s");
+		GetWorld()->GetTimerManager().SetTimer(InvisibilityTimerHandle, FTimerDelegate::CreateLambda([this]() {
+			if (InvisibilityAmount >= 4.0f) {
+				InActive();
+				GetWorld()->GetTimerManager().ClearTimer(this->InvisibilityTimerHandle);
+				return;
+			}
+
+			InvisibilityAmount += 0.15f;
+			VisibilityMaterialInstance->SetScalarParameterValue(TEXT("Amount"), InvisibilityAmount);
+			}), 0.1f, true);
+	}
+}
+void APOEMonster_Base::Active()
+{
+	SetActorHiddenInGame(false);
+}
+void APOEMonster_Base::InActive()
+{
+	SetActorHiddenInGame(true);
+
+	UPOEGameInstance* POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
+	CHECKRETURN(POEGameInstance == nullptr);
+	POEGameInstance->MonsterPooling->AddObject(this);
 }
 float APOEMonster_Base::GetAttackDelay()
 {
 	return DelayAfterAttack;
 }
-\
+void APOEMonster_Base::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InvisibilityAmount = 0;
+}

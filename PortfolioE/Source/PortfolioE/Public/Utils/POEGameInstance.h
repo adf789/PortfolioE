@@ -72,6 +72,32 @@ public:
 	int32 Percent;
 };
 
+USTRUCT(BlueprintType)
+struct FPOEMonsterStatData : public FTableRowBase {
+	GENERATED_BODY()
+
+public:
+	FPOEMonsterStatData() : MonsterId(0), MonsterLevel(1), AttackValue(0), HpValue(0), AddAttackValuePerLevel(0), AddHpValuePerLevel(0) {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 MonsterId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 MonsterLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 AttackValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 HpValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 AddAttackValuePerLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 AddHpValuePerLevel;
+};
+
 /**
  * 
  */
@@ -88,6 +114,7 @@ public:
 	FPOEItemData* GetPOEItemData(int32 ItemId);
 	FPOEItemStatData* GetPOEItemStatData(int32 ItemId, int32 Level);
 	int32 GetLotteryRandomItemId();
+	FPOEMonsterStatData* GetMonsterDataForId(int32 MonsterId);
 
 	UFUNCTION()
 	class UTexture2D* GetItemTextureForId(int32 ItemId);
@@ -95,6 +122,7 @@ public:
 
 	class ActorObjectPool* EffectPooling;
 	class ActorObjectPool* DamageTextPooling;
+	class ActorObjectPool* MonsterPooling;
 	UUIScreenInteraction* UIScreenInteraction;
 
 	int32 LotteryCoinCount;
@@ -109,6 +137,9 @@ private:
 
 	UPROPERTY()
 	class UDataTable* POEItemLotteryTable;
+
+	UPROPERTY()
+	class UDataTable* POEMonsterTable;
 
 	UPROPERTY()
 	TMap<int32, class UTexture2D*> LoadedTexture;

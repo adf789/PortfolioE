@@ -13,12 +13,19 @@ public:
 	ActorObjectPool();
 	~ActorObjectPool();
 
-	void AddObject(class APoolingActor* poolingObject);
-	class APoolingActor* GetUnUseObject();
+	void AddObject(AActor* poolingObject);
+	void AddMonster(class APOEMonster_Base* poolingObject);
+	AActor* GetUnUseObject();
+	class APOEMonster_Base* GetUnUseMonster(int32 MonsterId);
 	void ResetAllObjects();
+	void ResetAllMonsters();
 	int32 GetObjectCount();
+	int32 GetMonsterCount();
 	   
 protected:
-	TArray<class APoolingActor*> EffectPooling;
+	UPROPERTY()
+	TArray<AActor*> CreatedActors;
 
+	UPROPERTY()
+	TArray<class APOEMonster_Base*> CreatedMonsters;
 };

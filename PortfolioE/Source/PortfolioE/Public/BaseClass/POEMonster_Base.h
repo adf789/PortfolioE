@@ -21,8 +21,13 @@ public:
 	virtual void CheckMeleeAttackCollision() override;
 	virtual float GetAIDetectRange() override;
 	virtual void Die() override;
+	virtual void Active();
+	virtual void InActive();
 
 	float GetAttackDelay();
+
+protected:
+	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
@@ -40,7 +45,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Minimap)
 	class UPaperSpriteComponent* ArrowSprite;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Material, Meta = (AllowPrivateAccess = true))
+	class UMaterialInstanceDynamic* VisibilityMaterialInstance;
+
+	FTimerHandle InvisibilityTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Material, Meta = (AllowPrivateAccess = true))
+	float InvisibilityAmount;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	float RestTimer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
+	float MonsterId;
 };

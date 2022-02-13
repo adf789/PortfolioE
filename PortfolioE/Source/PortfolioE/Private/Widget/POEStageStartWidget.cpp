@@ -7,9 +7,52 @@
 #include "MyInventoryComponent.h"
 #include "POEGameInstance.h"
 #include "UIScreenInteraction.h"
+#include "MonsterSpawner.h"
+#include "EngineUtils.h"
+#include "POEMonster_Base.h"
+#include "Engine/AssetManager.h"
+#include "ActorObjectPool.h"
 
 void UPOEStageStartWidget::OnStageStart()
 {
+	UWorld* CurrentWorld = GetWorld();
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+
+	CHECKRETURN(GameInstance == nullptr);
+
+	FSoftObjectPath SlotClassPath(TEXT("/Game/POE/Blueprints/Actor/POEMonster_Normal1.POEMonster_Normal1_C"));
+
+	TSubclassOf<APOEMonster_Base> NormalMonster = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<APOEMonster_Base>(SlotClassPath));
+	for (TActorIterator<AMonsterSpawner> It(CurrentWorld); It; ++It) {
+		TEST_LOG("Spawn!!");
+		AMonsterSpawner* SpawnPoint = *It;
+
+		for (int i = 0; i < 3; i++) {
+			FVector SpawnLocation = SpawnPoint->GetSpawnLocation();
+
+			FRandomStream Random(FMath::Rand());
+			int8 RandX = Random.RandRange(-20, 20);
+			int8 RandY = Random.RandRange(-20, 20);
+
+			SpawnLocation.X += RandX;
+			SpawnLocation.Y += RandY;
+
+			FPOEMonsterStatData* MonsterStatData = GameInstance->GetMonsterDataForId(1);
+			CHECKRETURN(MonsterStatData == nullptr);
+
+			APOEMonster_Base* Monster = GameInstance->MonsterPooling->GetUnUseMonster(MonsterStatData->MonsterId);
+			if (Monster == nullptr) {
+				Monster = GetWorld()->SpawnActor<APOEMonster_Base>(NormalMonster->GetDefaultObject()->GetClass(), SpawnLocation, FRotator::ZeroRotator);
+				GameInstance->MonsterPooling->AddMonster(Monster);
+			}
+			else TEST_LOG("Ã£À½!!");
+
+			CHECKRETURN(Monster == nullptr);
+			Monster->Active();
+			Monster->CharacterStatus->AttackValue = MonsterStatData->AttackValue;
+			Monster->CharacterStatus->SetHPValue(MonsterStatData->HpValue);
+		}
+	}
 }
 
 void UPOEStageStartWidget::OnCancel()

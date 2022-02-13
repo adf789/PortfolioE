@@ -8,6 +8,7 @@
 UPOEGameInstance::UPOEGameInstance() {
 	this->EffectPooling = new ActorObjectPool();
 	this->DamageTextPooling = new ActorObjectPool();
+	this->MonsterPooling = new ActorObjectPool();
 
 	static ConstructorHelpers::FObjectFinder<UDataTable>
 		DT_ITEM_DATA_TABLE(TEXT("/Game/POE/GameData/ItemDataTable.ItemDataTable"));
@@ -26,11 +27,18 @@ UPOEGameInstance::UPOEGameInstance() {
 	CHECKRETURN(!DT_ITEM_LOTTERY_TABLE.Succeeded());
 	POEItemLotteryTable = DT_ITEM_LOTTERY_TABLE.Object;
 	CHECKRETURN(POEItemLotteryTable->RowMap.Num() == 0);
+
+	static ConstructorHelpers::FObjectFinder<UDataTable>
+		DT_MONSTER_TABLE(TEXT("/Game/POE/GameData/MonsterTable.MonsterTable"));
+	CHECKRETURN(!DT_MONSTER_TABLE.Succeeded());
+	POEMonsterTable = DT_MONSTER_TABLE.Object;
+	CHECKRETURN(POEMonsterTable->RowMap.Num() == 0);
 }
 
 UPOEGameInstance::~UPOEGameInstance() {
 	delete EffectPooling;
 	delete DamageTextPooling;
+	delete MonsterPooling;
 }
 
 FPOEItemData * UPOEGameInstance::GetPOEItemData(int32 ItemId)
@@ -51,6 +59,12 @@ FPOEItemStatData * UPOEGameInstance::GetPOEItemStatData(int32 ItemId, int32 Leve
 
 	TEST_LOG_WITH_VAR("Not found stat data id: %d, level: %d", ItemId, Level);
 	return nullptr;
+}
+
+FPOEMonsterStatData * UPOEGameInstance::GetMonsterDataForId(int32 MonsterId)
+{
+	CHECKRETURN(POEMonsterTable == nullptr, nullptr);
+	return POEMonsterTable->FindRow<FPOEMonsterStatData>(*FString::FromInt(MonsterId + 1), TEXT(""));
 }
 
 int32 UPOEGameInstance::GetLotteryRandomItemId()
