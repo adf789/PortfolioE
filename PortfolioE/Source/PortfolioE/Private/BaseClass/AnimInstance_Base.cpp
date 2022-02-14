@@ -71,6 +71,11 @@ void UAnimInstance_Base::PlayDie()
 	IsDead = true;
 }
 
+void UAnimInstance_Base::InitValues()
+{
+	IsDead = false;
+}
+
 void UAnimInstance_Base::BindCharacter(APOECharacter_Base* Actor)
 {
 	CharacterActor = Actor;

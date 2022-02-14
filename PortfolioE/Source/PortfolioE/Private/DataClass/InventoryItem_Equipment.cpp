@@ -12,24 +12,30 @@ void UInventoryItem_Equipment::SetItemData(FPOEItemData* ItemData) {
 
 	CHECKRETURN(ItemData == nullptr);
 
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
-	CHECKRETURN(GameInstance == nullptr);
-
-	FPOEItemStatData* ItemStatData = GameInstance->GetPOEItemStatData(ItemData->ItemId, 1);
-	CHECKRETURN(ItemStatData == nullptr);
-
 	SetDisplayName(FName(*ItemData->ItemName));
 	SetItemId(ItemData->ItemId);
-	SetTextureId(ItemStatData->ItemId);
+	SetTextureId(ItemData->ItemId);
 	SetDescription(FText::FromString(ItemData->Description));
-	SetCurrentExp(0);
-	SetRequireExp(ItemStatData->RequireExp);
 	SetItemType(EItemType::EQUIPMENT);
-	SetItemLevel(1);
-	this->ItemAttackValue = ItemStatData->AttackValue;
-	this->ItemHpValue = ItemStatData->HpValue;
-	this->ItemMoveSpeedValue = ItemStatData->SpeedValue;
 	this->IsPassive = ItemData->Passive;
+	SetItemLevel(1);
+}
+
+void UInventoryItem_Equipment::SetItemStatData(FPOEItemStatData * StatData)
+{
+	Super::SetItemStatData(StatData);
+
+	CHECKRETURN(StatData == nullptr);
+
+	SetCurrentExp(0);
+	SetRequireExp(StatData->RequireExp);
+	SetItemLevel(StatData->Level);
+	this->ItemAttackValue = StatData->AttackValue;
+	this->ItemHpValue = StatData->HpValue;
+	this->ItemMoveSpeedValue = StatData->SpeedValue;
+	this->ItemAddAttackValue = 0;
+	this->ItemAddHpValue = 0;
+	this->ItemAddMoveSpeedValue = 0;
 }
 
 bool UInventoryItem_Equipment::AddExp(int32 Exp)
@@ -43,11 +49,26 @@ bool UInventoryItem_Equipment::AddExp(int32 Exp)
 	if (CurrentItemLevel + 1 == ItemLevel) {
 		FPOEItemStatData* NextLevelStatData = GameInstance->GetPOEItemStatData(ItemId, ItemLevel);
 		if (NextLevelStatData != nullptr) {
-			ItemAttackValue += NextLevelStatData->AttackValue;
-			ItemHpValue += NextLevelStatData->HpValue;
-			ItemMoveSpeedValue += NextLevelStatData->SpeedValue;
+			ItemAttackValue = NextLevelStatData->AttackValue;
+			ItemHpValue = NextLevelStatData->HpValue;
+			ItemMoveSpeedValue = NextLevelStatData->SpeedValue;
 		}
 	}
 
 	return true;
+}
+
+float UInventoryItem_Equipment::GetAttackValue()
+{
+	return this->ItemAttackValue + this->ItemAddAttackValue;
+}
+
+float UInventoryItem_Equipment::GetHpValue()
+{
+	return this->ItemHpValue + this->ItemAddHpValue;
+}
+
+float UInventoryItem_Equipment::GetMoveSpeedValue()
+{
+	return this->ItemMoveSpeedValue + this->ItemAddMoveSpeedValue;
 }

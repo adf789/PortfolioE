@@ -34,9 +34,9 @@ void UPOEItemDetailViewWidget::InitView()
 		ItemImage->SetColorAndOpacity(FLinearColor::White);
 		if (ItemData->GetItemType() == EItemType::EQUIPMENT) {
 			UInventoryItem_Equipment* EquipItemData = Cast<UInventoryItem_Equipment>(ItemData);
-			SetAttackValueText((int)EquipItemData->ItemAttackValue);
-			SetHpValueText((int)EquipItemData->ItemHpValue);
-			SetSpeedValueText((int)EquipItemData->ItemMoveSpeedValue);
+			SetAttackValueText((int)EquipItemData->GetAttackValue());
+			SetHpValueText((int)EquipItemData->GetHpValue());
+			SetSpeedValueText((int)EquipItemData->GetMoveSpeedValue());
 			ExpBar->SetPercent(EquipItemData->GetCurrentExp() / EquipItemData->GetRequireExp());
 			ItemTypeText->SetText(FText::FromString(EquipItemData->IsPassive ? TEXT("(PASSIVE)") : TEXT("(ACTIVE)")));
 			ItemLevelText->SetText(FText::FromString(FString::Printf(TEXT("Level: %d"), ItemData->GetItemLevel())));
@@ -51,10 +51,10 @@ void UPOEItemDetailViewWidget::SetAttackValueText(int32 Value)
 
 	if (EquipmentItem != nullptr) {
 		if (!EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->ItemAttackValue;
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->GetAttackValue();
 		}
 		else if (EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->ItemAttackValue;
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->GetAttackValue();
 		}
 	}
 
@@ -76,10 +76,10 @@ void UPOEItemDetailViewWidget::SetHpValueText(int32 Value)
 
 	if (EquipmentItem != nullptr) {
 		if (!EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->ItemHpValue;
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->GetHpValue();
 		}
 		else if (EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->ItemHpValue;
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->GetHpValue();
 		}
 	}
 
@@ -101,10 +101,10 @@ void UPOEItemDetailViewWidget::SetSpeedValueText(int32 Value)
 
 	if (EquipmentItem != nullptr) {
 		if (!EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedActiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->ItemMoveSpeedValue;
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedActiveItem()->GetMoveSpeedValue();
 		}
 		else if (EquipmentItem->IsPassive && EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem() != nullptr) {
-			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->ItemMoveSpeedValue;
+			ValueIsMoreThanEquipped = Value >= EquipmentItem->GetOwningInventory()->GetEquippedPassiveItem()->GetMoveSpeedValue();
 		}
 	}
 

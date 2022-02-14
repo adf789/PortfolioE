@@ -114,6 +114,7 @@ void APOEMonster_Base::Die()
 	if (VisibilityMaterialInstance == nullptr) {
 		GetWorld()->GetTimerManager().SetTimer(InvisibilityTimerHandle, FTimerDelegate::CreateLambda([this]() {
 			this->SetActorHiddenInGame(true);
+			GameInstance->DyingMonster();
 			}), 3.0f, false);
 	}
 	else {
@@ -121,6 +122,7 @@ void APOEMonster_Base::Die()
 			if (InvisibilityAmount >= 4.0f) {
 				InActive();
 				GetWorld()->GetTimerManager().ClearTimer(this->InvisibilityTimerHandle);
+				GameInstance->DyingMonster();
 				return;
 			}
 
@@ -132,14 +134,26 @@ void APOEMonster_Base::Die()
 void APOEMonster_Base::Active()
 {
 	SetActorHiddenInGame(false);
+	if (VisibilityMaterialInstance != nullptr) {
+		InvisibilityAmount = 0;
+		VisibilityMaterialInstance->SetScalarParameterValue(TEXT("Amount"), InvisibilityAmount);
+	}
+
+	APOEMonsterAIController* AIController = Cast<APOEMonsterAIController>(GetController());
+	CHECKRETURN(AIController == nullptr);
+
+	GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
+	CHECKRETURN(AIController == nullptr);
+
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("POECharacter"));
+	IsSpawned = false;
+	AnimInstance->InitValues();
 }
 void APOEMonster_Base::InActive()
 {
 	SetActorHiddenInGame(true);
 
-	UPOEGameInstance* POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
-	CHECKRETURN(POEGameInstance == nullptr);
-	POEGameInstance->MonsterPooling->AddMonster(this);
+	if(GameInstance != nullptr) GameInstance->MonsterPooling->AddMonster(this);
 }
 float APOEMonster_Base::GetAttackDelay()
 {

@@ -22,11 +22,15 @@ void UPOEStageStartWidget::OnStageStart()
 
 	FSoftObjectPath SlotClassPath(TEXT("/Game/POE/Blueprints/Actor/POEMonster_Normal1.POEMonster_Normal1_C"));
 
+	int8 SpawnMonsterCount = 1;
+	GameInstance->SetCountSpawnMonster(1);
+	GameInstance->SetStageLevel(1);
+
 	TSubclassOf<APOEMonster_Base> NormalMonster = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<APOEMonster_Base>(SlotClassPath));
 	for (TActorIterator<AMonsterSpawner> It(CurrentWorld); It; ++It) {
 		AMonsterSpawner* SpawnPoint = *It;
 
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 1; i++) {
 			FVector SpawnLocation = SpawnPoint->GetSpawnLocation();
 
 			FRandomStream Random(FMath::Rand());
@@ -41,12 +45,10 @@ void UPOEStageStartWidget::OnStageStart()
 
 			APOEMonster_Base* Monster = GameInstance->MonsterPooling->GetUnUseMonster(MonsterStatData->MonsterId);
 			if (Monster == nullptr) {
-				TEST_LOG("생성!!");
 				Monster = GetWorld()->SpawnActor<APOEMonster_Base>(NormalMonster->GetDefaultObject()->GetClass(), SpawnLocation, FRotator::ZeroRotator);
 				Monster->MonsterId = MonsterStatData->MonsterId;
 				GameInstance->MonsterPooling->AddMonster(Monster);
 			}
-			else TEST_LOG("찾음!!");
 
 			CHECKRETURN(Monster == nullptr);
 			Monster->Active();
@@ -54,6 +56,8 @@ void UPOEStageStartWidget::OnStageStart()
 			Monster->CharacterStatus->InitHPVale(MonsterStatData->HpValue);
 		}
 	}
+
+	OnCancel();
 }
 
 void UPOEStageStartWidget::OnCancel()
@@ -63,6 +67,9 @@ void UPOEStageStartWidget::OnCancel()
 	if (GameInstance != nullptr) {
 		UUserWidget* InventoryWidget = GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::INVENTORY);
 		if (InventoryWidget != nullptr) InventoryWidget->RemoveFromParent();
+
+		UUserWidget* HUDPanel = GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD);
+		HUDPanel->SetVisibility(ESlateVisibility::Visible);
 	}
 	GetOwningPlayer()->SetPause(false);
 }

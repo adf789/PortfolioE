@@ -214,18 +214,18 @@ void UPOEMergeCraftWidget::UpdateTextForValues()
 
 	if (EquipmentItem != nullptr) {
 		FPOEItemStatData* NextLevelStatData = GameInstance->GetPOEItemStatData(EquipmentItem->GetItemId(), EquipmentItem->GetItemLevel() + 1);
-
+		
 		if (NextLevelStatData != nullptr && MaterialItem != nullptr && EquipmentItem->GetRequireExp() <= EquipmentItem->GetCurrentExp() + MaterialItem->GetAddExp()) {
-			AttackValueText->SetText(FText::FromString(FString::Printf(TEXT("Attack: %d(+%d)"), (int)EquipmentItem->ItemAttackValue, (int)NextLevelStatData->AttackValue)));
-			HpValueText->SetText(FText::FromString(FString::Printf(TEXT("Hp: %d(+%d)"), (int)EquipmentItem->ItemHpValue, (int)NextLevelStatData->HpValue)));
-			SpeedValueText->SetText(FText::FromString(FString::Printf(TEXT("Speed: %d(+%d)"), (int)EquipmentItem->ItemMoveSpeedValue, (int)NextLevelStatData->SpeedValue)));
+			AttackValueText->SetText(FText::FromString(FString::Printf(TEXT("Attack: %d -> %d"), (int)EquipmentItem->GetAttackValue(), (int)(NextLevelStatData->AttackValue + EquipmentItem->ItemAddAttackValue))));
+			HpValueText->SetText(FText::FromString(FString::Printf(TEXT("Hp: %d -> %d"), (int)EquipmentItem->GetHpValue(), (int)(NextLevelStatData->HpValue + EquipmentItem->ItemAddHpValue))));
+			SpeedValueText->SetText(FText::FromString(FString::Printf(TEXT("Speed: %d -> %d"), (int)EquipmentItem->GetMoveSpeedValue(), (int)(NextLevelStatData->SpeedValue + EquipmentItem->ItemAddMoveSpeedValue))));
 			ItemLevelText->SetText(FText::FromString(FString::Printf(TEXT("Level: %d"), EquipmentItem->GetItemLevel() + 1)));
 			LevelUpInfoText->SetVisibility(ESlateVisibility::Visible);
 			return;
 		}
-		AttackValueText->SetText(FText::FromString(FString::Printf(TEXT("Attack: %d"), (int)EquipmentItem->ItemAttackValue)));
-		HpValueText->SetText(FText::FromString(FString::Printf(TEXT("Hp: %d"), (int)EquipmentItem->ItemHpValue)));
-		SpeedValueText->SetText(FText::FromString(FString::Printf(TEXT("Speed: %d"), (int)EquipmentItem->ItemMoveSpeedValue)));
+		AttackValueText->SetText(FText::FromString(FString::Printf(TEXT("Attack: %d"), (int)EquipmentItem->GetAttackValue())));
+		HpValueText->SetText(FText::FromString(FString::Printf(TEXT("Hp: %d"), (int)EquipmentItem->GetHpValue())));
+		SpeedValueText->SetText(FText::FromString(FString::Printf(TEXT("Speed: %d"), (int)EquipmentItem->GetMoveSpeedValue())));
 		ItemLevelText->SetText(FText::FromString(FString::Printf(TEXT("Level: %d"), EquipmentItem->GetItemLevel())));
 		LevelUpInfoText->SetVisibility(ESlateVisibility::Hidden);
 	}

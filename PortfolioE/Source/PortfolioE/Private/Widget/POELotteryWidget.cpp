@@ -78,9 +78,9 @@ void UPOELotteryWidget::ShowMessagePanel(FString Text) {
 }
 
 void UPOELotteryWidget::AddRandonStatToItem(class UInventoryItem_Equipment* EquipmentItem) {
-	if (EquipmentItem->ItemAttackValue != 0) EquipmentItem->ItemAttackValue += FMath::RandRange(0, 50);
-	if (EquipmentItem->ItemHpValue != 0) EquipmentItem->ItemHpValue += FMath::RandRange(0, 10000);
-	if (EquipmentItem->ItemMoveSpeedValue != 0) EquipmentItem->ItemMoveSpeedValue += FMath::RandRange(0, 20);
+	if (EquipmentItem->ItemAttackValue != 0) EquipmentItem->ItemAddAttackValue += FMath::RandRange(0, 50);
+	if (EquipmentItem->ItemHpValue != 0) EquipmentItem->ItemAddHpValue += FMath::RandRange(0, 10000);
+	if (EquipmentItem->ItemMoveSpeedValue != 0) EquipmentItem->ItemAddMoveSpeedValue += FMath::RandRange(0, 20);
 }
 
 void UPOELotteryWidget::ClosePanel() {

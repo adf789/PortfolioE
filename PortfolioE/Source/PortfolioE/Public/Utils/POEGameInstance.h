@@ -96,6 +96,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 AddHpValuePerLevel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MonsterReward")
+	int32 MaxCountForSpawnMonster;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MonsterReward")
+	int32 CurCountForSpawnMonster;
 };
 
 /**
@@ -115,9 +121,15 @@ public:
 	FPOEItemStatData* GetPOEItemStatData(int32 ItemId, int32 Level);
 	int32 GetLotteryRandomItemId();
 	FPOEMonsterStatData* GetMonsterDataForId(int32 MonsterId);
+	void SetCountSpawnMonster(int32 MonsterCount);
+	void DyingMonster();
+	void SetStageLevel(int32 Level);
 
 	UFUNCTION()
 	class UTexture2D* GetItemTextureForId(int32 ItemId);
+
+	UFUNCTION()
+	class UInventoryItem_Equipment* GetRandEquipmentForReward(int32 Level);
 
 
 	class ActorObjectPool* EffectPooling;
@@ -127,8 +139,17 @@ public:
 
 	int32 LotteryCoinCount;
 	int32 LotteryCount;
+	int32 DropCount;
+	int32 StageLevel;
 
 private:
+	void ShowBattleReward();
+	void CreateRewardItems();
+	void RewardItemInInventory();
+	void SetMaxDropPercent();
+	struct FPOEItemData* GetDropItemData();
+	class UInventoryItem_Equipment* GetCreatedDropItem(FPOEItemData* ItemData, int32 Level);
+
 	UPROPERTY()
 	class UDataTable* POEItemDataTable;
 
@@ -143,4 +164,19 @@ private:
 
 	UPROPERTY()
 	TMap<int32, class UTexture2D*> LoadedTexture;
+
+	UPROPERTY()
+	TArray<class UInventoryItem_Base*> CreatedRewardItems;
+
+	UPROPERTY()
+	int32 RewardCoinCount;
+
+	UPROPERTY()
+	int32 MaxSpawnMonsterCount;
+
+	UPROPERTY()
+	int32 CurSpawnMonsterCount;
+
+	UPROPERTY()
+	int32 MaxDropPercent;
 };

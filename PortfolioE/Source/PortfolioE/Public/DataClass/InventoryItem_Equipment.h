@@ -18,10 +18,20 @@ public:
 	UInventoryItem_Equipment();
 	
 	virtual void SetItemData(struct FPOEItemData* ItemData) override;
+	virtual void SetItemStatData(struct FPOEItemStatData* StatData) override;
 	virtual bool AddExp(int32 Exp) override;
 
+	float GetAttackValue();
+	float GetHpValue();
+	float GetMoveSpeedValue();
+
 	float ItemAttackValue;
+	float ItemAddAttackValue;
+
 	float ItemHpValue;
+	float ItemAddHpValue;
+
 	float ItemMoveSpeedValue;
+	float ItemAddMoveSpeedValue;
 	bool IsPassive;
 };

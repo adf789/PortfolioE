@@ -26,7 +26,6 @@ void ActorObjectPool::AddMonster(APOEMonster_Base * poolingObject)
 
 	for (int i = 0; i < CreatedMonsters[poolingObject->MonsterId].Num(); i++) {
 		if (CreatedMonsters[poolingObject->MonsterId][i] == poolingObject) {
-			TEST_LOG("ม฿บน!!");
 			return;
 		}
 	}

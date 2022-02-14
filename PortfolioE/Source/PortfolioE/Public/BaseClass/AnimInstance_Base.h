@@ -25,6 +25,7 @@ public:
 	void PlayAttack();
 	void PlayHit(FVector Direction);
 	void PlayDie();
+	virtual void InitValues();
 
 	FOnAnimEvent OnSpawnEnd;
 	FOnAnimEvent OnAttackEnd;

@@ -53,6 +53,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Material, Meta = (AllowPrivateAccess = true))
 	float InvisibilityAmount;
 
+	class UPOEGameInstance* GameInstance;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	float RestTimer;

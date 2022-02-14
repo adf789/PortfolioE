@@ -17,6 +17,8 @@ public:
 	
 	UFUNCTION()
 	bool IsRemainCapacity() const;
+
+	bool IsRemainCapacity(int32 AddCount) const;
 	
 	bool IsExistItemForItemId(class UInventoryItem_Base* TargetItem) const;
 

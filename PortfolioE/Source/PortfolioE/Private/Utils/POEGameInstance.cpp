@@ -4,6 +4,10 @@
 #include "ActorObjectPool.h"
 #include "Engine/AssetManager.h"
 #include "POEItemTexturePath.h"
+#include "POERewardWidget.h"
+#include "POECharacter.h"
+#include "MyInventoryComponent.h"
+#include "InventoryItem_Equipment.h"
 
 UPOEGameInstance::UPOEGameInstance() {
 	this->EffectPooling = new ActorObjectPool();
@@ -39,6 +43,9 @@ UPOEGameInstance::~UPOEGameInstance() {
 	delete EffectPooling;
 	delete DamageTextPooling;
 	delete MonsterPooling;
+
+	CreatedRewardItems.Reset();
+	LoadedTexture.Reset();
 }
 
 FPOEItemData * UPOEGameInstance::GetPOEItemData(int32 ItemId)
@@ -65,6 +72,72 @@ FPOEMonsterStatData * UPOEGameInstance::GetMonsterDataForId(int32 MonsterId)
 {
 	CHECKRETURN(POEMonsterTable == nullptr, nullptr);
 	return POEMonsterTable->FindRow<FPOEMonsterStatData>(*FString::FromInt(MonsterId + 1), TEXT(""));
+}
+
+void UPOEGameInstance::SetCountSpawnMonster(int32 MonsterCount)
+{
+	MaxSpawnMonsterCount = MonsterCount;
+	CurSpawnMonsterCount = MaxSpawnMonsterCount;
+}
+
+void UPOEGameInstance::DyingMonster()
+{
+	if (CurSpawnMonsterCount <= 0) return;
+	CurSpawnMonsterCount--;
+
+	if (CurSpawnMonsterCount <= 0) {
+		CreateRewardItems();
+		RewardItemInInventory();
+		ShowBattleReward();
+	}
+}
+
+void UPOEGameInstance::SetStageLevel(int32 Level) {
+	StageLevel = Level;
+}
+
+void UPOEGameInstance::ShowBattleReward()
+{
+	UPOERewardWidget* RewardPanel = Cast<UPOERewardWidget>(UIScreenInteraction->ShowPanel(EUIPanelName::REWARD));
+	CHECKRETURN(RewardPanel == nullptr);
+
+	RewardPanel->SetRewardItemList(CreatedRewardItems);
+	RewardPanel->AddCoinInRewardList(RewardCoinCount);
+}
+
+void UPOEGameInstance::CreateRewardItems()
+{
+	APOECharacter* Character = Cast<APOECharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	CHECKRETURN(Character == nullptr);
+
+	CreatedRewardItems.Reset();
+	RewardCoinCount = 0;
+	FRandomStream Random(FMath::Rand());
+	Random.GenerateNewSeed();
+
+	int32 AddItemCount = 0;
+	for (int i = 0, RewardCoinCount = 0; i < MaxSpawnMonsterCount; i++) {
+		RewardCoinCount += Random.RandRange(0, StageLevel);
+		Random.GenerateNewSeed();
+
+		if (Character->Inventory->IsRemainCapacity(AddItemCount)) {
+			UInventoryItem_Equipment* EquipmentItem = GetRandEquipmentForReward(StageLevel);
+			CreatedRewardItems.Add(EquipmentItem);
+			AddItemCount++;
+		}
+	}
+}
+
+void UPOEGameInstance::RewardItemInInventory()
+{
+	APOECharacter* Character = Cast<APOECharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	CHECKRETURN(Character == nullptr);
+
+	LotteryCoinCount += RewardCoinCount;
+
+	for (int i = 0; i < CreatedRewardItems.Num(); i++) {
+		if (!Character->Inventory->TryInsertItem(CreatedRewardItems[i])) break;
+	}
 }
 
 int32 UPOEGameInstance::GetLotteryRandomItemId()
@@ -96,4 +169,62 @@ UTexture2D * UPOEGameInstance::GetItemTextureForId(int32 ItemId)
 
 	LoadedTexture.Add(ItemId, TempTexture);
 	return TempTexture;
+}
+
+UInventoryItem_Equipment * UPOEGameInstance::GetRandEquipmentForReward(int32 Level)
+{
+	// 드랍율 설정
+	SetMaxDropPercent();
+
+	// 아이템 드랍
+	FPOEItemData* DropItemData = GetDropItemData();
+
+	// 아이템 생성
+	return GetCreatedDropItem(DropItemData, Level);
+}
+
+void UPOEGameInstance::SetMaxDropPercent() {
+	if (MaxDropPercent != 0) return;
+
+	MaxDropPercent = 30;	// 아무거도 나오지 않을 확률
+
+	TArray<FName> DropItemDataRowNames = POEItemDataTable->GetRowNames();
+	for (int i = 0; i < DropItemDataRowNames.Num(); i++) {
+		FPOEItemData* FetchedItemData = POEItemDataTable->FindRow<FPOEItemData>(DropItemDataRowNames[i], TEXT(""));
+		if (FetchedItemData == nullptr) continue;
+
+		MaxDropPercent += FetchedItemData->DropRate;
+	}
+}
+
+FPOEItemData * UPOEGameInstance::GetDropItemData()
+{
+	FRandomStream Random(FMath::Rand());
+	int32 RandNum = Random.RandRange(0, MaxDropPercent);
+	int32 Sum = 0;
+
+	FPOEItemData* FetchedItemData = nullptr;
+	TArray<FName> DropItemDataRowNames = POEItemDataTable->GetRowNames();
+	for (int i = 0; i < DropItemDataRowNames.Num(); i++) {
+		FetchedItemData = POEItemDataTable->FindRow<FPOEItemData>(DropItemDataRowNames[i], TEXT(""));
+		if (FetchedItemData == nullptr) continue;
+
+		Sum += FetchedItemData->DropRate;
+		if (RandNum <= Sum) {
+			break;
+		}
+	}
+
+	return FetchedItemData;
+}
+
+UInventoryItem_Equipment* UPOEGameInstance::GetCreatedDropItem(FPOEItemData * ItemData, int32 Level)
+{
+	if (ItemData == nullptr) return nullptr;
+
+	UInventoryItem_Equipment* CreatedItem = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), FName(*FString::Printf(TEXT("Drop%d"), DropCount)));
+	CreatedItem->SetItemData(ItemData);
+	CreatedItem->SetItemStatData(GetPOEItemStatData(ItemData->ItemId, Level));
+
+	return CreatedItem;
 }

@@ -11,6 +11,10 @@ void UInventoryItem_Base::SetItemData(FPOEItemData * ItemData)
 {
 }
 
+void UInventoryItem_Base::SetItemStatData(FPOEItemStatData * StatData)
+{
+}
+
 bool UInventoryItem_Base::AddExp(int32 Exp)
 {
 	if (RequireExp == -1) return false;

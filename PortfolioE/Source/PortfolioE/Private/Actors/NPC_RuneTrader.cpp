@@ -67,6 +67,9 @@ void ANPC_RuneTrader::OnAction()
 	Player->UIScreens->ShowPanel(EUIPanelName::INVENTORY);
 	Player->UIScreens->ShowPanel(EUIPanelName::STAGE_START);
 
+	UUserWidget* HUDPanel = Player->UIScreens->GetPanel(EUIPanelName::HUD);
+	HUDPanel->SetVisibility(ESlateVisibility::Hidden);
+
 	UPOEInventoryAndEquipWidget* InventoryAndEquipWidget = Cast<UPOEInventoryAndEquipWidget>(Player->UIScreens->GetPanel(EUIPanelName::INVENTORY));
 	if(InventoryAndEquipWidget != nullptr) InventoryAndEquipWidget->InitInventoryView();
 }

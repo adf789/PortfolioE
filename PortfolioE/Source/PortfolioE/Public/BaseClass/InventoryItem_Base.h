@@ -18,6 +18,7 @@ public:
 	UInventoryItem_Base();
 
 	virtual void SetItemData(struct FPOEItemData* ItemData);
+	virtual void SetItemStatData(struct FPOEItemStatData* StatData);
 	virtual bool AddExp(int32 Exp);
 
 	void SetInventoryId(int32 ItemId);

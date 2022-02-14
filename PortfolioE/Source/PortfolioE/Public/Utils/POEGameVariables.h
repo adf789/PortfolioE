@@ -16,9 +16,9 @@ class PORTFOLIOE_API POEGameVariables
 UENUM()
 enum EViewportLevel { 
 	DAMAGE_TEXT UMETA(DisplayName = "ViewportLevel DAMAGE_TEXT"),
-	MENU UMETA(DisplayName = "ViewportLevel MENU"),
 	HUD UMETA(DisplayName = "ViewportLevel HUD"),
 	NORMAL_PANEL UMETA(DisplayName = "ViewportLevel NORMAL_PANEL"),
+	MENU UMETA(DisplayName = "ViewportLevel MENU"),
 };
 
 UENUM(BlueprintType)
@@ -38,6 +38,7 @@ enum class EUIPanelName : uint8 {
 	LOTTERY,
 	MERGE_CRAFT,
 	MESSAGE_BOX,
+	REWARD,
 };
 
 UENUM(BlueprintType)
