@@ -30,6 +30,6 @@ void APOEGrux_Boss::InitializeValues()
 	CharacterStatus->InitMoveSpeedValue(400.0f);
 
 	AttackRange = 300.0f;
-	AIDetectDistance = 2000.0f;
+	AIDetectDistance = 5000.0f;
 	AttackCollisionScale = 200.0f;
 }

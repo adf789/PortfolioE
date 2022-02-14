@@ -73,12 +73,6 @@ void UPOERewardWidget::NativeConstruct() {
 
 	GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	CHECKRETURN(GameInstance == nullptr);
-
-	FTimerHandle VisibleTimer;
-	GetWorld()->GetTimerManager().SetTimer(VisibleTimer, [this]() {
-		this->GameInstance->UIScreenInteraction->ClosePanel(EUIPanelName::REWARD);
-
-		}, 1.0f, false, 5.0f);
 }
 
 

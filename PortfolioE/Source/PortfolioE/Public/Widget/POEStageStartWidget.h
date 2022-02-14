@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "PortfolioE.h"
 #include "Blueprint/UserWidget.h"
 #include "POEStageStartWidget.generated.h"
+
+#define MAX_STAGE 10
 
 /**
  * 
@@ -23,12 +24,25 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+	UFUNCTION()
+	void PrevStage();
+	UFUNCTION()
+	void NextStage();
+	UFUNCTION()
+	void SetStage();
+	void SpawnNormalMonster(UClass* MonsterClass, FVector Location);
+	void SpawnBossMonster(UClass* MonsterClass, FVector Location);
 
 protected:
 	UPROPERTY()
-	class UButton* startButton;
+	class UButton* PrevStageButton;
 
 	UPROPERTY()
-	class UButton* cancelButton;
+	class UButton* NextStageButton;
 
+	UPROPERTY()
+	class UTextBlock* CurrentStageNumber;
+
+	UPROPERTY()
+	class UPOEGameInstance* GameInstance;
 };

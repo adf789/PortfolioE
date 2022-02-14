@@ -7,6 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "POEPlayerHUDWidget.h"
 #include "POEGameInstance.h"
+#include "POEGameInstance.h"
 
 APOEPlayerController::APOEPlayerController()
 {
@@ -34,11 +35,14 @@ void APOEPlayerController::BeginPlay()
 	Super::BeginPlay();
 	bShowMouseCursor = true;
 	
+	GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
 	GetWorldTimerManager().SetTimer(detectTimer, this, &APOEPlayerController::DetectNPCOnCursor, .1f, true);
 }
 
 void APOEPlayerController::DetectNPCOnCursor()
 {
+	if (GameInstance != nullptr && GameInstance->IsDoingBattle) return;
+
 	FHitResult hitResult;
 	bool bResult = GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, hitResult);
 	if (bResult) {

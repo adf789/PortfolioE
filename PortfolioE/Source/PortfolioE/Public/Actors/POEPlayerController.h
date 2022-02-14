@@ -70,4 +70,5 @@ protected:
 
 private:
 	FTimerHandle detectTimer;
+	class UPOEGameInstance* GameInstance;
 };

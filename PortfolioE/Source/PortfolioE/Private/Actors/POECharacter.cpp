@@ -233,8 +233,6 @@ void APOECharacter::Dash()
 		DashCoolTime = true;
 		IsSprinting = true;
 
-		UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
-		CHECKRETURN(GameInstance == nullptr);
 		UPOEPlayerHUDWidget* HUDPanel = Cast<UPOEPlayerHUDWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD));
 		if (HUDPanel != nullptr) {
 			HUDPanel->SetTimerDashSlot(5.0f);
@@ -284,7 +282,7 @@ void APOECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	FInputActionBinding Pressed(TEXT("SetDestination"), EInputEvent::IE_Pressed);
 	Pressed.ActionDelegate.GetDelegateForManualSet().BindLambda([this]() {
 		if (POEPlayerController != nullptr && POEPlayerController->IsDetectedNPC()) {
-			CheckNPC = true;
+			if(!GameInstance->IsDoingBattle) CheckNPC = true;
 			return;
 		}
 		CheckMouseDrag = true;
@@ -349,8 +347,9 @@ void APOECharacter::PostInitializeComponents()
 	GetCharacterMovement()->RotationRate = FRotator(.0f, 720.0f, .0f);
 	GetCharacterMovement()->MaxWalkSpeed = CharacterStatus->MoveSpeedValue;
 
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
-	if (GameInstance != nullptr) GameInstance->UIScreenInteraction = UIScreens;
+	GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+	CHECKRETURN(GameInstance == nullptr);
+	GameInstance->UIScreenInteraction = UIScreens;
 }
 
 void APOECharacter::CheckMeleeAttackCollision()
@@ -461,8 +460,6 @@ void APOECharacter::CastingSpell(FVector Location)
 
 	AEffectDamageActor* NewEffect = nullptr;
 	bool bPooling = true;
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
-	CHECKRETURN(GameInstance == nullptr);
 
 	UPOEPlayerHUDWidget* HUDPanel = Cast<UPOEPlayerHUDWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD));
 	CHECKRETURN(HUDPanel == nullptr);
@@ -536,9 +533,6 @@ void APOECharacter::PrepareCastingSpell()
 }
 
 void APOECharacter::BindCoolTime() {
-	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetGameInstance());
-	CHECKRETURN(GameInstance == nullptr);
-
 	UPOEPlayerHUDWidget* HUDPanel = Cast<UPOEPlayerHUDWidget>(GameInstance->UIScreenInteraction->GetPanel(EUIPanelName::HUD));
 	CHECKRETURN(HUDPanel == nullptr);
 

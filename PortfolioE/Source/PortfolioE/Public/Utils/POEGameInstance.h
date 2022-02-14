@@ -9,6 +9,8 @@
 #include "UIScreenInteraction.h"
 #include "POEGameInstance.generated.h"
 
+#define MAX_STAGE 10
+
 USTRUCT(BlueprintType)
 struct FPOEItemData : public FTableRowBase {
 	GENERATED_BODY()
@@ -123,7 +125,6 @@ public:
 	FPOEMonsterStatData* GetMonsterDataForId(int32 MonsterId);
 	void SetCountSpawnMonster(int32 MonsterCount);
 	void DyingMonster();
-	void SetStageLevel(int32 Level);
 
 	UFUNCTION()
 	class UTexture2D* GetItemTextureForId(int32 ItemId);
@@ -140,7 +141,9 @@ public:
 	int32 LotteryCoinCount;
 	int32 LotteryCount;
 	int32 DropCount;
-	int32 StageLevel;
+	int32 CurStageLevel;
+	int32 MaxStageLevel;
+	bool IsDoingBattle;
 
 private:
 	void ShowBattleReward();

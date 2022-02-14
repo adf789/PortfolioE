@@ -37,6 +37,9 @@ UPOEGameInstance::UPOEGameInstance() {
 	CHECKRETURN(!DT_MONSTER_TABLE.Succeeded());
 	POEMonsterTable = DT_MONSTER_TABLE.Object;
 	CHECKRETURN(POEMonsterTable->RowMap.Num() == 0);
+
+	MaxStageLevel = 1;
+	CurStageLevel = 1;
 }
 
 UPOEGameInstance::~UPOEGameInstance() {
@@ -86,14 +89,14 @@ void UPOEGameInstance::DyingMonster()
 	CurSpawnMonsterCount--;
 
 	if (CurSpawnMonsterCount <= 0) {
+		if (MAX_STAGE > MaxStageLevel && MaxStageLevel == CurStageLevel) {
+			MaxStageLevel++;
+			CurStageLevel = MaxStageLevel;
+		}
 		CreateRewardItems();
 		RewardItemInInventory();
 		ShowBattleReward();
 	}
-}
-
-void UPOEGameInstance::SetStageLevel(int32 Level) {
-	StageLevel = Level;
 }
 
 void UPOEGameInstance::ShowBattleReward()
@@ -103,6 +106,13 @@ void UPOEGameInstance::ShowBattleReward()
 
 	RewardPanel->SetRewardItemList(CreatedRewardItems);
 	RewardPanel->AddCoinInRewardList(RewardCoinCount);
+
+	FTimerHandle VisibleTimer;
+	GetWorld()->GetTimerManager().SetTimer(VisibleTimer, [this]() {
+		UIScreenInteraction->ClosePanel(EUIPanelName::REWARD);
+		IsDoingBattle = false;
+
+		}, 1.0f, false, 5.0f);
 }
 
 void UPOEGameInstance::CreateRewardItems()
@@ -117,11 +127,11 @@ void UPOEGameInstance::CreateRewardItems()
 
 	int32 AddItemCount = 0;
 	for (int i = 0, RewardCoinCount = 0; i < MaxSpawnMonsterCount; i++) {
-		RewardCoinCount += Random.RandRange(0, StageLevel);
+		RewardCoinCount += Random.RandRange(0, CurStageLevel);
 		Random.GenerateNewSeed();
 
 		if (Character->Inventory->IsRemainCapacity(AddItemCount)) {
-			UInventoryItem_Equipment* EquipmentItem = GetRandEquipmentForReward(StageLevel);
+			UInventoryItem_Equipment* EquipmentItem = GetRandEquipmentForReward(CurStageLevel);
 			CreatedRewardItems.Add(EquipmentItem);
 			AddItemCount++;
 		}

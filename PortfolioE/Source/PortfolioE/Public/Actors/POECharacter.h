@@ -143,5 +143,7 @@ private:
 	class UMaterialInstanceDynamic* SmearMaterialInstance;
 
 	FTimerHandle CoolTimeHandle;
+
+	class UPOEGameInstance* GameInstance;
 #pragma endregion
 };
