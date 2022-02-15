@@ -112,7 +112,6 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 {
 	float totalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (AnimInstance != nullptr) {
-		//IsHitting = true;
 		CharacterState = ECharacterBehaviorState::HITTING;
 
 		FVector AttackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
@@ -149,12 +148,10 @@ void APOECharacter_Base::OnAnimMontageEnded(UAnimMontage * Montage, bool bInterr
 {
 	if (CharacterState == ECharacterBehaviorState::ATTACKING) {
 		if(OnAttackEndDelegate.IsBound()) OnAttackEndDelegate.Broadcast();
-		//IsAttacking = false;
 		CharacterState = ECharacterBehaviorState::IDLE;
 	}
 	else if (CharacterState == ECharacterBehaviorState::HITTING) {
 		if(OnHitEndDelegate.IsBound()) OnHitEndDelegate.Broadcast();
-		//IsHitting = false;
 		CharacterState = ECharacterBehaviorState::IDLE;
 	}
 }

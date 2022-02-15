@@ -8,6 +8,8 @@
 #include "POECharacter.h"
 #include "MyInventoryComponent.h"
 #include "InventoryItem_Equipment.h"
+#include "MonsterSpawner.h"
+#include "EngineUtils.h"
 
 void UPOELotteryWidget::NativeConstruct() {
 	Super::NativeConstruct();
@@ -29,9 +31,21 @@ void UPOELotteryWidget::NativeConstruct() {
 	CloseButton->OnClicked.AddDynamic(this, &UPOELotteryWidget::ClosePanel);
 }
 
-int32 UPOELotteryWidget::GetItemIdForRandom()
+void UPOELotteryWidget::SpawnLotteryMonster()
 {
-	return int32();
+	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
+	CHECKRETURN(GameInstance == nullptr);
+
+	FVector SpawnLocation;
+	for (TActorIterator<AMonsterSpawner> It(GetWorld()); It; ++It) {
+		if (It->IsBossSpawner) {
+			SpawnLocation = It->GetSpawnLocation();
+			break;
+		}
+	}
+
+	GameInstance->ReadyLotteryMonster(SpawnLocation);
+	GameInstance->SpawnLotteryMonster();
 }
 
 void UPOELotteryWidget::StartLottery() {
@@ -52,10 +66,13 @@ void UPOELotteryWidget::StartLottery() {
 	GameInstance->LotteryCoinCount--;
 	HaveCoinText->SetText(FText::AsNumber(GameInstance->LotteryCoinCount));
 
-	UInventoryItem_Base* NewItem = CreateLotteryItem();
+	SpawnLotteryMonster();
+	ClosePanel();
+
+	/*UInventoryItem_Base* NewItem = CreateLotteryItem();
 	Character->Inventory->TryInsertItem(NewItem);
 
-	ShowMessagePanel(FString::Printf(TEXT("get %s"), *NewItem->GetDisplayName().ToString()));
+	ShowMessagePanel(FString::Printf(TEXT("get %s"), *NewItem->GetDisplayName().ToString()));*/
 }
 
 UInventoryItem_Base* UPOELotteryWidget::CreateLotteryItem() {

@@ -46,3 +46,9 @@ enum class EItemType : uint8 {
 	EQUIPMENT,
 	ETC,
 };
+
+UENUM(BlueprintType)
+enum class EBossType : uint8 {
+	NONE,
+	GRUX,
+};

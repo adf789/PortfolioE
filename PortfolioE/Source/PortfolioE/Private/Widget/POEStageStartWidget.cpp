@@ -20,31 +20,27 @@ void UPOEStageStartWidget::OnStageStart()
 
 	FSoftObjectPath SlotClassPath(TEXT("/Game/POE/Blueprints/Actor/POEMonster_Normal1.POEMonster_Normal1_C"));
 
-	int SpawnCount_NormalMonster = 3;
+	int SpawnCount_NormalMonster = 2;
 	int SpawnCount_SpawnPoint = 0;
 	TSubclassOf<APOEMonster_Base> NormalMonster = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<APOEMonster_Base>(SlotClassPath));
-
 
 	for (TActorIterator<AMonsterSpawner> It(CurrentWorld); It; ++It) {
 		AMonsterSpawner* SpawnPoint = *It;
 		FVector SpawnLocation = SpawnPoint->GetSpawnLocation();
 
-		if (SpawnPoint->IsBossSpawner && GameInstance->CurStageLevel) {
-
-			SpawnBossMonster(APOEGrux_Boss::StaticClass(), SpawnLocation);
+		if (SpawnPoint->IsBossSpawner) {
+			if(GameInstance->CurStageLevel == 10) GameInstance->ReadyBoss(EBossType::GRUX, SpawnLocation);
 			continue;
 		}
 
 		SpawnCount_SpawnPoint++;
 		for (int i = 0; i < SpawnCount_NormalMonster; i++) {
 			FRandomStream Random(FMath::Rand());
-			int8 RandX = Random.RandRange(-20, 20);
-			int8 RandY = Random.RandRange(-20, 20);
-			int8 Height = i * 220;
+			int16 RandX = -20 + 20 * i;
+			int16 RandY = 20 - FMath::Sqrt(pow(RandX, 2.0));
 
 			SpawnLocation.X += RandX;
 			SpawnLocation.Y += RandY;
-			SpawnLocation.Z += Height;
 
 			SpawnNormalMonster(NormalMonster->GetDefaultObject()->GetClass(), SpawnLocation);
 		}
@@ -143,26 +139,7 @@ void UPOEStageStartWidget::SpawnNormalMonster(UClass * MonsterClass, FVector Loc
 	}
 
 	CHECKRETURN(Monster == nullptr);
-	Monster->Active();
-	Monster->CharacterStatus->InitAttackValue(MonsterStatData->AttackValue * GameInstance->CurStageLevel);
-	Monster->CharacterStatus->InitHPVale(MonsterStatData->HpValue * GameInstance->CurStageLevel);
-}
-
-void UPOEStageStartWidget::SpawnBossMonster(UClass* MonsterClass, FVector Location)
-{
-	FPOEMonsterStatData* MonsterStatData = GameInstance->GetMonsterDataForId(0);
-	CHECKRETURN(MonsterStatData == nullptr);
-
-	APOEMonster_Base* Monster = GameInstance->MonsterPooling->GetUnUseMonster(MonsterStatData->MonsterId);
-	if (Monster == nullptr) {
-		Monster = GetWorld()->SpawnActor<APOEMonster_Base>(MonsterClass, Location, FRotator::ZeroRotator);
-		CHECKRETURN(Monster == nullptr);
-
-		Monster->MonsterId = MonsterStatData->MonsterId;
-		GameInstance->MonsterPooling->AddMonster(Monster);
-	}
-
-	CHECKRETURN(Monster == nullptr);
+	Monster->SetActorLocation(Location);
 	Monster->Active();
 	Monster->CharacterStatus->InitAttackValue(MonsterStatData->AttackValue * GameInstance->CurStageLevel);
 	Monster->CharacterStatus->InitHPVale(MonsterStatData->HpValue * GameInstance->CurStageLevel);

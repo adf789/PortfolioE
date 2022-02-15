@@ -24,6 +24,13 @@ public:
 	void SetTimer(float Time);
 	void SetDistance(float Distance);
 	void SetDirection(FVector Direction);
+	void SetAttacker(class APOECharacter* Attacker);
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	
+	UFUNCTION()
+	void OnHitBegin(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	void InitValues();
 
 protected:
@@ -34,6 +41,8 @@ protected:
 private:
 	UFUNCTION()
 	bool CheckInActiveOnCondition();
+
+	float GetRandAttackValue();
 
 	UFUNCTION()
 	void SetNextValue(float DeltaTime);
@@ -63,4 +72,7 @@ private:
 	FVector StartLocation;
 
 	FVector ForwardVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	class APOECharacter* Attacker;
 };

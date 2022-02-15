@@ -31,7 +31,6 @@ protected:
 	UFUNCTION()
 	void SetStage();
 	void SpawnNormalMonster(UClass* MonsterClass, FVector Location);
-	void SpawnBossMonster(UClass* MonsterClass, FVector Location);
 
 protected:
 	UPROPERTY()

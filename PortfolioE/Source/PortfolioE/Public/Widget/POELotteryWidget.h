@@ -29,7 +29,7 @@ protected:
 	void ShowMessagePanel(FString Text);
 
 private:
-	int32 GetItemIdForRandom();
+	void SpawnLotteryMonster();
 
 	UPROPERTY()
 		class UTextBlock* HaveCoinText;

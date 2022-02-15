@@ -125,6 +125,10 @@ public:
 	FPOEMonsterStatData* GetMonsterDataForId(int32 MonsterId);
 	void SetCountSpawnMonster(int32 MonsterCount);
 	void DyingMonster();
+	void ReadyBoss(EBossType BossType, FVector SpawnLocation);
+	void ReadyLotteryMonster(FVector SpawnLocation);
+	bool SpawnBoss();
+	bool SpawnLotteryMonster();
 
 	UFUNCTION()
 	class UTexture2D* GetItemTextureForId(int32 ItemId);
@@ -149,6 +153,7 @@ private:
 	void ShowBattleReward();
 	void CreateRewardItems();
 	void RewardItemInInventory();
+	void CreateLotteryItem();
 	void SetMaxDropPercent();
 	struct FPOEItemData* GetDropItemData();
 	class UInventoryItem_Equipment* GetCreatedDropItem(FPOEItemData* ItemData, int32 Level);
@@ -182,4 +187,13 @@ private:
 
 	UPROPERTY()
 	int32 MaxDropPercent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	FVector BossSpawnPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	FVector LotteryMonsterSpawnPoint;
+
+	EBossType BossType;
+	bool IsReadySpawnLotteryMonster;
 };

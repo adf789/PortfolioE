@@ -221,7 +221,6 @@ void APOECharacter::PrepareMeleeAttack()
 void APOECharacter::Dash()
 {
 	if (DashCoolTime) {
-		TEST_LOG("Dash Cooltime now");
 		return;
 	}
 	else if (IsPlayingMontionAnything() && !IsComboInput) return;
@@ -483,6 +482,7 @@ void APOECharacter::CastingSpell(FVector Location)
 		NewEffect->SetActorLocationAndRotation(SpawnLocation + FVector::UpVector * 20.0f, Rot);
 	}
 
+	NewEffect->SetAttacker(this);
 	NewEffect->SetParticleSystem(SelectedEffect);
 	NewEffect->Active();
 	NewEffect->SetDirection(GetActorForwardVector());

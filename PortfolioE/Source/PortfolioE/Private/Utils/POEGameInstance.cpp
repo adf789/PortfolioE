@@ -8,6 +8,7 @@
 #include "POECharacter.h"
 #include "MyInventoryComponent.h"
 #include "InventoryItem_Equipment.h"
+#include "POEMonster_Base.h"
 
 UPOEGameInstance::UPOEGameInstance() {
 	this->EffectPooling = new ActorObjectPool();
@@ -85,18 +86,108 @@ void UPOEGameInstance::SetCountSpawnMonster(int32 MonsterCount)
 
 void UPOEGameInstance::DyingMonster()
 {
-	if (CurSpawnMonsterCount <= 0) return;
-	CurSpawnMonsterCount--;
-
-	if (CurSpawnMonsterCount <= 0) {
-		if (MAX_STAGE > MaxStageLevel && MaxStageLevel == CurStageLevel) {
-			MaxStageLevel++;
-			CurStageLevel = MaxStageLevel;
-		}
-		CreateRewardItems();
+	// 뽑기 몬스터
+	if (IsReadySpawnLotteryMonster) {
+		IsReadySpawnLotteryMonster = false;
+		CreateLotteryItem();
 		RewardItemInInventory();
 		ShowBattleReward();
+		return;
 	}
+
+	// 일반, 보스 몬스터
+	CurSpawnMonsterCount--;
+
+	if (CurSpawnMonsterCount > 0) return;
+
+	bool IsSpawnBoss = SpawnBoss();
+
+	if (IsSpawnBoss) return;
+
+	CreateRewardItems();
+	RewardItemInInventory();
+	ShowBattleReward();
+
+	if (MAX_STAGE > MaxStageLevel && MaxStageLevel == CurStageLevel) {
+		MaxStageLevel++;
+		CurStageLevel = MaxStageLevel;
+	}
+}
+
+bool UPOEGameInstance::SpawnBoss()
+{
+	if (BossType == EBossType::NONE) return false;
+
+	int BossId = 0;
+	UClass* BossClass = nullptr;
+	switch (BossType)
+	{
+	case EBossType::GRUX:
+		BossId = 0;
+		break;
+	}
+
+	CHECKRETURN(BossClass == nullptr, false);
+	FPOEMonsterStatData* MonsterStatData = GetMonsterDataForId(BossId);
+	CHECKRETURN(MonsterStatData == nullptr, false);
+
+	APOEMonster_Base* Monster = MonsterPooling->GetUnUseMonster(MonsterStatData->MonsterId);
+	if (Monster == nullptr) {
+		Monster = GetWorld()->SpawnActor<APOEMonster_Base>(BossClass, BossSpawnPoint, FRotator::ZeroRotator);
+		CHECKRETURN(Monster == nullptr, false);
+
+		Monster->MonsterId = MonsterStatData->MonsterId;
+		MonsterPooling->AddMonster(Monster);
+	}
+
+	CHECKRETURN(Monster == nullptr, false);
+	Monster->SetActorLocation(BossSpawnPoint);
+	Monster->Active();
+	Monster->CharacterStatus->InitAttackValue(MonsterStatData->AttackValue);
+	Monster->CharacterStatus->InitHPVale(MonsterStatData->HpValue);
+
+	BossType = EBossType::NONE;
+	MaxSpawnMonsterCount += 10;
+	return true;
+}
+
+bool UPOEGameInstance::SpawnLotteryMonster()
+{
+	if (!IsReadySpawnLotteryMonster) return false;
+	FPOEMonsterStatData* LotteryData = POEMonsterTable->FindRow<FPOEMonsterStatData>(TEXT("Lottery"), TEXT(""));
+	CHECKRETURN(LotteryData == nullptr, false);
+
+	FSoftObjectPath ClassPath("/Game/POE/Blueprints/Actor/POEMonster_Lottery.POEMonster_Lottery_c");
+	TSubclassOf<APOEMonster_Base> LotteryMonsterClass = UAssetManager::GetStreamableManager().LoadSynchronous(TSoftClassPtr<APOEMonster_Base>(ClassPath));
+	CHECKRETURN(LotteryMonsterClass == nullptr, false);
+
+	APOEMonster_Base* Monster = MonsterPooling->GetUnUseMonster(LotteryData->MonsterId);
+	if (Monster == nullptr) {
+		Monster = GetWorld()->SpawnActor<APOEMonster_Base>(LotteryMonsterClass, LotteryMonsterSpawnPoint, FRotator::ZeroRotator);
+		CHECKRETURN(Monster == nullptr, false);
+
+		Monster->MonsterId = LotteryData->MonsterId;
+		MonsterPooling->AddMonster(Monster);
+	}
+
+	CHECKRETURN(Monster == nullptr, false);
+	Monster->SetActorLocation(LotteryMonsterSpawnPoint);
+	Monster->Active();
+	Monster->CharacterStatus->InitHPVale(LotteryData->HpValue);
+
+	return true;
+}
+
+void UPOEGameInstance::ReadyBoss(EBossType BossType, FVector SpawnLocation)
+{
+	this->BossType = BossType;
+	this->BossSpawnPoint = SpawnLocation;
+}
+
+void UPOEGameInstance::ReadyLotteryMonster(FVector SpawnLocation)
+{
+	this->IsReadySpawnLotteryMonster = true;
+	this->LotteryMonsterSpawnPoint = SpawnLocation;
 }
 
 void UPOEGameInstance::ShowBattleReward()
@@ -148,6 +239,22 @@ void UPOEGameInstance::RewardItemInInventory()
 	for (int i = 0; i < CreatedRewardItems.Num(); i++) {
 		if (!Character->Inventory->TryInsertItem(CreatedRewardItems[i])) break;
 	}
+}
+
+void UPOEGameInstance::CreateLotteryItem()
+{
+	UInventoryItem_Equipment* NewItem = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), FName(*FString::Printf(TEXT("Lottery%d"), LotteryCount++)));
+	NewItem->SetItemData(GetPOEItemData(GetLotteryRandomItemId()));
+	NewItem->SetItemStatData(GetPOEItemStatData(NewItem->GetItemId(), 1));
+	
+	if (NewItem->ItemAttackValue != 0) NewItem->ItemAddAttackValue += FMath::RandRange(0, 50);
+	if (NewItem->ItemHpValue != 0) NewItem->ItemAddHpValue += FMath::RandRange(0, 10000);
+	if (NewItem->ItemMoveSpeedValue != 0) NewItem->ItemAddMoveSpeedValue += FMath::RandRange(0, 20);
+
+	RewardCoinCount = 0;
+
+	CreatedRewardItems.Reset();
+	CreatedRewardItems.Add(NewItem);
 }
 
 int32 UPOEGameInstance::GetLotteryRandomItemId()
@@ -232,7 +339,7 @@ UInventoryItem_Equipment* UPOEGameInstance::GetCreatedDropItem(FPOEItemData * It
 {
 	if (ItemData == nullptr) return nullptr;
 
-	UInventoryItem_Equipment* CreatedItem = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), FName(*FString::Printf(TEXT("Drop%d"), DropCount)));
+	UInventoryItem_Equipment* CreatedItem = NewObject<UInventoryItem_Equipment>(this, UInventoryItem_Equipment::StaticClass(), FName(*FString::Printf(TEXT("Drop%d"), DropCount++)));
 	CreatedItem->SetItemData(ItemData);
 	CreatedItem->SetItemStatData(GetPOEItemStatData(ItemData->ItemId, Level));
 
