@@ -10,19 +10,10 @@ const FName APOEMonsterAIController::BBKEY_TargetDirection(TEXT("TargetDirection
 const FName APOEMonsterAIController::BBKEY_AttackDist(TEXT("AttackDist"));
 const FName APOEMonsterAIController::BBKEY_WaypointLocation(TEXT("WaypointLocation"));
 const FName APOEMonsterAIController::BBKEY_SetWaypointDirection(TEXT("SetWaypointLocation"));
+const FName APOEMonsterAIController::BBKEY_IsRunMonster(TEXT("IsRunMonster"));
 
 APOEMonsterAIController::APOEMonsterAIController() {
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree>
-		BTObject(TEXT("/Game/POE/AI/BT_POEMonster.BT_POEMonster"));
-	if (BTObject.Succeeded()) {
-		BTPattern = BTObject.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UBlackboardData>
-		BBObject(TEXT("/Game/POE/AI/BB_POEMonster.BB_POEMonster"));
-	if (BBObject.Succeeded()) {
-		BBDatas = BBObject.Object;
-	}
+	LoadBehaviorTree();
 }
 
 void APOEMonsterAIController::Possess(APawn * InPawn)
@@ -42,6 +33,7 @@ void APOEMonsterAIController::RunAI()
 			UE_LOG(POE, Error, TEXT("Couldn't run Behavior"));
 		}
 	}
+	if (OnPostRunAI.IsBound()) OnPostRunAI.Broadcast();
 }
 
 void APOEMonsterAIController::StopAI()
@@ -49,5 +41,20 @@ void APOEMonsterAIController::StopAI()
 	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BehaviorTreeComponent != nullptr) {
 		BehaviorTreeComponent->StopTree(EBTStopMode::Safe);
+	}
+}
+
+void APOEMonsterAIController::LoadBehaviorTree()
+{
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree>
+		BTObject(TEXT("/Game/POE/AI/BT_POEMonster.BT_POEMonster"));
+	if (BTObject.Succeeded()) {
+		BTPattern = BTObject.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UBlackboardData>
+		BBObject(TEXT("/Game/POE/AI/BB_POEMonster.BB_POEMonster"));
+	if (BBObject.Succeeded()) {
+		BBDatas = BBObject.Object;
 	}
 }

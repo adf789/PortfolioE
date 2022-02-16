@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "POEMonsterAIController.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnPostRunAI);
 /**
  * 
  */
@@ -22,8 +23,12 @@ public:
 
 	void RunAI();
 	void StopAI();
+
+	FOnPostRunAI OnPostRunAI;
 	
-private:
+protected:
+	virtual void LoadBehaviorTree();
+
 	UPROPERTY()
 	class UBehaviorTree* BTPattern;
 
@@ -36,4 +41,5 @@ public:
 	static const FName BBKEY_AttackDist;
 	static const FName BBKEY_WaypointLocation;
 	static const FName BBKEY_SetWaypointDirection;
+	static const FName BBKEY_IsRunMonster;
 };
