@@ -214,7 +214,6 @@ void UPOEGameInstance::CreateRewardItems()
 	CreatedRewardItems.Reset();
 	RewardCoinCount = 0;
 	FRandomStream Random(FMath::Rand());
-	Random.GenerateNewSeed();
 
 	int32 AddItemCount = 0;
 	for (int i = 0, RewardCoinCount = 0; i < MaxSpawnMonsterCount; i++) {
@@ -226,7 +225,9 @@ void UPOEGameInstance::CreateRewardItems()
 			CreatedRewardItems.Add(EquipmentItem);
 			AddItemCount++;
 		}
+		else break;
 	}
+	TEST_LOG_WITH_VAR("Create Coin Count: %d", RewardCoinCount);
 }
 
 void UPOEGameInstance::RewardItemInInventory()
@@ -261,6 +262,7 @@ int32 UPOEGameInstance::GetLotteryRandomItemId()
 {
 	FRandomStream Random(FMath::Rand());
 	int8 RandNum = Random.RandRange(0, 100);
+	Random.GenerateNewSeed();
 	int8 Sum = 0;
 
 	TArray<FName> LotteryDataRowNames = POEItemLotteryTable->GetRowNames();

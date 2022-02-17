@@ -183,13 +183,11 @@ void UMyInventoryComponent::SetDefaultItem()
 
 	UInventoryItem_Equipment* DefaultItem1 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem1"));
 	DefaultItem1->SetItemData(GameInstance->GetPOEItemData(0));
-	FPOEItemStatData* ItemStatData1 = GameInstance->GetPOEItemStatData(0, 1);
-	DefaultItem1->SetItemStatData(ItemStatData1);
+	DefaultItem1->SetItemStatData(GameInstance->GetPOEItemStatData(0, 1));
 
 	UInventoryItem_Equipment* DefaultItem2 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem2"));
 	DefaultItem2->SetItemData(GameInstance->GetPOEItemData(1));
-	FPOEItemStatData* ItemStatData2 = GameInstance->GetPOEItemStatData(1, 1);
-	DefaultItem2->SetItemStatData(ItemStatData2);
+	DefaultItem2->SetItemStatData(GameInstance->GetPOEItemStatData(1, 1));
 
 	TryInsertItem(DefaultItem1);
 	TryInsertItem(DefaultItem2);

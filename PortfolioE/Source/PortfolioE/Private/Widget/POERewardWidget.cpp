@@ -34,6 +34,7 @@ void UPOERewardWidget::SetRewardItemList(TArray<class UInventoryItem_Base*> Item
 
 void UPOERewardWidget::AddCoinInRewardList(int32 CoinCount)
 {
+	TEST_LOG_WITH_VAR("CoinCount: %d", CoinCount);
 	if (CoinCount == 0) return;
 
 	bool AlreadyAddCoinSlot = false;

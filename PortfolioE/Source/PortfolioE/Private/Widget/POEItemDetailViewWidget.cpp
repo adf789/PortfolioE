@@ -37,7 +37,7 @@ void UPOEItemDetailViewWidget::InitView()
 			SetAttackValueText((int)EquipItemData->GetAttackValue());
 			SetHpValueText((int)EquipItemData->GetHpValue());
 			SetSpeedValueText((int)EquipItemData->GetMoveSpeedValue());
-			ExpBar->SetPercent(EquipItemData->GetCurrentExp() / EquipItemData->GetRequireExp());
+			ExpBar->SetPercent((float)EquipItemData->GetCurrentExp() / EquipItemData->GetRequireExp());
 			ItemTypeText->SetText(FText::FromString(EquipItemData->IsPassive ? TEXT("(PASSIVE)") : TEXT("(ACTIVE)")));
 			ItemLevelText->SetText(FText::FromString(FString::Printf(TEXT("Level: %d"), ItemData->GetItemLevel())));
 		}

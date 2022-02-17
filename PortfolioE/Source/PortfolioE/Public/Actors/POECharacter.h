@@ -14,13 +14,9 @@ class PORTFOLIOE_API APOECharacter : public APOECharacter_Base
 
 #pragma region Function
 public:
-	// Sets default values for this character's properties
 	APOECharacter();
 
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void PostInitializeComponents() override;
@@ -33,8 +29,9 @@ public:
 	UFUNCTION()
 	virtual void OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 
+
 	UFUNCTION(BlueprintCallable)
-		void SetAttackType();
+	void SetAttackType();
 	void CheckAttackCombo();
 	bool IsPlayingMontionAnything();
 
