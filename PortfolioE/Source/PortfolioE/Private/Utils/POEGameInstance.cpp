@@ -8,7 +8,7 @@
 #include "POECharacter.h"
 #include "MyInventoryComponent.h"
 #include "InventoryItem_Equipment.h"
-#include "POEMonster_Base.h"
+#include "POEGrux_Boss.h"
 
 UPOEGameInstance::UPOEGameInstance() {
 	this->EffectPooling = new ActorObjectPool();
@@ -39,8 +39,8 @@ UPOEGameInstance::UPOEGameInstance() {
 	POEMonsterTable = DT_MONSTER_TABLE.Object;
 	CHECKRETURN(POEMonsterTable->RowMap.Num() == 0);
 
-	MaxStageLevel = 1;
-	CurStageLevel = 1;
+	MaxStageLevel = 10;
+	CurStageLevel = 10;
 }
 
 UPOEGameInstance::~UPOEGameInstance() {
@@ -97,7 +97,7 @@ void UPOEGameInstance::DyingMonster()
 
 	// 일반, 보스 몬스터
 	CurSpawnMonsterCount--;
-
+	TEST_LOG_WITH_VAR("Remain: %d", CurSpawnMonsterCount);
 	if (CurSpawnMonsterCount > 0) return;
 
 	bool IsSpawnBoss = SpawnBoss();
@@ -124,6 +124,7 @@ bool UPOEGameInstance::SpawnBoss()
 	{
 	case EBossType::GRUX:
 		BossId = 0;
+		BossClass = APOEGrux_Boss::StaticClass();
 		break;
 	}
 
@@ -146,6 +147,7 @@ bool UPOEGameInstance::SpawnBoss()
 	Monster->CharacterStatus->InitAttackValue(MonsterStatData->AttackValue);
 	Monster->CharacterStatus->InitHPVale(MonsterStatData->HpValue);
 
+	TEST_LOG_WITH_VAR("Spawn boss: %s", *Monster->GetName());
 	BossType = EBossType::NONE;
 	MaxSpawnMonsterCount += 10;
 	return true;
@@ -180,6 +182,7 @@ bool UPOEGameInstance::SpawnLotteryMonster()
 
 void UPOEGameInstance::ReadyBoss(EBossType BossType, FVector SpawnLocation)
 {
+	if (BossType == EBossType::GRUX) TEST_LOG("Ready GRUX");
 	this->BossType = BossType;
 	this->BossSpawnPoint = SpawnLocation;
 }
@@ -216,18 +219,18 @@ void UPOEGameInstance::CreateRewardItems()
 	FRandomStream Random(FMath::Rand());
 
 	int32 AddItemCount = 0;
-	for (int i = 0, RewardCoinCount = 0; i < MaxSpawnMonsterCount; i++) {
+	for (int i = 0; i < MaxSpawnMonsterCount; i++) {
 		RewardCoinCount += Random.RandRange(0, CurStageLevel);
 		Random.GenerateNewSeed();
 
 		if (Character->Inventory->IsRemainCapacity(AddItemCount)) {
 			UInventoryItem_Equipment* EquipmentItem = GetRandEquipmentForReward(CurStageLevel);
+			if (EquipmentItem == nullptr) continue;
 			CreatedRewardItems.Add(EquipmentItem);
 			AddItemCount++;
 		}
 		else break;
 	}
-	TEST_LOG_WITH_VAR("Create Coin Count: %d", RewardCoinCount);
 }
 
 void UPOEGameInstance::RewardItemInInventory()
@@ -320,8 +323,11 @@ FPOEItemData * UPOEGameInstance::GetDropItemData()
 {
 	FRandomStream Random(FMath::Rand());
 	int32 RandNum = Random.RandRange(0, MaxDropPercent);
-	int32 Sum = 0;
+	int32 Sum = 30;
 
+	if (RandNum <= Sum) {
+		return nullptr;
+	}
 	FPOEItemData* FetchedItemData = nullptr;
 	TArray<FName> DropItemDataRowNames = POEItemDataTable->GetRowNames();
 	for (int i = 0; i < DropItemDataRowNames.Num(); i++) {

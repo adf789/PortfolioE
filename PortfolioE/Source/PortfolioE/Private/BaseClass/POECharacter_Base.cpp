@@ -46,6 +46,8 @@ void APOECharacter_Base::BeginPlay()
 	Super::BeginPlay();
 	if (StatusWidget != nullptr) StatusWidget->SetHiddenInGame(true);
 	CharacterState = ECharacterBehaviorState::IDLE;
+
+	HitCoolTimer = 1;
 }
 
 // Called every frame
@@ -53,6 +55,7 @@ void APOECharacter_Base::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HitCoolTimer < 1) HitCoolTimer += DeltaTime;
 }
 
 void APOECharacter_Base::PostInitializeComponents()
@@ -115,11 +118,10 @@ float APOECharacter_Base::TakeDamage(float DamageAmount, struct FDamageEvent con
 		CharacterState = ECharacterBehaviorState::HITTING;
 
 		FVector AttackDirection = GetActorLocation() - DamageCauser->GetActorLocation();
-		if (!DontMotion) {
+		if (HitCoolTimer >= 1) {
 			AnimInstance->PlayHit(AttackDirection);
+			HitCoolTimer = 0;
 		}
-
-		if (!ContinousMotion) DontMotion = false;
 	}
 	APOEPlayerController* PlayerController = Cast<APOEPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (FloatingDamageClass2 != nullptr && PlayerController != nullptr) {

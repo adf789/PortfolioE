@@ -47,7 +47,7 @@ void UPOEStageStartWidget::OnStageStart()
 	}
 
 	CHECKRETURN(SpawnCount_SpawnPoint == 0);
-	GameInstance->SetCountSpawnMonster(SpawnCount_NormalMonster * SpawnCount_SpawnPoint + (GameInstance->CurStageLevel == 10? 1 : 0));
+	GameInstance->SetCountSpawnMonster(SpawnCount_NormalMonster * SpawnCount_SpawnPoint);
 	GameInstance->IsDoingBattle = true;
 	OnCancel();
 }

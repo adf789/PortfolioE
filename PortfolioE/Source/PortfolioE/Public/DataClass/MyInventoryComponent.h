@@ -14,6 +14,7 @@ class PORTFOLIOE_API UMyInventoryComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UMyInventoryComponent();
+	~UMyInventoryComponent();
 	
 	UFUNCTION()
 	bool IsRemainCapacity() const;

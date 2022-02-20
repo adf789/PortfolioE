@@ -23,15 +23,11 @@ public:
 	virtual void CheckMeleeAttackCollision() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
-	void MeleeAttack();
 	void ApplyCharacterStatus();
 
 	UFUNCTION()
 	virtual void OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 
-
-	UFUNCTION(BlueprintCallable)
-	void SetAttackType();
 	void CheckAttackCombo();
 	bool IsPlayingMontionAnything();
 
@@ -40,13 +36,15 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void LoadInventoryData();
 
+	void SetAttackType();
 	void PrepareMeleeAttack();
+	void MeleeAttack();
 	void Dash();
 	bool GetCurDestination(FHitResult& HitResult);
 	void SetDestination();
 	void ClickTarget();
-	void CastingSpell(FVector Location);
 	void PrepareCastingSpell();
+	void CastingSpell(FVector Location);
 
 private:
 	void BindCoolTime();
@@ -59,9 +57,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
-
-	UPROPERTY(VisibleAnywhere, Category = Collision)
-	UCapsuleComponent* MeleeCollision;
 
 	UPROPERTY(VisibleAnywhere, Category = Minimap)
 	USpringArmComponent* SpringArmForCapture;

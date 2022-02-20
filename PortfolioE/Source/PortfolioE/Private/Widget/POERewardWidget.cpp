@@ -10,12 +10,17 @@ void UPOERewardWidget::SetRewardItemList(TArray<class UInventoryItem_Base*> Item
 {
 	RewardListView->ClearChildren();
 
-	int32 Size = FMath::Max3(RewardListView->GetChildrenCount(), ItemList.Num(), 9);
+	int32 Size = FMath::Max(RewardListView->GetChildrenCount(), ItemList.Num());
 	for (int i = 0; i < Size; i++) {
 		UPOERewardItemWidget* TempRewardSlot = nullptr;
+		if (i >= 9) break;
 
 		if (i >= ItemList.Num()) {
-			break;
+			UWidget* ChildListSlot = RewardListView->GetChildAt(i);
+			if (ChildListSlot != nullptr) {
+				ChildListSlot->SetVisibility(ESlateVisibility::Hidden);
+			}
+			continue;
 		}
 		else if (i >= RewardListView->GetChildrenCount()) {
 			TempRewardSlot = CreateWidget<UPOERewardItemWidget>(GameInstance, RewardListItemClass);
@@ -34,7 +39,6 @@ void UPOERewardWidget::SetRewardItemList(TArray<class UInventoryItem_Base*> Item
 
 void UPOERewardWidget::AddCoinInRewardList(int32 CoinCount)
 {
-	TEST_LOG_WITH_VAR("CoinCount: %d", CoinCount);
 	if (CoinCount == 0) return;
 
 	bool AlreadyAddCoinSlot = false;

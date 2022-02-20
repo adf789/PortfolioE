@@ -30,7 +30,6 @@ APOECharacter::APOECharacter()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
-	MeleeCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("MELEECOLLISION"));
 	SpringArmForCapture = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmForCapture"));
 	CaptureCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureCamera"));
 	ArrowSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowSprite"));
@@ -161,9 +160,8 @@ void APOECharacter::OnAnimMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	IsComboInput = false;
 	if(IsSprinting) SmearMaterialInstance->SetScalarParameterValue(TEXT("Amount"), 0);
 	IsSprinting = false;
-	//IsCasting = false;
-	CharacterState = ECharacterBehaviorState::IDLE;
 	CurrentCombo = 1;
+	CharacterState = ECharacterBehaviorState::IDLE;
 }
 
 void APOECharacter::SetAttackType()

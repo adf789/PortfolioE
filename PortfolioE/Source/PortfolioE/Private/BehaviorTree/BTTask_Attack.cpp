@@ -20,7 +20,6 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerCo
 		UE_LOG(POE, Error, TEXT("Attacker is null"));
 		return EBTNodeResult::Failed;
 	}
-
 	if (Attacker->GetState() == ECharacterBehaviorState::ATTACKING) return EBTNodeResult::InProgress;
 
 	UNavigationSystem::SimpleMoveToLocation(OwnerComp.GetAIOwner(), Attacker->GetActorLocation());

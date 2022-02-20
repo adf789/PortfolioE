@@ -21,6 +21,12 @@ UPOECharacterAnimInstance::UPOECharacterAnimInstance() {
 		CastMontage = CAST_MONTAGE.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
+		HIT_MONTAGE(TEXT("/Game/POE/Animations/Sevarog/SevarogHit_Montage.SevarogHit_Montage"));
+	if (HIT_MONTAGE.Succeeded()) {
+		HitMontage = HIT_MONTAGE.Object;
+	}
+
 	MaxAttackComboIndex = 3;
 	CurAttackComboIndex = 1;
 }
@@ -59,6 +65,16 @@ void UPOECharacterAnimInstance::PlayAttackMotion()
 void UPOECharacterAnimInstance::PlayHitMotion(FVector Direction)
 {
 	Super::PlayHitMotion(Direction);
+	if (IsDead) return;
+
+	if (Montage_IsPlaying(HitMontage)) return;
+	FVector DirNormalized = Direction.GetSafeNormal();
+	float DotProduct = FVector::DotProduct(DirNormalized, GetOwningActor()->GetActorForwardVector().GetSafeNormal());
+
+	Montage_Play(HitMontage);
+	if (DotProduct <= 1 && DotProduct > 0.5) {
+		Montage_JumpToSection(TEXT("Hit_Back"), HitMontage);
+	}
 }
 
 void UPOECharacterAnimInstance::AnimNotify_ContinueCombo()

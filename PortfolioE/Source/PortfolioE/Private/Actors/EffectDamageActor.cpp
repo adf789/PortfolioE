@@ -14,7 +14,6 @@ AEffectDamageActor::AEffectDamageActor() {
 	DamageCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	DamageCollision->SetSphereRadius(90.0f);
 	DamageCollision->OnComponentBeginOverlap.AddDynamic(this, &AEffectDamageActor::OnOverlapBegin);
-	//DamageCollision->OnComponentHit.AddDynamic(this, &AEffectDamageActor::OnHitBegin);
 
 	RootComponent = DamageCollision;
 	ParticleSystemComponent->SetupAttachment(DamageCollision);
@@ -28,12 +27,14 @@ void AEffectDamageActor::SetParticleSystem(UParticleSystem * ParticleData)
 void AEffectDamageActor::Active()
 {
 	Super::Active();
+	DamageCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	ParticleSystemComponent->ActivateSystem(true);
 }
 
 void AEffectDamageActor::InActive()
 {
 	Super::InActive();
+	DamageCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	UPOEGameInstance* POEGameInstance = Cast<UPOEGameInstance>(GetGameInstance());
 	CHECKRETURN(POEGameInstance == nullptr);
 	POEGameInstance->EffectPooling->AddObject(this);
@@ -49,7 +50,7 @@ void AEffectDamageActor::Tick(float DeltaTime)
 		InActive();
 	}
 	else {
-		SetNextValue(DeltaTime);
+		SetNextLocation(DeltaTime);
 	}
 }
 
@@ -83,18 +84,7 @@ void AEffectDamageActor::SetAttacker(APOECharacter* Attacker)
 void AEffectDamageActor::OnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	APOEMonster_Base* Monster = Cast<APOEMonster_Base>(OtherActor);
-	if (Monster != nullptr) {
-		Monster->TakeDamage(GetRandAttackValue(), FDamageEvent(), Attacker->GetController(), Attacker);
-	}
-}
-
-void AEffectDamageActor::OnHitBegin(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
-{
-	APOEMonster_Base* Monster = Cast<APOEMonster_Base>(Hit.GetActor());
-	if (OtherActor != nullptr) {
-		TEST_LOG_WITH_VAR("Hit: %s", *OtherActor->GetName());
-	}
-	if (Monster != nullptr) {
+	if (Monster != nullptr && Attacker != nullptr) {
 		Monster->TakeDamage(GetRandAttackValue(), FDamageEvent(), Attacker->GetController(), Attacker);
 	}
 }
@@ -132,7 +122,7 @@ float AEffectDamageActor::GetRandAttackValue()
 	return AttackValue;
 }
 
-void AEffectDamageActor::SetNextValue(float DeltaTime)
+void AEffectDamageActor::SetNextLocation(float DeltaTime)
 {
 	if (IsSetTimer) {
 		PassingTime += DeltaTime;

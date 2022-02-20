@@ -17,6 +17,10 @@ UMyInventoryComponent::UMyInventoryComponent()
 	MaxCapacity = 20;
 }
 
+UMyInventoryComponent::~UMyInventoryComponent() {
+	HaveItems.Reset();
+}
+
 bool UMyInventoryComponent::IsRemainCapacity() const
 {
 	if (HaveItems.Num() == MaxCapacity) {
@@ -177,7 +181,7 @@ void UMyInventoryComponent::SetDefaultItem()
 	UPOEGameInstance* GameInstance = Cast<UPOEGameInstance>(GetWorld()->GetGameInstance());
 	CHECKRETURN(GameInstance == nullptr);
 
-	GameInstance->LotteryCoinCount = 10;
+	GameInstance->LotteryCoinCount = 0;
 
 	HaveItems.Reset();
 
@@ -187,10 +191,25 @@ void UMyInventoryComponent::SetDefaultItem()
 
 	UInventoryItem_Equipment* DefaultItem2 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem2"));
 	DefaultItem2->SetItemData(GameInstance->GetPOEItemData(1));
-	DefaultItem2->SetItemStatData(GameInstance->GetPOEItemStatData(1, 1));
+	DefaultItem2->SetItemStatData(GameInstance->GetPOEItemStatData(1, 10));
 
-	TryInsertItem(DefaultItem1);
+	UInventoryItem_Equipment* DefaultItem3 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem3"));
+	DefaultItem3->SetItemData(GameInstance->GetPOEItemData(2));
+	DefaultItem3->SetItemStatData(GameInstance->GetPOEItemStatData(2, 1));
+
+	UInventoryItem_Equipment* DefaultItem4 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem4"));
+	DefaultItem4->SetItemData(GameInstance->GetPOEItemData(3));
+	DefaultItem4->SetItemStatData(GameInstance->GetPOEItemStatData(3, 1));
+
+	UInventoryItem_Equipment* DefaultItem5 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem5"));
+	DefaultItem5->SetItemData(GameInstance->GetPOEItemData(4));
+	DefaultItem5->SetItemStatData(GameInstance->GetPOEItemStatData(4, 10));
+
+	//TryInsertItem(DefaultItem1);
 	TryInsertItem(DefaultItem2);
+	/*TryInsertItem(DefaultItem3);
+	TryInsertItem(DefaultItem4);*/
+	TryInsertItem(DefaultItem5);
 }
 
 // Called when the game starts

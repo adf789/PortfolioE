@@ -63,6 +63,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
 	bool DontMotion;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State, Meta = (AllowPrivateAccess = true))
+	float HitCoolTimer;
+
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	class TSubclassOf<class AFloatingDamageText> FloatingDamageClass2;
 
