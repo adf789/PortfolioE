@@ -1,4 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Description
+// 게임의 전반적인 데이터 혹은 일부 기능을 담고있는 클래스
+// 현재 게임의 데이터와 몬스터 스폰 및 보상 관련기능이 추가되어 있음.
 
 #include "POEGameInstance.h"
 #include "ActorObjectPool.h"

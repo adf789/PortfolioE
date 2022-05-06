@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Description
+// 캐릭터의 능력치 데이터를 담고있는 클래스
 
 #include "POECharacterStat.h"
 

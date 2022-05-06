@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Description
+// 오브젝트 풀링을 하기위한 클래스
 
 #include "ActorObjectPool.h"
 #include "POEMonster_Base.h"

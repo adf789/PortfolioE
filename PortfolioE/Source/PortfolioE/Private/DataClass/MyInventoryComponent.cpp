@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Description
+// 인벤토리의 기능을 담당하는 클래스
 
 #include "MyInventoryComponent.h"
 #include "POECharacterStat.h"
@@ -185,6 +186,7 @@ void UMyInventoryComponent::SetDefaultItem()
 
 	HaveItems.Reset();
 
+	// 기본 아이템의 형식
 	UInventoryItem_Equipment* DefaultItem1 = NewObject<UInventoryItem_Equipment>(GameInstance, UInventoryItem_Equipment::StaticClass(), TEXT("DefaultItem1"));
 	DefaultItem1->SetItemData(GameInstance->GetPOEItemData(0));
 	DefaultItem1->SetItemStatData(GameInstance->GetPOEItemStatData(0, 1));

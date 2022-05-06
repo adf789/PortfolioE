@@ -1,4 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Description
+// UI 기능을 도와주는 클래스
+// 대표적으로 UI를 보여주거나 가릴 때 많이 사용됨
 
 #include "UIScreenInteraction.h"
 #include "UserWidget.h"

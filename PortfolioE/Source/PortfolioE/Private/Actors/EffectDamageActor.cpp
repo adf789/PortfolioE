@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Description
+// 투사체 관련 클래스
 
 #include "EffectDamageActor.h"
 #include "ActorObjectPool.h"

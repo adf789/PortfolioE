@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Description
+// 플레이어블 캐릭터 외 NPC, 몬스터의 기능을 담당하는 클래스
 
 #include "POENpcCharacter.h"
 #include "Components/WidgetComponent.h"
